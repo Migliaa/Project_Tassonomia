@@ -1,0 +1,14 @@
+# harness di terze parti: clonato, non versionato
+tau2-bench/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# segreti
+.env
+.env.local
+
+# risultati grezzi dei run (i results.json pubblicati vanno aggiunti a mano)
+results/raw/
