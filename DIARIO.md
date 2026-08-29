@@ -252,6 +252,52 @@ vera di questo progetto.
 
 ---
 
+## 2026-08-30 — Smoke test S4: verificato, S2 chiude solido
+
+Ripreso il piano di ieri: rilancio dei task **2** e **7** con `--max-retries 1`, per vedere se
+il tracing costruito in S2 serve davvero a diagnosticare un fallimento.
+
+- **Primo inciampo, non legato a Gemini**: il primo lancio (`--task-ids 2 7`, senza
+  `--agent-llm`/`--user-llm`) è caduto su `AuthenticationError` di **OpenAI** — mancavano i
+  flag del motore, quindi è andato sul default del CLI invece che su Gemini. Corretto
+  aggiungendo `--agent-llm gemini/gemini-3.5-flash-lite --user-llm gemini/gemini-3.5-flash-lite`
+  esplicitamente (il baseline di ieri li aveva impostati e non era stato annotato qui).
+- **Quota RPD davvero esaurita**, non solo RPM: il progetto Google Cloud era a **502/500**
+  richieste giornaliere per `gemini-3.5-flash-lite` (confermato dallo screenshot del pannello
+  "Limiti di frequenza" di AI Studio — la finestra "28 giorni" del grafico aveva tratto in
+  inganno, sembrava un tetto mensile ma **RPD resta giornaliero**, quella era solo la finestra
+  di visualizzazione). Tre tentativi di rilancio del solo task 7 dopo un'attesa pulita di 90s
+  hanno continuato a fallire al primo giro — segno che non era il limite RPM a rigenerarsi, ma
+  la quota giornaliera già saturata da prima.
+- **La rotazione della chiave API sullo stesso progetto non basta**: verificato con una singola
+  chiamata di test (non un task intero) che la nuova chiave sul progetto già saturo dava lo
+  stesso errore di quota — **RPD è legata al progetto Google Cloud, non alla singola API key**.
+  Risolto passando a una chiave di un **nuovo progetto Google Cloud**, con quota free-tier
+  indipendente da zero.
+- **Risultato del rilancio pulito**:
+  - Task **2**: questa volta **passato** (reward 1.0) — non deterministico rispetto al
+    baseline di ieri (dove era fallito per azione di scrittura mai eseguita). Utile di per sé:
+    conferma che non tutti i fallimenti della baseline sono sistematici, alcuni dipendono
+    dalla varianza del modello. Da tenere a mente per S4/S5: un solo run per task non basta a
+    distinguere un bug riproducibile da una fluttuazione.
+  - Task **7**: fallito di nuovo, **stesso pattern esatto del baseline di ieri** — 5/5 azioni
+    di lettura/scrittura eseguite correttamente (`Partial Action Reward: 5/5`), ma il dato di
+    conferma `1628` mai comunicato all'utente (`Communicate Checks: 1628 ❌`).
+- **Verifica della leggibilità via API** (non solo a occhio): la traccia del task 7 fallito ha
+  18 osservazioni, tutte con lo stesso `traceId` e annidate sotto un'unica SPAN radice nominata
+  con lo scopo del task; lo score `reward=0` è attaccato alla stessa traccia con un commento
+  leggibile. Cercando `"1628"` in tutti gli output della traccia: **zero risultati** — combacia
+  esattamente con la diagnosi di tau2 (mai comunicato). Il fallimento è quindi ricostruibile
+  dalla sola traccia Langfuse, senza guardare i log locali.
+
+✅ **Smoke test S4 superato**: filtro per `reward = 0`, apertura della traccia, lettura della
+conversazione annidata, diagnosi confermabile in pochi minuti. S2 è chiuso nel modo più solido
+possibile prima di iniziare S3.
+
+**Prossimo passo**: S3, l'agente custom — checklist in `TASSONOMIA.md`, non duplicata qui.
+
+---
+
 ## 2026-08-27/28 — S1, `D-37`: locale-first ribalta l'ordine
 
 Il piano (`TASSONOMIA.md`) è stato rivisto due volte da un'altra sessione mentre questa era
@@ -292,3 +338,4 @@ con Haiku quando `D-37` è arrivato: pivot pulito, nessun rollback necessario.
 | 2026-08-29 | test isolato tool calling (5 prompt) | 5 | gemini-3.5-flash-lite | ~$0 (tier gratuito) | $0.00 |
 | 2026-08-29 | 3 task veri (id 0,1,2) | 3 | gemini-3.5-flash-lite | $0.0819 | $0.08 |
 | 2026-08-29 | baseline 10 task sviluppo (id 0-9) | 10 | gemini-3.5-flash-lite | $0.2642 | $0.35 |
+| 2026-08-30 | smoke test S4 (task 2, 7 + tentativi falliti per quota) | 2 | gemini-3.5-flash-lite | $0.0622 | $0.41 |
