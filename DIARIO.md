@@ -229,6 +229,23 @@ Nota: l'API REST **delle tracce** (`/api/public/traces/{id}`) risponde **504**, 
 **osservazioni** (`/api/public/observations`) funziona bene ed è quella da usare per verifiche
 programmatiche.
 
+### Chiusura giornata
+
+Consuntivo quota: **~434/500 RPD** su Gemini 3.5 Flash Lite, zero euro spesi (tier gratuito).
+Nessun costo reale, ma poco margine per oggi — il reset è giornaliero.
+
+Nella cronologia restano 2 tracce residue dal periodo prima del fix di collisione (`0061f82cf7`,
+run delle 17:05 e 20:40 fusi insieme) e 5 tracce vuote create dagli script di verifica offline
+lanciati durante il debug (nessuna chiamata LLM dentro, distinguibili perché senza figli).
+Innocue, non ripulite: cancellazione dati lasciata a discrezione dell'utente.
+
+**Prossimo passo consigliato**: prima di partire con S3 (agente custom), una verifica rapida ed
+economica del flusso di S4 sui task **2** e **7** (falliti nella baseline) — filtro `reward = 0`
+in Langfuse, apertura della traccia, lettura della conversazione fallita. È il test che dà senso
+concreto a tutto il lavoro di S2: se la diagnosi è leggibile in pochi minuti da lì, S2 è chiuso
+nel modo più solido; se non lo è, meglio scoprirlo ora che dopo aver scritto sopra il codice di
+S3. Costo stimato: ~16 richieste, trascurabile anche col margine ridotto di oggi.
+
 Nota sui costi: il tier gratuito non addebita denaro (lo $0.69 che Langfuse mostra è un costo
 teorico calcolato a listino), ma la quota **RPD consumata è reale** — ed è quella la valuta
 vera di questo progetto.
