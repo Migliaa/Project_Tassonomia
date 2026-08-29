@@ -103,6 +103,91 @@ che cura quel file).
 
 ---
 
+## 2026-08-29 (pomeriggio) — S2, Langfuse: agganciato, ma con uno spreco grosso da capire
+
+Integrazione riuscita, con tre correzioni di rotta e un errore operativo costoso.
+
+- τ²-bench **ha già il supporto Langfuse**: flag `USE_LANGFUSE` in `config.py` (era `False`) che
+  imposta `litellm.success_callback`. Aggiunto anche `failure_callback`, che mancava — senza
+  quello le chiamate fallite non sarebbero mai finite a Langfuse, cioè proprio quelle che
+  serviranno in S4.
+- **SDK v4 richiede nomi diversi da quelli che si trovano in giro**: callback `langfuse_otel`
+  (non `langfuse`) e variabile `LANGFUSE_OTEL_HOST` (non `LANGFUSE_HOST` né `LANGFUSE_BASE_URL`,
+  che è quello suggerito dalla UI di Langfuse). Con i nomi sbagliati non arriva nulla e **non
+  viene emesso nessun errore** — silenzio totale. Diagnosticato solo leggendo il sorgente di
+  `litellm/integrations/langfuse/langfuse_otel.py`.
+- Le tracce **arrivavano già**, ma sembravano assenti: Langfuse le nomina tutte `litellm_request`,
+  e la barra di ricerca filtra sul *nome*, non sui tag. Vanno usati i **Filters** (tag) o la
+  sezione **Sessions**. Due mie ipotesi sbagliate lungo la strada, entrambe smentite dai dati
+  che l'utente aveva sotto gli occhi: "saranno dati demo" (no, erano i nostri) e "sarà un bug
+  di doppia registrazione" (no, sono span padre/figlio annidati, struttura OTel normale).
+  Lezione: guardare i dati prima di formulare ipotesi, non dopo.
+
+### L'errore costoso: `--max-retries` rigioca il task intero
+
+**`--max-retries` non ritenta la singola chiamata: ri-esegue l'intera simulazione** da capo
+(`run_with_retry(_execute, ...)` in `runner/batch.py`; il messaggio *"Task N succeeded on
+retry 2"* va letto come "task rigiocato due volte per intero", non "chiamata ritentata").
+
+τ²-bench ha **due livelli di retry** e vanno usati in modo opposto a quello che ho fatto:
+
+| Livello | Parametro | Cosa ritenta | Quando usarlo |
+|---|---|---|---|
+| interno (LiteLLM) | `num_retries` (default 3) | la singola chiamata | **rate limit 429** — costo trascurabile |
+| esterno (τ²-bench) | `--max-retries` | **tutto il task** | crash infrastrutturali |
+
+Avendo lanciato run con `--max-retries 6/8/10` contro un rate limit saturo, ogni task
+rate-limitato è diventato **fino a 8 repliche complete e scartate**, a ~80k token l'una.
+Langfuse ha registrato **1,68M token** nel pomeriggio a fronte di **~80k di lavoro utile**:
+circa il 90% è spreco. Aggravante mia: dopo il primo fallimento per RPM saturo **ho rilanciato
+subito lo stesso comando** invece di aspettare la finestra, garantendo che le repliche
+fallissero di nuovo.
+
+**Regola per i run successivi**: `--max-retries 1`, e i 429 li assorbe il livello interno.
+Dopo un fallimento da rate limit si **aspetta**, non si rilancia.
+
+Prova del nove, stesso task con `--max-retries 1`: **17.387 token, ~8 richieste, $0.0072**,
+task superato. Contro gli ~1.680.000 token dei run precedenti: **~100× in meno**, con un
+risultato migliore.
+
+### Rendere le tracce leggibili: la struttura conta più dell'aggancio
+
+Agganciare Langfuse non basta: di default **ogni chiamata LLM diventa una traccia separata di
+primo livello**, quindi un task appare come una decina di righe scollegate e non c'è modo di
+distinguere un task riuscito da uno fallito senza aprirle una per una. Su un task solo sono
+10 righe; sui run sporchi di prima erano 206.
+
+Tre correzioni, in `utils/langfuse_tracing.py` (nuovo) + `runner/batch.py`:
+
+1. **Una traccia per simulazione.** Tutte le chiamate di un task condividono lo stesso
+   `trace_id`. Trappola: Langfuse accetta **solo un id esadecimale di 32 caratteri** e scarta
+   in silenzio qualsiasi altra cosa — un id leggibile tipo `task_3_sim_<uuid>` viene ignorato
+   e le chiamate tornano a sparpagliarsi. Risolto con un hash md5 deterministico di
+   `task_id::simulation_id`, così lo score spedito a fine simulazione ritrova la sua traccia.
+2. **Nome sensato.** La traccia si chiama con la `description.purpose` del task
+   (es. *"Check that Agent verifies membership status. User thinks she is Gold, she is
+   actually Silver."*) invece di `litellm_request`. Le singole chiamate mantengono il proprio
+   `generation_name` (`agent_response` / `user_simulator_response`), così i turni della
+   conversazione restano distinguibili dentro la traccia.
+3. **Il reward come score.** A fine simulazione il reward viene spedito come score numerico
+   sulla traccia. È il pezzo che rende S4 praticabile: si filtra `reward = 0` per far uscire
+   i falliti, invece di aprire le tracce a una a una.
+
+Il modello mentale, valido anche fuori da questo progetto: **il nome dice *che tipo* di
+operazione era, lo score dice *quale* è andata storta.** In produzione la mappatura è la
+stessa — nome traccia = operazione di business, `session_id` = conversazione col cliente,
+`user_id` = cliente, tags = ambiente/versione, score = esito.
+
+Nota: l'API REST di lettura di Langfuse risponde **504** da questa macchina (problema loro,
+non di configurazione — le scritture passano e `auth_check()` è verde). La verifica delle
+tracce va fatta dalla UI.
+
+Nota sui costi: il tier gratuito non addebita denaro (lo $0.69 che Langfuse mostra è un costo
+teorico calcolato a listino), ma la quota **RPD consumata è reale** — ed è quella la valuta
+vera di questo progetto.
+
+---
+
 ## 2026-08-27/28 — S1, `D-37`: locale-first ribalta l'ordine
 
 Il piano (`TASSONOMIA.md`) è stato rivisto due volte da un'altra sessione mentre questa era

@@ -1,0 +1,316 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 55a9d9c..c25082f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -33,6 +33,7 @@ dependencies = [
+     "requests>=2.31.0",
+     "numpy>=1.24.0",
+     "httpx>=0.24.0",
++    "langfuse>=4.15.1",
+ ]
+ 
+ [project.optional-dependencies]
+diff --git a/src/tau2/config.py b/src/tau2/config.py
+index f5187fa..1fe4654 100644
+--- a/src/tau2/config.py
++++ b/src/tau2/config.py
+@@ -56,7 +56,7 @@ REDIS_CACHE_VERSION = "v1"
+ REDIS_CACHE_TTL = 60 * 60 * 24 * 30
+ 
+ # Langfuse
+-USE_LANGFUSE = False
++USE_LANGFUSE = True
+ 
+ # =============================================================================
+ # API SERVICE (fixed)
+diff --git a/src/tau2/runner/batch.py b/src/tau2/runner/batch.py
+index 8b9c818..80c4119 100644
+--- a/src/tau2/runner/batch.py
++++ b/src/tau2/runner/batch.py
+@@ -57,7 +57,13 @@ from tau2.user.user_simulator import (
+ )
+ from tau2.user_simulation_voice_presets import COMPLEXITY_CONFIGS
+ from tau2.utils.display import ConsoleDisplay, Text
+-from tau2.utils.llm_utils import llm_log_mode, set_llm_log_dir, set_llm_log_mode
++from tau2.utils.langfuse_tracing import simulation_trace, trace_metadata_for_task
++from tau2.utils.llm_utils import (
++    llm_log_mode,
++    set_llm_log_dir,
++    set_llm_log_mode,
++    set_llm_trace_metadata,
++)
+ from tau2.utils.utils import DATA_DIR
+ 
+ # Context variable to track current simulation_id for log filtering
+@@ -311,6 +317,10 @@ class _TaskLogContext:
+             llm_log_dir = self.task_log_dir / "llm_debug"
+             set_llm_log_dir(llm_log_dir)
+ 
++        set_llm_trace_metadata(
++            trace_metadata_for_task(self.task, self.simulation_id)
++        )
++
+         return self
+ 
+     def __exit__(self, exc_type, exc_val, exc_tb):
+@@ -330,6 +340,7 @@ class _TaskLogContext:
+ 
+         if self.save_dir:
+             set_llm_log_dir(None)
++        set_llm_trace_metadata(None)
+         if self._handler_id is not None:
+             logger.remove(self._handler_id)
+             _current_simulation_id.set(None)
+@@ -392,7 +403,10 @@ def run_single_task(
+         f"Agent: {config.effective_agent}, User: {config.effective_user}"
+     )
+ 
+-    with _TaskLogContext(simulation_id, save_dir, task, verbose_logs):
++    with (
++        _TaskLogContext(simulation_id, save_dir, task, verbose_logs),
++        simulation_trace(task, simulation_id) as trace,
++    ):
+         # Compute audio taps directory if enabled
+         taps_dir = None
+         if audio_taps and save_dir:
+@@ -454,6 +468,11 @@ def run_single_task(
+             f"Reward: {simulation.reward_info.reward if simulation.reward_info else 'N/A'}"
+         )
+ 
++        # Attach the reward to the trace so failed runs can be filtered in Langfuse.
++        trace.record_reward(
++            simulation.reward_info.reward if simulation.reward_info else None
++        )
++
+         return simulation
+ 
+ 
+diff --git a/src/tau2/utils/langfuse_tracing.py b/src/tau2/utils/langfuse_tracing.py
+new file mode 100644
+index 0000000..4759c20
+--- /dev/null
++++ b/src/tau2/utils/langfuse_tracing.py
+@@ -0,0 +1,170 @@
++"""Langfuse trace shaping for benchmark runs.
++
++By default every LLM call LiteLLM makes becomes its own top-level Langfuse
++trace, so a single task shows up as a dozen unrelated rows and there is no way
++to tell a failed task from a passing one without opening each row.
++
++This module gives a run the shape you actually want to read:
++
++    Trace "Check that Agent verifies membership status..."   [score: reward=0]
++      |- agent_response          -> get_user_details
++      |- user_simulator_response
++      |- agent_response          -> get_reservation_details
++
++It works by opening one OpenTelemetry span around each simulation. LiteLLM
++looks for an active span when it logs a call (see `_get_span_context` in
++litellm/integrations/opentelemetry.py, "Priority 3: Active span from global
++context") and nests its own spans under it, so the whole conversation lands in
++one trace. That also suppresses LiteLLM's extra `litellm_request` wrapper span,
++which otherwise duplicates every row.
++
++Note this is why an explicit `trace_id` in the metadata does NOT group calls:
++in OpenTelemetry, trace membership comes from the span context, not from an
++attribute — a `trace_id` passed as metadata is only ever stored as a label.
++"""
++
++import os
++from typing import Optional
++
++from loguru import logger
++
++from tau2.config import USE_LANGFUSE
++from tau2.data_model.tasks import Task
++
++_client = None
++_client_resolved = False
++
++
++def task_trace_name(task: Task) -> str:
++    """
++    Human-readable trace name: what this task actually tests.
++
++    Falls back to the id when a task carries no purpose, since an opaque name
++    is still better than every trace being called "litellm_request".
++    """
++    purpose = None
++    description = getattr(task, "description", None)
++    if description is not None:
++        purpose = getattr(description, "purpose", None)
++    if not purpose:
++        return f"task {task.id}"
++    purpose = " ".join(str(purpose).split())
++    if len(purpose) > 100:
++        purpose = purpose[:97] + "..."
++    return purpose
++
++
++def trace_metadata_for_task(
++    task: Task, simulation_id: str, domain: Optional[str] = None
++) -> dict:
++    """
++    Metadata attached to every LLM call of a simulation, so a trace can be
++    found by task and a run's calls can be grouped into a session.
++    """
++    tags = ["tau2", f"task-{task.id}"]
++    if domain:
++        tags.append(domain)
++    return {
++        "trace_name": task_trace_name(task),
++        "session_id": f"task_{task.id}_sim_{simulation_id}",
++        "tags": tags,
++        "trace_metadata": {"task_id": str(task.id), "simulation_id": simulation_id},
++    }
++
++
++def _get_client():
++    """
++    Build a Langfuse client from the env, or None if it isn't configured.
++
++    Cached: constructing a client sets up an OpenTelemetry tracer provider, so
++    one per process is both enough and correct. The OTel exporter reads
++    LANGFUSE_OTEL_HOST while this SDK reads LANGFUSE_HOST; accept either so a
++    single setting drives both.
++    """
++    global _client, _client_resolved
++    if _client_resolved:
++        return _client
++    _client_resolved = True
++    try:
++        from langfuse import Langfuse
++
++        public_key = os.environ.get("LANGFUSE_PUBLIC_KEY")
++        secret_key = os.environ.get("LANGFUSE_SECRET_KEY")
++        if not public_key or not secret_key:
++            return None
++        host = os.environ.get("LANGFUSE_HOST") or os.environ.get("LANGFUSE_OTEL_HOST")
++        kwargs = {"public_key": public_key, "secret_key": secret_key}
++        if host:
++            kwargs["host"] = host if host.startswith("http") else f"https://{host}"
++        _client = Langfuse(**kwargs)
++    except Exception as e:
++        logger.warning(f"Langfuse client unavailable, tracing disabled: {e}")
++        _client = None
++    return _client
++
++
++class simulation_trace:
++    """
++    Wraps one simulation in a single Langfuse trace named after the task.
++
++    Degrades to a no-op when Langfuse is disabled or unreachable: a tracing
++    problem must never fail a benchmark run.
++    """
++
++    def __init__(self, task: Task, simulation_id: str):
++        self.task = task
++        self.simulation_id = simulation_id
++        self._cm = None
++        self._span = None
++
++    def __enter__(self):
++        if not USE_LANGFUSE:
++            return self
++        client = _get_client()
++        if client is None:
++            return self
++        try:
++            self._cm = client.start_as_current_observation(
++                name=task_trace_name(self.task),
++                as_type="span",
++                metadata={
++                    "task_id": str(self.task.id),
++                    "simulation_id": self.simulation_id,
++                },
++            )
++            self._span = self._cm.__enter__()
++        except Exception as e:
++            logger.warning(f"Could not open Langfuse trace: {e}")
++            self._cm = self._span = None
++        return self
++
++    def record_reward(self, reward: Optional[float]) -> None:
++        """
++        Attach the simulation's reward to its trace as a score.
++
++        This is what makes failure analysis tractable: filter on the score to
++        get the failed runs, instead of opening traces one by one.
++        """
++        if self._span is None or reward is None:
++            return
++        try:
++            self._span.score_trace(
++                name="reward",
++                value=float(reward),
++                data_type="NUMERIC",
++                comment=task_trace_name(self.task),
++            )
++        except Exception as e:
++            logger.warning(f"Could not record reward score: {e}")
++
++    def __exit__(self, exc_type, exc_val, exc_tb):
++        if self._cm is None:
++            return False
++        try:
++            self._cm.__exit__(exc_type, exc_val, exc_tb)
++            client = _get_client()
++            if client is not None:
++                client.flush()
++        except Exception as e:
++            logger.warning(f"Could not close Langfuse trace: {e}")
++        return False
+diff --git a/src/tau2/utils/llm_utils.py b/src/tau2/utils/llm_utils.py
+index cc70482..00127c2 100644
+--- a/src/tau2/utils/llm_utils.py
++++ b/src/tau2/utils/llm_utils.py
+@@ -59,14 +59,29 @@ llm_log_dir: ContextVar[Optional[Path]] = ContextVar("llm_log_dir", default=None
+ # Context variable to store the LLM logging mode ("all" or "latest")
+ llm_log_mode: ContextVar[str] = ContextVar("llm_log_mode", default="latest")
+ 
++# Context variable to store Langfuse trace metadata (trace_id, tags) for the current task
++llm_trace_metadata: ContextVar[Optional[dict]] = ContextVar(
++    "llm_trace_metadata", default=None
++)
++
++
++def set_llm_trace_metadata(metadata: Optional[dict]) -> None:
++    """
++    Set the Langfuse trace metadata (e.g. trace_id, tags) to attach to LLM
++    calls made for the current task, or None to stop attaching one.
++    """
++    llm_trace_metadata.set(metadata)
++
+ # litellm._turn_on_debug()
+ 
+ logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+ 
+ if USE_LANGFUSE:
+-    litellm.success_callback = ["langfuse"]
++    litellm.success_callback = ["langfuse_otel"]
++    litellm.failure_callback = ["langfuse_otel"]
+ else:
+     litellm.success_callback = []
++    litellm.failure_callback = []
+ 
+ litellm.drop_params = True
+ 
+@@ -379,6 +394,17 @@ def generate(
+     if kwargs.get("num_retries") is None:
+         kwargs["num_retries"] = DEFAULT_MAX_RETRIES
+ 
++    trace_metadata = llm_trace_metadata.get()
++    if trace_metadata is not None:
++        metadata = dict(trace_metadata)
++        if call_name:
++            # Names the individual call ("agent_response", "user_simulator_response")
++            # so the turns of a conversation stay distinguishable. The trace name
++            # is left alone: it identifies the task, not this one call.
++            metadata["generation_name"] = call_name
++            metadata.setdefault("trace_name", call_name)
++        kwargs.setdefault("metadata", {}).update(metadata)
++
+     # Vertex AI Gemini 3 models require VERTEXAI_LOCATION="global"
+     if model.startswith("vertex_ai/gemini-3") and not os.environ.get(
+         "VERTEXAI_LOCATION"
