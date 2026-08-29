@@ -24,44 +24,18 @@ index f5187fa..1fe4654 100644
  # =============================================================================
  # API SERVICE (fixed)
 diff --git a/src/tau2/runner/batch.py b/src/tau2/runner/batch.py
-index 8b9c818..80c4119 100644
+index 8b9c818..8966bf5 100644
 --- a/src/tau2/runner/batch.py
 +++ b/src/tau2/runner/batch.py
-@@ -57,7 +57,13 @@ from tau2.user.user_simulator import (
+@@ -57,6 +57,7 @@ from tau2.user.user_simulator import (
  )
  from tau2.user_simulation_voice_presets import COMPLEXITY_CONFIGS
  from tau2.utils.display import ConsoleDisplay, Text
--from tau2.utils.llm_utils import llm_log_mode, set_llm_log_dir, set_llm_log_mode
-+from tau2.utils.langfuse_tracing import simulation_trace, trace_metadata_for_task
-+from tau2.utils.llm_utils import (
-+    llm_log_mode,
-+    set_llm_log_dir,
-+    set_llm_log_mode,
-+    set_llm_trace_metadata,
-+)
++from tau2.utils.langfuse_tracing import simulation_trace
+ from tau2.utils.llm_utils import llm_log_mode, set_llm_log_dir, set_llm_log_mode
  from tau2.utils.utils import DATA_DIR
  
- # Context variable to track current simulation_id for log filtering
-@@ -311,6 +317,10 @@ class _TaskLogContext:
-             llm_log_dir = self.task_log_dir / "llm_debug"
-             set_llm_log_dir(llm_log_dir)
- 
-+        set_llm_trace_metadata(
-+            trace_metadata_for_task(self.task, self.simulation_id)
-+        )
-+
-         return self
- 
-     def __exit__(self, exc_type, exc_val, exc_tb):
-@@ -330,6 +340,7 @@ class _TaskLogContext:
- 
-         if self.save_dir:
-             set_llm_log_dir(None)
-+        set_llm_trace_metadata(None)
-         if self._handler_id is not None:
-             logger.remove(self._handler_id)
-             _current_simulation_id.set(None)
-@@ -392,7 +403,10 @@ def run_single_task(
+@@ -392,7 +393,10 @@ def run_single_task(
          f"Agent: {config.effective_agent}, User: {config.effective_user}"
      )
  
@@ -73,7 +47,7 @@ index 8b9c818..80c4119 100644
          # Compute audio taps directory if enabled
          taps_dir = None
          if audio_taps and save_dir:
-@@ -454,6 +468,11 @@ def run_single_task(
+@@ -454,6 +458,11 @@ def run_single_task(
              f"Reward: {simulation.reward_info.reward if simulation.reward_info else 'N/A'}"
          )
  
@@ -87,10 +61,10 @@ index 8b9c818..80c4119 100644
  
 diff --git a/src/tau2/utils/langfuse_tracing.py b/src/tau2/utils/langfuse_tracing.py
 new file mode 100644
-index 0000000..4759c20
+index 0000000..908344c
 --- /dev/null
 +++ b/src/tau2/utils/langfuse_tracing.py
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,209 @@
 +"""Langfuse trace shaping for benchmark runs.
 +
 +By default every LLM call LiteLLM makes becomes its own top-level Langfuse
@@ -104,28 +78,60 @@ index 0000000..4759c20
 +      |- user_simulator_response
 +      |- agent_response          -> get_reservation_details
 +
-+It works by opening one OpenTelemetry span around each simulation. LiteLLM
-+looks for an active span when it logs a call (see `_get_span_context` in
-+litellm/integrations/opentelemetry.py, "Priority 3: Active span from global
-+context") and nests its own spans under it, so the whole conversation lands in
-+one trace. That also suppresses LiteLLM's extra `litellm_request` wrapper span,
-+which otherwise duplicates every row.
++It works by opening one OpenTelemetry span around each simulation and handing
++that span to LiteLLM explicitly, via `litellm_parent_otel_span` in the call
++metadata ("Priority 1" in `_get_span_context`, litellm/integrations/
++opentelemetry.py). LiteLLM then creates its spans as children of it, so the
++whole conversation lands in one trace. It also stops emitting its extra
++`litellm_request` wrapper span once a parent exists, which otherwise duplicates
++every row.
 +
-+Note this is why an explicit `trace_id` in the metadata does NOT group calls:
-+in OpenTelemetry, trace membership comes from the span context, not from an
-+attribute — a `trace_id` passed as metadata is only ever stored as a label.
++Two things that look like they should work but don't:
++
++- Passing a `trace_id` in the metadata does NOT group calls. In OpenTelemetry
++  trace membership comes from the span context, not from an attribute, so a
++  `trace_id` passed this way is only ever stored as a label.
++- Relying on LiteLLM to pick up the active span from the ambient context
++  ("Priority 3") does NOT work either: it logs calls from a different thread,
++  and the OpenTelemetry context is per-thread, so by then no span is active.
++  Hence passing the span object explicitly.
 +"""
 +
 +import os
++import random
++from contextlib import contextmanager
 +from typing import Optional
 +
 +from loguru import logger
 +
 +from tau2.config import USE_LANGFUSE
 +from tau2.data_model.tasks import Task
++from tau2.utils.llm_utils import set_llm_trace_metadata
 +
 +_client = None
 +_client_resolved = False
++
++
++@contextmanager
++def _unseeded_randomness():
++    """
++    Temporarily restore genuine randomness to the global `random` module.
++
++    tau2 seeds it for reproducible simulations, and OpenTelemetry's default id
++    generator draws trace and span ids from that same module — so every run of a
++    task is handed *identical* ids. Langfuse groups observations purely by trace
++    id (there is no separate trace entity in v4), so without this every run of a
++    given task merges into one ever-growing trace.
++
++    The previous RNG state is restored on exit, so simulation reproducibility is
++    unaffected.
++    """
++    state = random.getstate()
++    random.seed(os.urandom(16))
++    try:
++        yield
++    finally:
++        random.setstate(state)
 +
 +
 +def task_trace_name(task: Task) -> str:
@@ -217,15 +223,21 @@ index 0000000..4759c20
 +        if client is None:
 +            return self
 +        try:
-+            self._cm = client.start_as_current_observation(
-+                name=task_trace_name(self.task),
-+                as_type="span",
-+                metadata={
-+                    "task_id": str(self.task.id),
-+                    "simulation_id": self.simulation_id,
-+                },
-+            )
-+            self._span = self._cm.__enter__()
++            with _unseeded_randomness():
++                self._cm = client.start_as_current_observation(
++                    name=task_trace_name(self.task),
++                    as_type="span",
++                    metadata={
++                        "task_id": str(self.task.id),
++                        "simulation_id": self.simulation_id,
++                    },
++                )
++                self._span = self._cm.__enter__()
++            metadata = trace_metadata_for_task(self.task, self.simulation_id)
++            # Handing LiteLLM the span object is what actually nests the calls;
++            # it logs from another thread, where the ambient context is empty.
++            metadata["litellm_parent_otel_span"] = self._span._otel_span
++            set_llm_trace_metadata(metadata)
 +        except Exception as e:
 +            logger.warning(f"Could not open Langfuse trace: {e}")
 +            self._cm = self._span = None
@@ -251,6 +263,7 @@ index 0000000..4759c20
 +            logger.warning(f"Could not record reward score: {e}")
 +
 +    def __exit__(self, exc_type, exc_val, exc_tb):
++        set_llm_trace_metadata(None)
 +        if self._cm is None:
 +            return False
 +        try:

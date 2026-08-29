@@ -178,9 +178,56 @@ operazione era, lo score dice *quale* è andata storta.** In produzione la mappa
 stessa — nome traccia = operazione di business, `session_id` = conversazione col cliente,
 `user_id` = cliente, tags = ambiente/versione, score = esito.
 
-Nota: l'API REST di lettura di Langfuse risponde **504** da questa macchina (problema loro,
-non di configurazione — le scritture passano e `auth_check()` è verde). La verifica delle
-tracce va fatta dalla UI.
+### Il bug vero: il seed di riproducibilità collideva con gli id di OpenTelemetry
+
+I primi tre tentativi di raggruppamento sono falliti, ognuno per un motivo diverso, e vale la
+pena elencarli perché sono tutti errori plausibili:
+
+1. **`trace_id` nel metadata** — è quello che suggerisce la documentazione dell'integrazione
+   LiteLLM, ma è **obsoleta rispetto a Langfuse v4**. La guida di migrazione a v4 dice la cosa
+   decisiva: *"One OTEL trace ID shared by all observations. There is no separately ingested
+   trace entity."* Il raggruppamento avviene **solo** per OTel trace id nativo; un `trace_id`
+   passato come metadata finisce come semplice etichetta (`langfuse.trace.id`) e viene ignorato.
+2. **Contare sullo span attivo nel contesto** — LiteLLM lo cerca ("Priority 3"), ma scrive i log
+   da un **thread diverso**, e il contesto OpenTelemetry è per-thread: non vede nulla. Va passato
+   esplicitamente l'oggetto span come `litellm_parent_otel_span` ("Priority 1").
+3. **`trace_context` esplicito** — funziona, ma Langfuse crea un genitore "remoto" fittizio mai
+   ingerito, e la traccia resta **senza radice** (`root=0`).
+
+E sotto a tutto, la causa reale: **τ²-bench fissa `random.seed(300)`** per la riproducibilità
+degli esperimenti, e il generatore di id di OpenTelemetry **pesca dallo stesso modulo `random`**.
+Risultato: ogni run produceva trace id e span id *identici*, e Langfuse — che raggruppa per trace
+id — fondeva tutti i run dello stesso task in un'unica traccia sempre più grande (17 osservazioni
+da tre run diversi). Confermato in laboratorio: con `random.seed(300)` il generatore OTel
+restituisce due volte esattamente gli stessi id, e quei frammenti erano riconoscibili a occhio
+dentro il `traceId` e il `parentObservationId` che l'API restituiva.
+
+**Soluzione**: `_unseeded_randomness()`, che ridà casualità vera (`os.urandom`) al modulo `random`
+solo per l'istante in cui si crea lo span, e **ripristina subito lo stato precedente** — verificato
+che la riproducibilità di τ²-bench resta intatta.
+
+Morale trasferibile: quando si fissa un seed globale per riproducibilità, si sta seminando anche
+tutto ciò che *implicitamente* dipende da quel generatore — inclusi identificatori che devono
+essere unici. `uuid4` non è affetto (usa `os.urandom`), gli id OTel sì.
+
+### Stato finale, verificato via API
+
+```
+TRACE f25f9086...   obs=9   root=1
+  ROOT SPAN        "Check that Agent verifies membership status..."
+    +- GENERATION  user_simulator_response
+    +- TOOL        agent_response   (x5)
+    +- GENERATION  user_simulator_response  (x2)
+SCORES: reward=1 -> f25f9086
+```
+
+✅ **Uscita S2 raggiunta**: una traccia per run, nominata con la `purpose` del task, chiamate
+annidate in ordine, reward come score filtrabile. Il flusso di S4 è ora praticabile: filtro
+`reward = 0`, apro la traccia, leggo la conversazione, classifico il fallimento.
+
+Nota: l'API REST **delle tracce** (`/api/public/traces/{id}`) risponde **504**, ma quella delle
+**osservazioni** (`/api/public/observations`) funziona bene ed è quella da usare per verifiche
+programmatiche.
 
 Nota sui costi: il tier gratuito non addebita denaro (lo $0.69 che Langfuse mostra è un costo
 teorico calcolato a listino), ma la quota **RPD consumata è reale** — ed è quella la valuta
