@@ -154,6 +154,41 @@ su **tutti i piani** (Hobby, Core, Pro, Enterprise), senza limiti d'uso dichiara
 Non è quindi una feature a pagamento. *(Sulla disponibilità in self-hosting vedi §9: la pagina
 overview non lo dichiara esplicitamente.)*
 
+### 1.9 Verificato nella UI il 2026-08-30 (chiude due domande aperte di §9)
+
+Osservato direttamente nel progetto, non nella documentazione:
+
+**Esistono anche i Code Evaluator, non solo quelli LLM.** La schermata "Add an evaluator" offre
+due pulsanti: *New LLM-as-a-judge* e ***New code evaluator***. Un code evaluator applica una
+regola deterministica invece di interrogare un modello: nessun costo di inferenza, nessun rischio
+che il giudice sbagli. Per criteri oggettivi è la scelta corretta, e la documentazione consultata
+non lo rendeva evidente.
+
+**Il catalogo dei template è di 20 voci, in 7 categorie** (chiude la domanda §9.5):
+
+| Categoria | Template | Tipo |
+|---|---|---|
+| Conversational / Chatbots | Detect Chat Intent · Detect Out-of-Scope Request · Detect User Disagreement · Detect User Distress | LLM judge |
+| | Detect User Frustration (ALL CAPS) | **Code** |
+| Quality | Check Correctness · Check Answer Relevance · Judge on One Quality Criterion | LLM judge |
+| | Check if Output Is an Exact Match · Validate Keyword Overlap | **Code** |
+| Classifier | Classify Input Topic · Classify Input Language | LLM judge |
+| Retrieval | Check Answer Groundedness · Check Context Precision · Check Context Recall | LLM judge |
+| Safety / Security | Detect PII Leakage · Check Rule Adherence · Detect Prompt Injection | LLM judge |
+| Coding agents | Classify Engineering Task Type · Classify Coding Agent Usage per Department | LLM judge |
+
+**Nessun template è pensato per agenti multi-turno con tool.** Il catalogo è tarato su chatbot
+conversazionali e RAG. Per `tassonomia` i due punti di partenza più vicini sono **Check Rule
+Adherence** (l'agente airline ha una policy vera nel system prompt) e **Judge on One Quality
+Criterion** come base vuota da personalizzare sui campi `nl_assertions` / `communicate_info` che
+i task τ²-bench già contengono.
+
+**Un evaluator LLM non è gratuito.** Il primo passo della configurazione è collegare una *LLM
+connection* di progetto, cioè una propria chiave API: ogni esecuzione è una chiamata fatturata
+all'utente. Attivare molti evaluator su tutto il traffico moltiplica il costo del sistema
+osservato — ragione pratica per preferire i code evaluator dove la domanda ha una risposta
+oggettiva.
+
 ---
 
 ## 2. Dataset ed experiment
@@ -713,10 +748,19 @@ Domande rimaste senza risposta nelle fonti primarie consultate:
 4. **Free tier e costo teorico.** Nessuna pagina discute il caso in cui il modello sia gratuito e il
    costo mostrato sia puramente nominale. La conclusione di §6.3 è mia, dedotta dal meccanismo di
    calcolo documentato.
-5. **Libreria di evaluator predefiniti.** La pagina LLM-as-a-Judge parla di «templates» che
-   prepopolano la configurazione, ma la pagina overview non elenca un catalogo gestito (tipo RAGAS,
-   hallucination, toxicity). Non so quali template esistano davvero senza guardare la UI.
+5. ~~**Libreria di evaluator predefiniti.**~~ ✅ **Risolta il 2026-08-30 guardando la UI** — 20
+   template in 7 categorie, elencati in §1.9. Nessuno pensato per agenti multi-turno con tool.
 6. **Differenze `langfuse_otel` vs callback `"langfuse"` legacy.** Menzionate ma non spiegate.
+   *Parzialmente chiarita il 2026-08-30 dal pannello "Action required" del progetto*: quello che
+   conta in pratica non è il nome del callback ma l'header **`x-langfuse-ingestion-version: 4`**
+   sull'exporter OTLP. Senza, i dati arrivano per la via **v3 a ingestion ritardata** anche con
+   SDK v4 installato. Il client `Langfuse()` **non lo imposta da solo**: va passato via
+   `additional_headers` (trovato nel sorgente del pacchetto, `_client/client.py`, non nella
+   documentazione). Quattro endpoint REST risultano deprecati con dismissione al **16 novembre
+   2026**: `/api/public/observations` → `/api/public/v2/observations`, `/api/public/scores` →
+   `/api/public/v3/scores`, `/api/public/traces` → `/api/public/v2/observations`, e
+   `/api/public/traces/{id}` → `client.api.observations.get_many` — quest'ultimo è quello che
+   restituiva sistematicamente **504** durante S2: non era un bug nostro, era già in uscita.
 7. **Come modellare un benchmark.** Nessuna guida su come mappare i concetti session/user su un
    benchmark agentico anziché su un'app con utenti reali.
 8. **Semantica precisa del trace ID in v4.** Ho verificato il modello observations-first e la
