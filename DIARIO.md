@@ -429,6 +429,55 @@ con Haiku quando `D-37` è arrivato: pivot pulito, nessun rollback necessario.
 
 ---
 
+## 2026-08-30 (S3) — Le tre decisioni dell'agente custom, a ritmo di insegnamento
+
+Ripresa dopo compact. Prima di scrivere codice, letta insieme l'interfaccia `HalfDuplexAgent`
+(`src/tau2/agent/base_agent.py`) con l'immagine del centralinista: librone di regole
+(`domain_policy`), pannello di pulsanti (`tools`), bloc-notes (`state`), un turno = o un
+messaggio o una chiamata a un tool, mai insieme. Prima spiegazione troppo tecnica (gergo di
+tipi/generics), corretta su richiesta esplicita: da lì, solo analogie, niente sigle non spiegate.
+
+**`tau2-bench/src/tau2/agent/custom_agent.py` creato** (nuovo file, non nella cronologia di
+questo repo — vive nel clone gitignorato, andrà salvato come patch quando l'agente è stabile,
+stesso schema di `tau2-langfuse-tracing.patch`). Parte da `LLMAgent` (il baseline di S1/S2),
+registrato in `registry.py` come `"custom_agent"`. Tre decisioni, in ordine:
+
+1. **Come mettere la policy nel prompt.** Verificato prima: `data/tau2/domains/airline/policy.md`
+   è già markdown con sezioni etichettate (`## Book flight`, `## Modify flight`, ecc.) — niente
+   da aggiungere lì. Aggiunto invece un **bignami** (`POLICY_HIGHLIGHTS`) prima del testo intero:
+   4 regole scelte a lettura mirata del documento (conferma esplicita prima di modificare,
+   formato rigido messaggio-O-tool, condizioni annidate sulla compensazione, scope/transfer) —
+   non dalla tassonomia di S4, che non esiste ancora.
+2. **Tool che torna errore.** Contatore `tool_error_streak` nello stato (Pydantic), non un
+   confronto testuale tra errori (fragile: stesso problema, dettagli diversi). A 3 errori di
+   fila, il **codice** — non il modello — forza un messaggio che spiega la situazione e chiede
+   al cliente se vuole essere trasferito, senza trasferire in automatico (scelta esplicita di
+   Andrea, per non disturbare un umano quando basterebbe riprovare). Punto di principio
+   riutilizzato da S5: quello che deve essere garantito va nel codice, non nel prompt.
+3. **Quando fermarsi.** 30 turni (proposta di Andrea, verificato ben sotto il tetto del
+   framework: `DEFAULT_MAX_STEPS=200` in `src/tau2/config.py`). Proposta iniziale di Andrea
+   includeva un numero di telefono/email di fantasia nel messaggio finale — corretto: violerebbe
+   la riga 9 della stessa policy ("no informazioni non fornite da utente o tool"). Usata invece
+   la procedura di resa **già scritta nel dominio** (riga 15 di `policy.md`): turno forzato con
+   la chiamata a `transfer_to_human_agents`, turno successivo forzato col messaggio esatto
+   `"YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON."`. Verificabile in S5 con un
+   code evaluator, cosa che un messaggio libero non avrebbe permesso.
+
+**Verifica**: solo `uv run python -c "import ..."` e chiamate dirette a `_generate_next_message`
+con stato costruito a mano (turno 29→30→31, 3° errore di fila) — **zero chiamate API**, i tre
+percorsi forzati ritornano prima di raggiungere `generate()`. Nessun task vero ancora girato:
+con tre decisioni sostanziali in un colpo solo, un test reale (anche di un solo task) è
+giustificato prima di continuare — a differenza di dopo la sola decisione 1, dove sarebbe stato
+uno spreco.
+
+**Piano ritoccato ancora**: aggiunto **S7** (proposta di Andrea, "siamo di strada") — ablation:
+stesso agente finale, 50 task, **una** modifica deliberata a policy o tools, confronto Experiment
+task-per-task col run di riferimento di S6. Andrea ha scelto esplicitamente scala 50 (non i 10 di
+sviluppo, mia raccomandazione iniziale) accettando il costo quota, da assorbire aprendo altri
+progetti Google Cloud. Dettagli in `TASSONOMIA.md`, sezione S7.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
