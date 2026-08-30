@@ -1,3 +1,5 @@
+warning: in the working copy of 'pyproject.toml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/tau2/utils/langfuse_tracing.py', LF will be replaced by CRLF the next time Git touches it
 diff --git a/pyproject.toml b/pyproject.toml
 index 55a9d9c..c25082f 100644
 --- a/pyproject.toml
@@ -61,10 +63,10 @@ index 8b9c818..8966bf5 100644
  
 diff --git a/src/tau2/utils/langfuse_tracing.py b/src/tau2/utils/langfuse_tracing.py
 new file mode 100644
-index 0000000..908344c
+index 0000000..284dfbd
 --- /dev/null
 +++ b/src/tau2/utils/langfuse_tracing.py
-@@ -0,0 +1,209 @@
+@@ -0,0 +1,215 @@
 +"""Langfuse trace shaping for benchmark runs.
 +
 +By default every LLM call LiteLLM makes becomes its own top-level Langfuse
@@ -192,7 +194,13 @@ index 0000000..908344c
 +        if not public_key or not secret_key:
 +            return None
 +        host = os.environ.get("LANGFUSE_HOST") or os.environ.get("LANGFUSE_OTEL_HOST")
-+        kwargs = {"public_key": public_key, "secret_key": secret_key}
++        kwargs = {
++            "public_key": public_key,
++            "secret_key": secret_key,
++            # Without this, the SDK's default OTLP exporter still uses v3's
++            # delayed ingestion path even though the SDK itself is v4.
++            "additional_headers": {"x-langfuse-ingestion-version": "4"},
++        }
 +        if host:
 +            kwargs["host"] = host if host.startswith("http") else f"https://{host}"
 +        _client = Langfuse(**kwargs)

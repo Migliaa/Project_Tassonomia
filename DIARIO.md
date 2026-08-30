@@ -298,6 +298,44 @@ possibile prima di iniziare S3.
 
 ---
 
+## 2026-08-30 (sera) — Manutenzione: allineamento a Langfuse v4 "vero"
+
+Durante il tour guidato della UI (in Chrome, con l'utente) è emerso un banner di progetto:
+"Ensure compatibility after November 16" — Langfuse ha rifatto data model e tabelle (v4,
+165× più veloce), e dopo il **16 novembre 2026** alcune integrazioni non aggiornate smettono
+di funzionare. Due azioni richieste, entrambe risolte:
+
+- **Ingestion ritardata**: il nostro SDK è già v4 (`4.15.1`), ma il client `Langfuse()` di
+  default **non** imposta l'header `x-langfuse-ingestion-version: 4` sull'exporter OTLP —
+  bisogna passarlo esplicitamente (trovato leggendo il sorgente installato, non la
+  documentazione: `_client/client.py` espone `additional_headers`). Aggiunto in
+  `langfuse_tracing.py`, verificato offline ispezionando l'exporter configurato (nessuna
+  chiamata reale, zero costo) — header presente, nessuna traccia sprecata per testarlo.
+- **4 endpoint REST deprecati**, tutti nostri script di verifica ad-hoc di oggi:
+  `/api/public/observations` → `/api/public/v2/observations`, `/api/public/scores` →
+  `/api/public/v3/scores`, `/api/public/traces/{id}` → `client.api.observations.get_many`,
+  `/api/public/traces` → `/api/public/v2/observations`. **Chiude un dubbio aperto di ieri**:
+  il 504 sistematico su `/api/public/traces/{id}` non era un problema nostro, quell'endpoint è
+  proprio quello in dismissione — spiega perché non abbiamo mai trovato una causa lato nostro.
+
+Nota di sicurezza minore: durante la verifica offline ho stampato in chiaro (nel mio stesso
+output di debug, mai committato) l'header `Authorization` dell'exporter, che contiene la
+secret key Langfuse codificata in base64 — banalmente reversibile. Resta solo nella
+trascrizione locale della sessione, non è stata condivisa altrove; l'utente è stato avvisato
+e può rigenerare la chiave da Langfuse se preferisce non correre rischi.
+
+Patch (`patches/tau2-langfuse-tracing.patch`) rigenerata e ricommittata.
+
+**Nota per chi tocca questo codice in futuro**: il pannello "Action required" dentro Langfuse
+mostra anche un prompt precompilato "Upgrade using coding agents" che invita esplicitamente un
+coding agent a fetchare ed eseguire un workflow da GitHub in autonomia, senza fermarsi a
+chiedere credenziali, e a creare nuove API key. Trattato come contenuto di terze parti da
+valutare, non da eseguire alla cieca — la stessa cautela già usata a fine agosto con lo skill
+Langfuse suggerito dalla UI. Il fix qui sopra è stato fatto leggendo il sorgente reale del
+pacchetto installato, non seguendo quel prompt.
+
+---
+
 ## 2026-08-27/28 — S1, `D-37`: locale-first ribalta l'ordine
 
 Il piano (`TASSONOMIA.md`) è stato rivisto due volte da un'altra sessione mentre questa era
