@@ -298,6 +298,66 @@ possibile prima di iniziare S3.
 
 ---
 
+## 2026-08-30 (notte) — Il piano riaperto, e il cambio di ritmo
+
+Due cose non tecniche ma decisive, entrambe volute dall'utente.
+
+**Il ritmo cambia.** Richiesta esplicita: *"non dobbiamo solo completare il progetto ma mi devi
+anche insegnare, devo capire."* S1 e S2 sono stati eseguiti in fretta e in autonomia — andava
+bene per infrastruttura e idraulica, è sbagliato per S3, che è **il vero oggetto di studio**
+(progettare agenti). Da qui in avanti: si spiega il concetto prima, possibilmente su dati veri
+del progetto, poi si esegue.
+
+Un esempio di come funziona, fatto sul task 7: invece di dire "è fallito", ricostruita dalla
+sola traccia Langfuse la dinamica esatta — l'agente ha interrogato **4** prenotazioni extra ma
+ne ha citate **2** nella risposta finale, dichiarando $708 invece di $1628. Non un fallimento
+di comprensione ma **di sintesi**, tipico dei modelli piccoli che devono ricomporre i risultati
+di molte tool call consecutive. È la differenza tra sapere *che* qualcosa non funziona e sapere
+*perché* — ed è il mestiere che questo progetto deve dimostrare.
+
+**Il piano è stato riaperto** (`TASSONOMIA.md`, revisione `🔵 2026-08-30`). L'obiezione iniziale
+era di over-engineering; l'utente l'ha ribaltata con un argomento corretto che va registrato:
+*le stime 25-36h del piano presumono lui che lavora a mano; con l'esecuzione delegata queste
+aggiunte costano minuti, quindi il calcolo che le aveva scartate non regge più.* Accettato.
+
+Aggiunte, tutte funzionalità native che sostituiscono lavoro manuale già previsto:
+
+| Sprint | Cosa | Perché non è scope creep |
+|---|---|---|
+| S3 | Dataset + Experiment per il confronto col baseline | L'uscita di S3 già pretende quel confronto; a occhio su due `results.json` la media può salire mentre due task peggiorano |
+| S4 | Famiglie di fallimento come Score Config categorico | Senza vocabolario chiuso, uomo e giudice-LLM scrivono etichette diverse per la stessa cosa e S5 diventa impossibile |
+| S5 | Code Evaluator + Annotation Queue | S5 già distingue assertion deterministica da giudizio LLM; farlo dentro Langfuse rende i due score confrontabili |
+| S6 | Alert + webhook Zapier | Unico punto dove un alert non è decorativo: il run da 50 è lungo e non presidiato |
+
+**Zapier rientra**, dopo essere stato escluso per decreto. Motivo del ribaltamento: gli alert
+Langfuse supportano i webhook, quindi Zapier come destinatario è un'automazione **reale** e
+costa minuti, mentre la voce in `TODO.md` prevedeva un giocattolo da 2-3h. Confine scritto:
+solo sink dell'alert, mai orchestratore, tetto 1 ora poi si ripiega su un canale nativo.
+
+**Tenuti fuori, con motivo scritto**: prompt management (git basta per un solo sviluppatore) e
+benchmark in CI (~80 chiamate API per push su un tetto di 500/giorno — e il punto di portfolio
+"so impedire regressioni in un sistema AI" lo copre già meglio il Dataset/Experiment di S3, che
+dimostra la parte davvero specifica dell'AI: il confronto su distribuzioni di punteggio invece
+del pass/fail).
+
+**Scoperte del tour guidato** (agente che pilota il browser dell'utente, non screenshot):
+- Non esistono due tab separate *Traces* e *Observations*: è **una tabella sola** con
+  l'interruttore *Is Root Observation*. Correzione a quanto affermato prima a memoria.
+- `type:SPAN scores.reward:0` isola i falliti veri **e scarta da solo** le tracce tronche da
+  errore infrastrutturale (non avendo concluso, non hanno score). Separare i fallimenti
+  dell'agente da quelli dell'infrastruttura è il primo lavoro di chi legge una dashboard.
+- Il catalogo evaluator è di **20 template in 7 categorie**, e comprende **evaluator a codice**,
+  non solo LLM — cosa che la documentazione non rendeva evidente. Nessun template è pensato per
+  agenti multi-turno con tool.
+- Un evaluator LLM **non è gratis**: richiede una propria chiave API, ogni esecuzione è
+  fatturata. Ragione pratica per preferire il codice dove la domanda ha risposta oggettiva.
+
+Il tour è **a metà**: mancano Datasets, Experiments, Human Annotation, Alerts, Scores, Sessions,
+Users, Dashboards. Deciso di visitarli **dentro lo sprint che li usa** invece che in un giro
+unico — coerente con `PIANO.md` (*"gli attrezzi si imparano usandoli"*).
+
+---
+
 ## 2026-08-30 (sera) — Manutenzione: allineamento a Langfuse v4 "vero"
 
 Durante il tour guidato della UI (in Chrome, con l'utente) è emerso un banner di progetto:
