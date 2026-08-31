@@ -960,6 +960,45 @@ spesa e le quote API.
 
 ---
 
+## 2026-08-31 — S5: il rerun di verifica si è fermato dopo un task, quota giornaliera esaurita
+
+Con il via libera di Andrea, lanciato `scripts/run_s5_round2_experiment.py`: un vero Experiment
+Langfuse nativo v4 (`dataset.run_experiment()`) sui 10 item di `airline-s4-round2`, sequenziale
+(`max_concurrency=1`), con 65s di pausa tra un task e l'altro come in S4.
+
+**Risultato reale: 1 task su 10 completato.** Il task 42 (canary) ha girato normalmente,
+`reward: 1.0`, costo $0.0387 — nessuna novità, quel task passava già prima di S5. Dal task
+successivo (41) in poi, ogni chiamata è fallita con `RESOURCE_EXHAUSTED` /
+`GenerateRequestsPerDayPerProjectPerModel-FreeTier`, limite **500 richieste al giorno** per
+`gemini-3.5-flash-lite`: non un limite RPM assorbibile da un retry, un tetto giornaliero già
+raggiunto. Il codice ha ritentato una volta per ciascun task (`--max-retries 1`, rispettato),
+ha fallito di nuovo con lo stesso errore, ed è passato al task successivo come previsto — nessun
+comportamento anomalo, solo quota finita.
+
+**La causa non è il round2 in sé**: rileggendo `data/simulations/` sono emersi 11 run di
+`custom_agent` fatti oggi tra le 12:33 e le 12:52 (task 39, 42, 23, 18, 41, 38, 37, 43 e tre
+ripetizioni), mai registrati nel registro spesa sotto. Con la policy **pre-S5** (Italiano non
+ancora tradotto) - probabilmente un supplemento/retry di S4 fatto prima di riprendere questa
+sessione. Costo reale ~$0.32, quota già in parte consumata prima ancora che il round2 partisse
+alle 20:29.
+
+**Difetto trovato nel mio stesso script**: l'evaluator `reward_evaluator` restituisce lista vuota
+quando `reward` è `None` (task falliti), invece di registrare un punteggio esplicito di
+fallimento. Risultato: la UI di Langfuse mostra "Average Scores: reward: 1.000" per l'intero
+esperimento - la media di un solo item su dieci, con gli altri nove silenziosamente esclusi
+invece che segnalati come fatti-a-metà. Un aggregato tecnicamente corretto ma che, letto senza
+guardare "Total items: 10" accanto, comunica un risultato che non è successo. Da correggere prima
+del prossimo lancio: un item senza reward va registrato con un punteggio 0 o un flag esplicito di
+`infra_error`, non omesso.
+
+**Nessuna verifica di S5 è quindi avvenuta**: non c'è ancora nessun dato per confrontare le 6
+famiglie corrette con il round1. Non rilanciato: dopo un fallimento da quota si aspetta, non si
+rilancia (vale ancora di più per una quota giornaliera - un retry immediato non ha alcuna
+possibilità di funzionare finché il contatore non si azzera). Serve una decisione di Andrea su
+quando riprovare.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -968,3 +1007,5 @@ spesa e le quote API.
 | 2026-08-29 | 3 task veri (id 0,1,2) | 3 | gemini-3.5-flash-lite | $0.0819 | $0.08 |
 | 2026-08-29 | baseline 10 task sviluppo (id 0-9) | 10 | gemini-3.5-flash-lite | $0.2642 | $0.35 |
 | 2026-08-30 | smoke test S4 (task 2, 7 + tentativi falliti per quota) | 2 | gemini-3.5-flash-lite | $0.0622 | $0.41 |
+| 2026-08-31 | batch S4 non registrato a suo tempo (12:33-12:52, 8 completati + 3 infra_error) | 8 | gemini-3.5-flash-lite | $0.3209 | $0.73 |
+| 2026-08-31 | S5 round2, 1/10 completato prima della quota giornaliera (task 42) | 1 | gemini-3.5-flash-lite | $0.0387 | $0.77 |
