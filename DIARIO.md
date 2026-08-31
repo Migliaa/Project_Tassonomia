@@ -592,6 +592,69 @@ più io al controllo del suo Chrome — quello resta solo per lavoro di setup/de
 
 ---
 
+## 2026-08-31 — S4: tassonomia dei fallimenti, cinque famiglie e una regola di metodo
+
+Scope allargato da 10 a 20 task di sviluppo (i 10 originali + altri 10 scelti per complessità,
+più azioni/assertion attese = più probabilità di far emergere bug reali). Su `custom_agent`:
+6 fallimenti sui 10 nuovi (18, 23, 33, 37, 39, 44) più il 7 già noto = **7 fallimenti da
+diagnosticare** su 20 task totali.
+
+**Metodo di diagnosi**: per ogni task fallito, non fidarsi mai della prima lettura — né
+dell'anteprima troncata della UI di Langfuse, né di un'ipotesi plausibile ma non verificata.
+Ogni diagnosi passa da: leggere l'osservazione completa via API (o il `results.json` locale,
+spesso più chiaro perché riporta il `reward_breakdown` esatto), leggere la definizione del task,
+e — passaggio decisivo — verificare qualunque numero o regola citata contro i dati grezzi
+(`db.json`, `policy.md`, il codice dei tool) prima di proporre una causa. Due volte in questo
+lavoro la prima ipotesi si è rivelata sbagliata dopo un controllo più attento, ed è stata
+corretta prima di essere accettata come famiglia.
+
+**Cinque famiglie trovate**, ciascuna con un caso concreto verificato dietro (nessuna inventata
+per simmetria o completezza):
+
+1. **Disambiguazione silenziosa** (task 7) — una domanda del cliente ammette più di una lettura
+   ragionevole (qui: "altri voli" include o no le prenotazioni di cui si sta già parlando);
+   l'agente sceglie un'interpretazione in silenzio invece di segnalare l'ambiguità o coprire
+   entrambe le letture.
+2. **Formattazione numerica non USD** (task 18) — azioni e calcolo perfetti, ma il totale
+   comunicato in formato europeo ("$23.553") invece che USA ("$23,553"); il controllo di tau2
+   cerca la stringa esatta e non la trova.
+3. **Non ripianifica quando il primo approccio si blocca** (task 23) — lo strumento non supporta
+   quello che serve (pagamento diviso su più certificati), l'agente lo scopre correttamente ma
+   invece di dedurre un percorso alternativo (cancellare e riprenotare separatamente) si arrende
+   e trasferisce a un umano.
+4. **L'utente chiude la chiamata nello stesso turno in cui conferma, prima che l'agente esegua**
+   (task 33) — non un errore dell'agente: `termination_reason: user_stop`, il simulatore-utente
+   genera `###STOP###` nello stesso messaggio in cui dice "sì, confermo", per regola propria
+   ("se l'obiettivo dell'istruzione è soddisfatto, fermati"). L'agente, che per policy propria
+   chiede conferma esplicita prima di ogni azione di scrittura, non ha mai il turno successivo
+   per eseguire. Confrontato con un task passato con successo, dove l'agente esegue prima e
+   riceve i ringraziamenti (con STOP) solo dopo — nessun rischio in quel caso.
+5. **Usa un metodo di pagamento non specificato esplicitamente dal cliente, invece di
+   chiederlo** (task 37) — la policy (`policy.md:130-131`) impone che il cliente fornisca
+   esplicitamente il metodo di pagamento (carta, gift card o certificato) per una modifica ai
+   voli; l'agente ha invece riusato di default il metodo già presente sulla prenotazione, senza
+   mai chiederlo, risultando nel metodo sbagliato.
+
+**Una regola di metodo, decisa con Andrea e valida per il resto del progetto**: le famiglie
+vanno definite tenendo conto di **due rischi opposti**. Una famiglia troppo generica (es. "sceglie
+o assume invece di chiedere") descrive un sintomo, non una regola che un agente possa applicare
+mentre ragiona — non è abbastanza deterministica da permettere un auto-riconoscimento e una
+correzione affidabile. Una famiglia troppo specifica rischia l'overfitting: una regola tagliata
+sul singolo task che non generalizza. Il compromesso, applicato alla famiglia 5: non "l'agente
+assume invece di chiedere" (troppo vago), ma "prima di usare un metodo di pagamento del cliente,
+il cliente deve averlo specificato esplicitamente in chat — carta, gift card o certificato" (un
+controllo binario, verificabile ad ogni turno, esteso a tutti e tre i tipi di pagamento previsti
+dalla policy e non solo al caso osservato con la carta di credito). Stessa logica applicata a
+tenere separate la famiglia 5 dalla famiglia 1 (Disambiguazione silenziosa): sembrano imparentate
+("l'agente decide da solo invece di consultare il cliente") ma il meccanismo è diverso —
+interpretazione di una domanda vs. dato obbligatorio mancante prima di una scrittura — e
+accorparle avrebbe prodotto una regola troppo larga per essere utile in entrambi i casi.
+
+Diagnosi in corso: task 39 e 44 ancora da analizzare prima di chiudere la tassonomia e passare
+alla progettazione della correzione dell'agente.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
