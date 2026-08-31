@@ -478,6 +478,67 @@ progetti Google Cloud. Dettagli in `TASSONOMIA.md`, sezione S7.
 
 ---
 
+## 2026-08-31 (notte→mattina) — S3: verifica dal vero su Langfuse, poi i 10 task di sviluppo
+
+**Test mirato delle tre decisioni, in ambiente reale (non solo offline).** Task 0, tre lanci:
+- Normale (limite 30 invariato): reward 1.0, $0.0108, nessuna sorpresa.
+- Limite abbassato temporaneamente a 2 (solo per il test, poi ripristinato a 30): un turno vero
+  poi lo stop forzato — conferma che il confine `>=` scatta esattamente dove deve.
+- Limite abbassato a 1: stop forzato dal primissimo turno, **zero chiamate a Gemini lato agente**
+  (visibile in Langfuse: solo 2 osservazioni `user_simulator_response`, nessuna
+  `custom_agent_response`) — i due messaggi forzati (tool call + testo di handoff) non passano
+  mai da `generate()`, esattamente come da codice.
+- Aperta la traccia del run normale: il prompt **davvero inviato a Gemini** contiene il tag
+  `<policy_highlights>` con le 4 regole della decisione 1, parola per parola. Non è rimasto solo
+  nel codice, arriva al modello.
+- Nota per chi riapre questo file: la tappa del tour "Evaluators + pannello migrazione v4" citata
+  in una sintesi precedente non era mai stata effettivamente girata insieme — corretto, vedi
+  [[project_tassonomia_plan_revision]].
+
+**Run sui 10 task di sviluppo (id 0-9), uno alla volta.** Prima infornata (task 1-9 in batch):
+solo i task 1, 2, 3 completati, **6 falliti per errore infrastrutturale** — non un bug
+dell'agente. Causa: quota **RPM** (15 richieste/minuto sul progetto Google Cloud nuovo), diversa
+dalla quota **RPD** giornaliera già nota da S2/S4. Il retry interno di LiteLLM non ha rispettato
+il `retryDelay` richiesto dall'API (~45-58s: i retry arrivavano dopo ~2s), quindi
+`--max-retries 1` (2 tentativi totali per task) non bastava a superarla.
+- **Primo tentativo di correzione, insufficiente**: 90s di attesa una tantum prima di rilanciare
+  i 6 task falliti in batch. Il task 4 è passato, ma i 5 successivi sono ricaduti nella stessa
+  cascata — un singolo task può da solo consumare quasi tutto il budget dei 15/minuto (task 4:
+  6 letture, quindi ~15-20 richieste), quindi lanciare il task successivo subito dopo trova la
+  finestra già piena.
+- **Correzione efficace**: task uno alla volta, con **65s di pausa tra ciascuno** (non una pausa
+  unica all'inizio). Tutti e 5 i rimanenti (5,6,7,8,9) completati senza altri errori.
+- **Nuova regola operativa da ricordare**: contro un 429 RPM (a differenza del 429 RPD, che
+  serve un giorno nuovo o un progetto nuovo), la finestra si libera in **decine di secondi**, ma
+  va rispettata **tra ogni task**, non solo prima del primo rilancio.
+
+**Risultato completo custom_agent sui 10 task di sviluppo — pass rate 9/10 (90%)**,
+contro l'8/10 (80%) del baseline di S1:
+
+| Task | Reward | Costo agente | Note |
+|---|---|---|---|
+| 0 | ✅ 1.0 | $0.0108 | |
+| 1 | ✅ 1.0 | $0.0271 | |
+| 2 | ✅ 1.0 | $0.0269 | passato anche qui (già nondeterministico in S2) |
+| 3 | ✅ 1.0 | $0.0079 | |
+| 4 | ✅ 1.0 | $0.0353 | |
+| 5 | ✅ 1.0 | $0.0254 | |
+| 6 | ✅ 1.0 | $0.0132 | |
+| 7 | ❌ 0.0 | $0.0452 | **stesso identico fallimento del baseline**: 5/5 azioni corrette, ma il dato richiesto mai comunicato all'utente. Le tre decisioni di S3 non lo toccano — non era il loro bersaglio (non è una violazione di policy, di tool, o di turni) |
+| 8 | ✅ 1.0 | $0.0353 | |
+| 9 | ✅ 1.0 | $0.0000* | *costo a $0 per un bug di LiteLLM ("model isn't mapped yet" per `gemini-3.5-flash-lite`), non un vero costo zero — la simulazione ha comunque generato messaggi reali |
+
+Nessun task che passava nel baseline è regredito. Il miglioramento (8/10→9/10) non è attribuibile
+con certezza a una singola decisione con un solo run per task — task 2 ha già mostrato
+nondeterminismo — ma nessuna regressione e un fallimento pre-esistente confermato invariato
+(task 7) è già un segnale pulito prima del confronto rigoroso.
+
+**Prossimo passo, a ritmo di insegnamento**: impostare il confronto **Dataset + Experiment** su
+Langfuse (baseline vs custom_agent, task per task) — volutamente rimandato al risveglio di
+Andrea, non fatto in autonomia: è la parte del tour di Langfuse che vale la pena vedere insieme.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
