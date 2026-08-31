@@ -690,6 +690,114 @@ monitorata, non corretta), poi rilanciare `custom_agent` sul dataset `airline-s4
 
 ---
 
+## 2026-08-31 — S5: prima di correggere, come si scrive una regola che l'agente segue davvero
+
+Avere sei famiglie diagnosticate non dice ancora *come* si scrive la correzione. Prima di toccare
+`custom_agent.py` ho fatto una ricerca su fonti primarie — documentazione ufficiale dei produttori
+di modelli e paper, non riassunti di terzi — per capire quali criteri rendono una regola
+comportamentale effettivamente efficace invece che semplicemente sensata sulla carta. La ricerca
+completa sta in [`docs/regole-comportamentali-agenti.md`](docs/regole-comportamentali-agenti.md);
+qui il sunto e le fonti.
+
+### Fonti
+
+- Anthropic, [*Effective context engineering for AI agents*](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- Anthropic, [*The new rules of context engineering for Claude 5 generation models*](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models)
+- Anthropic, [*Building effective AI agents*](https://www.anthropic.com/engineering/building-effective-agents)
+- Claude Platform Docs, [*Prompting best practices*](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+- OpenAI, [*A practical guide to building agents*](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/)
+- Barres et al., [*τ²-Bench: Evaluating Conversational Agents in a Dual-Control Environment*](https://arxiv.org/pdf/2506.07982)
+- [*Analyzing and Internalizing Complex Policy Documents for LLM Agents*](https://arxiv.org/pdf/2510.11588) (CC-Gen / CAP-CPT)
+- [*HANDBOOK.md: A Benchmark for Long-Context Agentic Instruction Following*](https://arxiv.org/html/2607.25398v1)
+
+### I sei punti che cambiano il modo di scrivere le regole
+
+**1. Il compromesso determinismo/overfitting ha un nome ed è consenso di settore.** Anthropic lo
+chiama *right altitude*: un system prompt sbaglia in due modi opposti — "hardcoding complex,
+brittle logic in their prompts", cioè un if-else scritto in prosa che copre solo il caso
+osservato, oppure "vague, high-level guidance that fails to give the LLM concrete signals". La
+formulazione buona è "specific enough to guide behavior effectively, yet flexible enough to
+provide the model with strong heuristics". È esattamente la prima regola di metodo che avevamo
+stabilito in S4 per definire le famiglie, arrivandoci per conto nostro dalle tracce: vale identica
+per le regole di correzione.
+
+**2. Le famiglie descrivono errori, le regole no.** Le istruzioni negative lasciano indeterminato
+cosa fare al posto del comportamento vietato. Anthropic documenta di aver riscritto il proprio
+prompt passando da "Never write multi-paragraph docstrings or multi-line comment blocks" a "Write
+code that reads like the surrounding code: match its comment density, naming, and idiom". Ogni
+nostra regola deve quindi prescrivere la procedura alternativa, non vietare il comportamento
+sbagliato — anche se la famiglia da cui nasce è, per costruzione, la descrizione di un errore.
+
+**3. Aggiungere regole non è un'operazione neutra.** Istruzioni sovrapposte o in conflitto creano
+"cognitive overhead": il modello spende ragionamento a risolvere la contraddizione invece che a
+lavorare. `POLICY_HIGHLIGHTS` ne contiene già cinque; ognuna delle nuove va confrontata una per
+una con quelle, e se si sovrappone si fonde invece di aggiungersi.
+
+**4. Le regole decadono con la distanza.** Il risultato più scomodo, dal paper HANDBOOK.md: un
+documento di regole permanenti non funziona come autorità contro cui l'agente filtra le proprie
+azioni candidate, ma come una fonte in più la cui influenza cala con la distanza. I quattro modi
+ricorrenti di fallire che identificano: lasciar sovrascrivere la policy da una richiesta plausibile
+ma non autorizzata; eseguire il controllo richiesto e poi agire contro il suo risultato; perdere i
+dettagli su orizzonti lunghi; **dichiarare una conformità che non si è raggiunta**. Con criteri
+applicati rigorosamente, il modello migliore si ferma al 36,2%. Due conseguenze per noi: mettere
+una regola nel system prompt non garantisce che valga al turno 20 (posizione e ripetizione al
+punto d'uso contano), e la nostra pratica di non fidarci di ciò che l'agente *dichiara* di aver
+fatto — leggendo invece `results.json` — non è prudenza eccessiva ma la risposta a un modo di
+fallire documentato.
+
+**5. Dove si può, non è una regola: è codice.** "Design better interfaces and tool parameters": una
+regola davvero deterministica non dovrebbe stare nel prompt, dove può essere ignorata, ma nel
+codice, dove non può. Lo avevamo già applicato in S3 senza chiamarlo così (il limite di 3 errori
+consecutivi e quello di 30 turni sono forzati dal codice, non lasciati al giudizio del modello).
+La prima domanda su ogni famiglia diventa quindi: *è una regola di prompt o è un controllo di
+codice?*
+
+**6. Un caveat che ribalta un consiglio.** Anthropic scrive che sui modelli di ultima generazione
+hanno potuto *eliminare* molte regole, perché il giudizio del modello ormai basta. Il nostro
+agente gira su `gemini-3.5-flash-lite`, scelto per costo: quel consiglio è calibrato su modelli di
+frontiera e da noi va letto al contrario. Dove un modello grande se la cava con un'euristica, il
+nostro ha bisogno che la procedura sia scritta — il che rende il punto 5 ancora più importante,
+non meno.
+
+Una nota accessoria ma utile come griglia: il paper su CC-Gen classifica le clausole di policy in
+**fattuali**, **comportamentali** e **condizionali**, e isola le condizionali come la vera fonte di
+complessità. Sulle nostre famiglie: la 2 è fattuale (un formato), la 1 e la 5 comportamentali
+(chiedere prima di agire), la 3 e la 6 condizionali (dipendono dall'esito di un controllo). È
+coerente aspettarsi che siano le ultime due a resistere di più a una semplice regola di prompt.
+
+### La checklist adottata
+
+Ogni regola scritta da qui in avanti deve passare tutti e nove i controlli, formulati come test
+binari:
+
+1. **Trigger osservabile prima dell'azione** (regola già nostra, da S4).
+2. **Prescrive un'azione, non un divieto.**
+3. **Verificabile in un singolo turno** da un revisore umano, senza interpretazione.
+4. **Nessun conflitto e nessun duplicato** con `AGENT_INSTRUCTION` e `POLICY_HIGHLIGHTS`.
+5. **Altitudine giusta**: non nomina il caso osservato, non è un principio generico.
+6. **Prompt o codice?** Se la condizione è meccanicamente verificabile dallo stato della
+   conversazione, va nel codice.
+7. **Passi numerati** se il comportamento corretto ne ha più di uno.
+8. **Esempio canonico** se la regola riguarda un formato.
+9. **Costo di regressione dichiarato in anticipo**: quale task già passante potrebbe rompere.
+
+Una regola che non passa un controllo non è necessariamente da buttare: può voler dire che va
+spostata nel codice (6), spezzata in due (4), o che la famiglia non è correggibile con una regola
+— come già stabilito per la famiglia 4.
+
+### Un limite da dichiarare, non da nascondere
+
+τ²-bench assegna reward 0 se una qualsiasi regola di policy è violata, anche quando la richiesta
+dell'utente è stata soddisfatta: una regola che sistema una famiglia ma ne rompe un'altra si vede
+subito nel punteggio, ed è per questo che nel dataset `airline-s4-round2` stanno i tre canary
+(0, 41, 42) accanto ai sette fallimenti. Ma un singolo run non è una misura: le simulazioni sono
+stocastiche e il benchmark originale misura la consistenza su più tentativi (pass^k) proprio
+perché l'esito varia tra run identici. Il budget non ci permette k run per task, quindi un delta
+di un solo task tra prima e dopo non sarà una prova di miglioramento — e va scritto così nel
+report, invece di essere venduto come risultato.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
