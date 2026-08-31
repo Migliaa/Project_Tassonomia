@@ -1,0 +1,309 @@
+diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
+new file mode 100644
+index 0000000..8d31d7a
+--- /dev/null
++++ b/src/tau2/agent/custom_agent.py
+@@ -0,0 +1,283 @@
++from typing import Generic, List, Optional, TypeVar
++
++from pydantic import BaseModel
++
++from tau2.agent.base_agent import (
++    HalfDuplexAgent,
++    ValidAgentInputMessage,
++    is_valid_agent_history_message,
++)
++from tau2.agent.base.llm_config import LLMConfigMixin
++from tau2.data_model.message import (
++    APICompatibleMessage,
++    AssistantMessage,
++    Message,
++    MultiToolMessage,
++    SystemMessage,
++    ToolCall,
++    ToolMessage,
++    UserMessage,
++)
++from tau2.environment.tool import Tool
++from tau2.utils.llm_utils import generate
++
++# NOTE per Andrea: parte da LLMAgent (src/tau2/agent/llm_agent.py) e da qui
++# lo cambiamo, una decisione alla volta - le tre del piano S3: come mettere
++# la policy nel system prompt (fatto, sotto), cosa fare quando un tool torna
++# errore (fatto, sotto), quando fermarsi (fatto, sotto).
++
++AGENT_INSTRUCTION = """
++You are a customer service agent that helps the user according to the <policy> provided below.
++In each turn you can either:
++- Send a message to the user.
++- Make a tool call.
++You cannot do both at the same time.
++
++Try to be helpful and always follow the policy. Always make sure you generate valid JSON only.
++""".strip()
++
++# S3, decisione 1: bignami in cima al librone di regole. Le 4 regole qui sotto sono
++# quelle piu' facili da sbagliare nella policy airline (conferma esplicita, formato
++# rigido messaggio-O-tool, condizioni annidate sulla compensazione, scope/transfer) -
++# non sono generate dalla tassonomia (che arriva in S4), sono una lettura mirata del
++# testo di policy.md fatta ora. Il testo completo resta sotto, invariato, come riferimento.
++#
++# S5 (famiglie 2 e 3, vedi docs/s5-correzioni.md): tradotto in inglese perche' era
++# l'unico blocco non inglese del system prompt e faceva rispondere l'agente in
++# italiano a clienti che scrivevano in inglese (10/20 task); il quarto punto e'
++# stato riparato perche' la nostra sintesi aveva perso l'"if and only if" della
++# policy originale (policy.md:15), rendendo l'agente piu' propenso al transfer.
++POLICY_HIGHLIGHTS = """
++Before proceeding, keep these in mind in particular:
++- Before any action that MODIFIES a reservation (booking, changing flights, baggage,
++  cabin, passenger details), you must obtain an explicit confirmation ("yes") from the user.
++- Each turn is either a message to the user or a tool call. Never both, never neither.
++- Extra compensation is offered ONLY if the user is a silver/gold member, or has travel
++  insurance, or is flying business. Never offer it on your own initiative.
++- Transfer to a human agent only if no action available to you can serve the customer's
++  goal. A blocked path is not the same as a request outside your scope.
++- If a tool returns an error, re-read the customer's message and the policy to check
++  whether the procedure was correct, before retrying.
++""".strip()
++
++# S5, famiglia 2: convenzioni di output verso il cliente.
++OUTPUT_CONVENTIONS = """
++1. Reply in the language the customer is writing in.
++2. Write every monetary amount in US dollar format: a comma every three digits, a period
++   only before cents. Example: $1,250 and $1,250.75 - never $1.250.
++""".strip()
++
++# S5, famiglie 1, 3, 5, 6: regole comportamentali nate dalla tassonomia. Ordinate per
++# flusso di conversazione, non per numero di famiglia. Vanno in fondo al system prompt
++# (vedi docs/s5-correzioni.md, "Decisione strutturale").
++HANDLING_CUSTOMER_REQUESTS = """
++1. When the customer's message contains more than one request, serve all of them before
++   closing the conversation. If one request is an action and another is a question, answer
++   the question in the same message in which you ask for confirmation of the action.
++2. When a question uses a scope word that could reasonably be read in more than one way
++   (for example "other", "the rest", "remaining", "all"), do not choose one reading
++   silently. State which reading your answer refers to, and give the answer for the other
++   reading as well, in the same message.
++3. When an action requires you to supply a payment method, use only a method the customer
++   has named in this conversation - the specific card, gift card, or certificate. If they
++   have not named one, list the payment methods on their profile and ask which to use,
++   before acting.
++4. When part of the customer's request cannot be done, or the path you first tried is
++   blocked:
++   a. Identify which parts of the request the policy still allows you to serve, including
++      through a different sequence of actions than the one you first tried.
++   b. Carry out those parts, asking for explicit confirmation first where the policy
++      requires it. If the customer has already confirmed them, carry them out now.
++   c. Tell the customer plainly which part could not be done and why. If an alternative
++      route exists but changes what they would get, describe it and let them choose,
++      rather than deciding for them or stopping there.
++   d. Transfer to a human agent only if step (a) leaves nothing you can serve.
++""".strip()
++
++# S3, decisione 2: se un tool sbaglia 3 volte di fila, e' il codice - non il
++# modello - a fermarsi e forzare questo messaggio, invece di lasciare che
++# Gemini decida se e quando arrendersi. Non chiama transfer_to_human_agents
++# in automatico: lascia scegliere al cliente, per non disturbare un umano
++# quando magari basta riprovare piu' tardi o cambiare approccio.
++TOOL_ERROR_STREAK_LIMIT = 3
++
++TOOL_ERROR_ESCALATION_MESSAGE = (
++    "I'm sorry, this action has failed multiple times in a row on my end. "
++    "I don't want to keep retrying without making progress. Would you like me to "
++    "transfer you to a human agent, or would you prefer to try something else instead?"
++)
++
++# S3, decisione 3: dopo 30 turni senza risolvere, il codice arrende l'agente -
++# ben sotto il tetto di sicurezza del framework (DEFAULT_MAX_STEPS=200 in
++# src/tau2/config.py), cosi' il nostro stop arriva prima di un troncamento
++# brutto e senza spiegazione. Il messaggio finale e il tool sono quelli gia'
++# previsti dalla policy del dominio (riga 15 di policy.md), non un'invenzione
++# nostra: la policy vieta esplicitamente di dare informazioni non fornite da
++# utente o tool (riga 9), quindi niente numeri di telefono o email inventati.
++AGENT_TURN_LIMIT = 30
++TRANSFER_TOOL_NAME = "transfer_to_human_agents"
++TRANSFER_HANDOFF_MESSAGE = "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON."
++
++SYSTEM_PROMPT = """
++<instructions>
++{agent_instruction}
++</instructions>
++<policy_highlights>
++{policy_highlights}
++</policy_highlights>
++<policy>
++{domain_policy}
++</policy>
++<handling_customer_requests>
++{handling_customer_requests}
++</handling_customer_requests>
++<output_conventions>
++{output_conventions}
++</output_conventions>
++""".strip()
++
++
++class CustomAgentState(BaseModel):
++    """The state of the agent."""
++
++    system_messages: list[SystemMessage]
++    messages: list[APICompatibleMessage]
++    tool_error_streak: int = 0
++    agent_turn_count: int = 0
++    giving_up: bool = False
++
++
++CustomAgentStateType = TypeVar("CustomAgentStateType", bound="CustomAgentState")
++
++
++class CustomAgent(
++    LLMConfigMixin, HalfDuplexAgent[CustomAgentStateType], Generic[CustomAgentStateType]
++):
++    """
++    Il nostro agente per S3. Parte identico a LLMAgent (il baseline di S1/S2).
++    """
++
++    def __init__(
++        self,
++        tools: List[Tool],
++        domain_policy: str,
++        llm: str,
++        llm_args: Optional[dict] = None,
++    ):
++        super().__init__(
++            tools=tools,
++            domain_policy=domain_policy,
++            llm=llm,
++            llm_args=llm_args,
++        )
++
++    @property
++    def system_prompt(self) -> str:
++        return SYSTEM_PROMPT.format(
++            domain_policy=self.domain_policy,
++            agent_instruction=AGENT_INSTRUCTION,
++            policy_highlights=POLICY_HIGHLIGHTS,
++            handling_customer_requests=HANDLING_CUSTOMER_REQUESTS,
++            output_conventions=OUTPUT_CONVENTIONS,
++        )
++
++    def get_init_state(
++        self, message_history: Optional[list[Message]] = None
++    ) -> CustomAgentStateType:
++        if message_history is None:
++            message_history = []
++        assert all(is_valid_agent_history_message(m) for m in message_history), (
++            "Message history must contain only AssistantMessage, UserMessage, or ToolMessage to Agent."
++        )
++        return CustomAgentState(
++            system_messages=[SystemMessage(role="system", content=self.system_prompt)],
++            messages=message_history,
++        )
++
++    def generate_next_message(
++        self, message: ValidAgentInputMessage, state: CustomAgentStateType
++    ) -> tuple[AssistantMessage, CustomAgentStateType]:
++        assistant_message = self._generate_next_message(message, state)
++        state.messages.append(assistant_message)
++        return assistant_message, state
++
++    def _generate_next_message(
++        self, message: ValidAgentInputMessage, state: CustomAgentStateType
++    ) -> AssistantMessage:
++        if isinstance(message, UserMessage) and message.is_audio:
++            raise ValueError("User message cannot be audio.")
++        if isinstance(message, MultiToolMessage):
++            state.messages.extend(message.tool_messages)
++        else:
++            state.messages.append(message)
++
++        # Decisione 3 ha la priorita' sulla 2: se stiamo gia' rinunciando del
++        # tutto, il fatto che l'ultimo tool sia fallito o no non conta piu'.
++        if state.giving_up:
++            state.giving_up = False
++            state.agent_turn_count = 0
++            return AssistantMessage.text(content=TRANSFER_HANDOFF_MESSAGE)
++
++        state.agent_turn_count += 1
++        if state.agent_turn_count >= AGENT_TURN_LIMIT:
++            state.giving_up = True
++            return AssistantMessage(
++                role="assistant",
++                content=None,
++                tool_calls=[
++                    ToolCall(
++                        name=TRANSFER_TOOL_NAME,
++                        arguments={
++                            "summary": "Conversation exceeded the maximum number of turns without resolution."
++                        },
++                    )
++                ],
++            )
++
++        self._update_tool_error_streak(message, state)
++        if state.tool_error_streak >= TOOL_ERROR_STREAK_LIMIT:
++            state.tool_error_streak = 0
++            return AssistantMessage.text(content=TOOL_ERROR_ESCALATION_MESSAGE)
++
++        messages = state.system_messages + state.messages
++        assistant_message = generate(
++            model=self.llm,
++            tools=self.tools,
++            messages=messages,
++            call_name="custom_agent_response",
++            **self.llm_args,
++        )
++        return assistant_message
++
++    @staticmethod
++    def _update_tool_error_streak(
++        message: ValidAgentInputMessage, state: CustomAgentStateType
++    ) -> None:
++        """Conta gli errori di tool di fila. Un UserMessage non lo tocca:
++        non e' ne' un successo ne' un fallimento di un'azione."""
++        if isinstance(message, ToolMessage):
++            tool_messages = [message]
++        elif isinstance(message, MultiToolMessage):
++            tool_messages = message.tool_messages
++        else:
++            return
++        if any(tm.error for tm in tool_messages):
++            state.tool_error_streak += 1
++        else:
++            state.tool_error_streak = 0
++
++
++def create_custom_agent(tools, domain_policy, **kwargs):
++    """Factory function for CustomAgent.
++
++    Args:
++        tools: Environment tools the agent can call.
++        domain_policy: Policy text the agent must follow.
++        **kwargs: Supports llm (str) and llm_args (dict).
++    """
++    return CustomAgent(
++        tools=tools,
++        domain_policy=domain_policy,
++        llm=kwargs.get("llm"),
++        llm_args=kwargs.get("llm_args"),
++    )
+diff --git a/src/tau2/registry.py b/src/tau2/registry.py
+index 86a97a1..1394fe5 100644
+--- a/src/tau2/registry.py
++++ b/src/tau2/registry.py
+@@ -4,6 +4,7 @@ from typing import Callable, Dict, Optional
+ from loguru import logger
+ from pydantic import BaseModel
+ 
++from tau2.agent.custom_agent import create_custom_agent
+ from tau2.agent.discrete_time_audio_native_agent import (
+     create_discrete_time_audio_native_agent,
+ )
+@@ -295,6 +296,7 @@ try:
+ 
+     # Agent factories
+     registry.register_agent_factory(create_llm_agent, "llm_agent")
++    registry.register_agent_factory(create_custom_agent, "custom_agent")
+     registry.register_agent_factory(
+         create_llm_gt_agent,
+         "llm_agent_gt",

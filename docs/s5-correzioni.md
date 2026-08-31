@@ -17,12 +17,18 @@ si perde al primo riclone.
 
 | Famiglia | Titolo | Stato |
 |---|---|---|
-| 1 | Disambiguazione silenziosa | **approvata, pronta da applicare** |
-| 2 | Formattazione numerica non USD | **approvata, pronta da applicare** |
-| 3 | Lo strumento risponde correttamente ma non permette l'operazione richiesta | **approvata** — regola fusa con la 6 |
+| 1 | Disambiguazione silenziosa | **implementata** |
+| 2 | Formattazione numerica non USD | **implementata** |
+| 3 | Lo strumento risponde correttamente ma non permette l'operazione richiesta | **implementata** — regola fusa con la 6 |
 | 4 | L'utente chiude la chiamata nello stesso turno in cui conferma | **non correggibile — solo monitoraggio** |
-| 5 | Usa un metodo di pagamento non specificato esplicitamente dal cliente | **approvata, pronta da applicare** |
-| 6 | Richiesta multi-elemento con esiti misti | **approvata** — regola fusa con la 3 |
+| 5 | Usa un metodo di pagamento non specificato esplicitamente dal cliente | **implementata** |
+| 6 | Richiesta multi-elemento con esiti misti | **implementata** — regola fusa con la 3 |
+
+**2026-08-31**: le tre modifiche applicate a `custom_agent.py`, testate per sintassi e per
+formattazione corretta del `system_prompt` (nessun placeholder rimasto, testo identico allo
+spec). Patch rigenerata — vedi nota sotto, era scoperta anche per S3. Verifica sul dataset
+`airline-s4-round2` non ancora lanciata: richiede il via libera di Andrea (tetto di spesa,
+quote API).
 
 **Decisione sul dataset di verifica** (presa il 2026-08-31): il dataset `airline-s4-round2` resta
 a 10 item, senza aggiungere i task 4, 8 e 43 come canary supplementari, pur sapendo che sarebbero

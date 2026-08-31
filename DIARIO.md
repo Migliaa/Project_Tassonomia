@@ -931,6 +931,35 @@ prompt cambia la generazione anche per loro. Di questi, due (41 e 42) sono canar
 
 ---
 
+## 2026-08-31 — S5: implementate le tre modifiche, e una patch scoperta da S3
+
+Applicate a `custom_agent.py` le tre modifiche specificate in `docs/s5-correzioni.md`: traduzione
+di `POLICY_HIGHLIGHTS` con il quarto punto riparato, le due costanti nuove
+(`OUTPUT_CONVENTIONS`, `HANDLING_CUSTOMER_REQUESTS`), e le due sezioni XML in fondo al
+`SYSTEM_PROMPT`. Testato che il file sia sintatticamente valido e che `system_prompt` si formatti
+senza placeholder rimasti, istanziando `CustomAgent` con una policy fittizia.
+
+Rigenerando la patch è emerso un buco che risale a S3, non a questa sessione: `custom_agent.py`
+non era mai stato tracciato da git (file nuovo, mai aggiunto), e la riga che lo registra in
+`registry.py` non era mai finita in nessuna patch. `patches/` conteneva solo
+`tau2-langfuse-tracing.patch` (S2). Concretamente: se `tau2-bench/` fosse stato riclonato in
+qualunque momento tra S3 e oggi, tutto l'agente sarebbe sparito senza preavviso — non solo le
+correzioni di S5, l'intero `CustomAgent`. Non è mai successo perché nel frattempo non c'è stato un
+riclone, ma è un rischio che è rimasto aperto per due sprint senza che nessuno se ne accorgesse.
+Creata `patches/tau2-custom-agent.patch` (custom_agent.py + registrazione), README aggiornato con
+il comando per rigenerarla.
+
+**Lezione**: "le nostre modifiche vivono in `patches/`" (la regola in `CLAUDE.md`) protegge solo
+i file di cui qualcuno si è ricordato di generare la patch la prima volta. Un file nuovo che non
+tocca mai un file già patchato può restare invisibile per sprint interi. Vale la pena, ogni tanto,
+controllare `git status` dentro `tau2-bench/` invece di fidarsi che tutto ciò che conta sia già
+in `patches/`.
+
+Non lanciata la verifica su `airline-s4-round2`: serve il via libera di Andrea per il tetto di
+spesa e le quote API.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
