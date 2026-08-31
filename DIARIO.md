@@ -798,6 +798,139 @@ report, invece di essere venduto come risultato.
 
 ---
 
+## 2026-08-31 — S5: sei famiglie, tre modifiche, e due difetti che ci eravamo fatti da soli
+
+Progettazione delle correzioni, famiglia per famiglia, ognuna passata contro i nove controlli
+della checklist. Il testo esatto da applicare sta in
+[`docs/s5-correzioni.md`](docs/s5-correzioni.md); qui quello che vale per il report.
+
+### Il risultato principale non è una correzione, è una diagnosi su di noi
+
+Analizzando la famiglia 2 ho letto il messaggio incriminato per intero invece del solo numero.
+L'agente rispondeva **in italiano a un cliente che scriveva in inglese**. Contando su tutti i run:
+
+| Agente | Task con almeno una risposta in italiano |
+|---|---|
+| `custom_agent` (il nostro) | **10 su 20** |
+| `llm_agent` (baseline) | **0** su 49 messaggi assistant |
+
+La causa era `POLICY_HIGHLIGHTS`, il bignami di policy che avevamo aggiunto in S3 come prima delle
+tre decisioni: scritto in italiano, unico blocco non inglese di un system prompt altrimenti tutto
+inglese. Il modello ne specchiava la lingua. E il `$23.553` che aveva fatto fallire il controllo
+non era un capriccio di formattazione: era il separatore delle migliaia italiano, coerente col
+resto del messaggio. Il sintomo, non la malattia.
+
+La famiglia 3 ha una storia parallela. Il testo della policy dice:
+
+> "You should transfer the user to a human agent **if and only if** the request cannot be handled
+> within the scope of your actions." (`policy.md:15`)
+
+Il nostro riassunto diceva:
+
+> "Se la richiesta esce dallo scopo di quello che puoi fare, trasferisci a un umano **invece di
+> improvvisare**."
+
+Riassumendo abbiamo perso l'*if and only if* — la metà restrittiva, quella che **vieta** il
+trasferimento negli altri casi — e abbiamo aggiunto "invece di improvvisare", che scoraggia
+attivamente la ricerca di un percorso alternativo. La nostra sintesi ha reso la policy più
+propensa al trasferimento dell'originale. Nel task 23 l'agente ha calcolato correttamente che tre
+certificati non stanno su un aggiornamento in place (`policy.md:131` impone un solo metodo), ha
+concluso che la richiesta era fuori scope e ha trasferito — **seguendo la nostra regola, non
+violandola**.
+
+Due famiglie su sei, e due dei sette fallimenti, hanno come causa prossima una correzione
+introdotta da noi per risolvere altro. È il risultato che porto nel report più volentieri di
+qualunque punto di reward: **correggere un agente introduce nuovi modi di fallire, e senza
+osservabilità non te ne accorgi**. È anche la giustificazione retroattiva più concreta di tutto il
+lavoro fatto su Langfuse in S2.
+
+### Una diagnosi di S4 era appoggiata sull'evidenza sbagliata
+
+La famiglia 1 (disambiguazione silenziosa) era stata definita sul task 7. Rileggendo la traccia,
+il nostro agente non aveva affatto scelto la lettura sbagliata: aveva recuperato i dati di tutte e
+quattro le altre prenotazioni e poi **non aveva risposto affatto**, lasciando cadere metà
+richiesta. L'ambiguità però esiste davvero, ed è dimostrata altrove: il baseline, su due run
+indipendenti, risponde `$708` dove il ground truth vuole `$1.628`. Ricostruendo il conto da
+`db.json`, `$708` sono le due prenotazioni diverse da quelle in discussione, `$1.628` sono tutte e
+quattro quelle imminenti — cioè il benchmark legge *"any other upcoming flights"* come "quelle che
+non hai ancora visto", il modello come "diverse da quelle che stiamo cancellando". Una lettura
+difendibile, data tre volte su tre.
+
+Quindi la famiglia resta valida, ma **non era confermata dalla traccia su cui l'avevamo definita**.
+Lezione di metodo: quando una famiglia nasce da un singolo trace, vale la pena cercarne conferma
+in tracce prodotte da un agente diverso prima di considerarla stabilita.
+
+### Sei famiglie, tre modifiche
+
+Le regole non si sommano una per famiglia. Il punto 4 della checklist impone di confrontare ogni
+regola nuova con quelle esistenti e **fondere invece di aggiungere** dove il trigger coincide:
+
+- le famiglie **3 e 6** condividono la precondizione *"qualcosa nella richiesta non si può fare"* e
+  sono diventate **una procedura sola in quattro passi** (individua cosa la policy consente ancora,
+  eseguilo, dichiara cosa non si è potuto fare e proponi l'alternativa, trasferisci solo se non
+  resta niente). Copre tre dei sette fallimenti: è la regola col miglior rapporto
+  copertura/costo di tutta S5;
+- le famiglie **2 e 3** condividono la riscrittura di `POLICY_HIGHLIGHTS` (traduzione + riparazione
+  del punto sul transfer), quindi la seconda non costa nemmeno una riga in più.
+
+Risultato: cinque famiglie correggibili in **tre modifiche** a `custom_agent.py`, e la sesta (la 4)
+resta senza correzione, come deciso in S4.
+
+### Tre dettagli di formulazione che non sono dettagli
+
+**"The policy still allows you to serve", non "you can serve".** Nel task 39 il cliente insiste per
+cancellare anche le prenotazioni non idonee ("proceed anyway"), e il ground truth ne vuole
+cancellate esattamente tre su sette. Una regola che spinge genericamente a *fare di più* avrebbe
+fatto fallire il task nella direzione opposta. Il vincolo sta nella scelta delle parole.
+
+**"When an action requires you to supply a payment method"** (famiglia 5). Verificato in
+`tools.py`: `cancel_reservation` non prende argomenti di pagamento, mentre `book_reservation`,
+`update_reservation_flights` e `update_reservation_baggages` sì. Delimitare così il trigger
+seleziona esattamente le tre operazioni giuste e impedisce all'agente di chiedere la carta prima di
+una cancellazione, dove il rimborso va d'ufficio sul metodo originale. Il costo di regressione
+(punto 9 della checklist) risolto nella formulazione, invece che accettato come rischio.
+
+**Gli esempi.** Avevo illustrato la regola della famiglia 1 con i numeri del task 7 ($402, $306,
+$708, $1.628). Andrea l'ha bocciato: overfitting travestito da buona pratica, e violazione del
+punto 5 della checklist mentre dichiaravo di soddisfare il punto 8. Ha anche chiesto se gli esempi
+siano davvero uno standard, dato il costo in token. Lo sono — Anthropic: *"examples are the
+'pictures' worth a thousand words"* — ma la parola operativa nella fonte è *canonical*:
+rappresentativo della classe. Il punto 8 della checklist è stato riscritto di conseguenza: un
+esempio si mette **solo** quando la regola descrive una forma difficile da dire a parole
+(tipicamente un formato), e **mai** costruito con i dati del caso che si sta correggendo.
+
+### Fondere due regole può far perdere una clausola
+
+Rivedendo la procedura fusa 3+6, Andrea ha sollevato il timore che l'agente si fermasse a
+dichiarare l'impossibilità invece di cercare l'alternativa. Il meccanismo temuto non si verifica —
+la ricerca dell'alternativa è nel primo passo, prima di ogni comunicazione. Ma la rilettura ha
+scoperto una perdita vera: la clausola originale della famiglia 3 finiva con *"offer the
+alternative, and let them choose"*, e nella fusione quel pezzo era sopravvissuto solo a metà.
+Nessun passo diceva di **proporre** l'alternativa quando questa cambia ciò che il cliente ottiene —
+il caso del task 23, dove cancellare e riprenotare non è una parte da eseguire ma una strada che il
+cliente deve accettare. Passo riscritto.
+
+Il punto 4 della checklist va quindi letto anche al contrario: il rischio di fondere due regole non
+è solo la sovrapposizione, è la **perdita silenziosa di una clausola**. Si trova rileggendo la
+versione fusa contro le due originali, non fidandosi dell'impressione che il senso "ci sia ancora".
+
+### Cosa aspettarsi, detto prima di misurare
+
+Sei dei sette fallimenti hanno una regola che li copre. Questo **non** significa che sei task
+passeranno: τ²-bench azzera il reward se una qualsiasi regola di policy è violata, quindi un task
+recuperato su una famiglia può fallire su un'altra cosa. E con un run per task un delta di uno o
+due task non si distingue dal rumore — il benchmark originale misura la consistenza su k tentativi
+proprio per questo, e noi non abbiamo il budget per farlo.
+
+Il rischio simmetrico da guardare nei canary: tre delle regole nuove spingono verso messaggi più
+lunghi e turni in più, contro il limite di 30 turni che il codice impone dalla decisione 3 di S3.
+Un task che oggi passa al turno 28 può smettere di passare. E cinque task che passano oggi
+contengono risposte in italiano: passano *nonostante* la lingua sbagliata, e cambiare la lingua del
+prompt cambia la generazione anche per loro. Di questi, due (41 e 42) sono canary nel dataset; tre
+(4, 8, 43) no, per una scelta di budget deliberata che va dichiarata come tale e non nascosta.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |

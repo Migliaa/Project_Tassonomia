@@ -362,7 +362,9 @@ correttamente, e non ha eseguito nulla.
       through a different sequence of actions than the one you first tried.
    b. Carry out those parts, asking for explicit confirmation first where the policy
       requires it. If the customer has already confirmed them, carry them out now.
-   c. Tell the customer plainly which part could not be done, and why.
+   c. Tell the customer plainly which part could not be done and why. If an alternative
+      route exists but changes what they would get, describe it and let them choose,
+      rather than deciding for them or stopping there.
    d. Transfer to a human agent only if step (a) leaves nothing you can serve.
 ```
 
@@ -510,7 +512,9 @@ HANDLING_CUSTOMER_REQUESTS = """
       through a different sequence of actions than the one you first tried.
    b. Carry out those parts, asking for explicit confirmation first where the policy
       requires it. If the customer has already confirmed them, carry them out now.
-   c. Tell the customer plainly which part could not be done, and why.
+   c. Tell the customer plainly which part could not be done and why. If an alternative
+      route exists but changes what they would get, describe it and let them choose,
+      rather than deciding for them or stopping there.
    d. Transfer to a human agent only if step (a) leaves nothing you can serve.
 """.strip()
 ```
@@ -571,3 +575,34 @@ dal rumore. Va scritto così nel report — vedi `docs/regole-comportamentali-ag
 Il rischio simmetrico, da guardare esplicitamente nei canary (0, 41, 42): tre delle regole nuove
 spingono verso messaggi più lunghi e turni in più (clausole 1, 3 e 4), e il codice ferma l'agente
 a 30 turni. Un task che oggi passa al turno 28 può non passare più.
+
+---
+
+## Nota di revisione — perché il passo (c) è stato riscritto
+
+Rilettura di Andrea sulla procedura fusa 3+6: timore che l'agente, leggendo il passo "di' al
+cliente quale parte non si è potuta fare", si fermi lì e trasferisca — cioè esattamente il
+comportamento della famiglia 3 che la clausola voleva correggere.
+
+Il meccanismo temuto non si verifica: il passo (a) contiene già la ricerca del percorso
+alternativo (*"including through a different sequence of actions than the one you first tried"*),
+e l'ordine dei passi garantisce che quella ricerca avvenga prima di qualsiasi comunicazione di
+impossibilità. La procedura fusa **è** la sezione condivisa tra le due famiglie.
+
+Ma l'obiezione ha scoperto una perdita reale nella fusione. La clausola originale della famiglia 3
+finiva con *"offer the alternative, and let them choose"*; nella procedura quel pezzo era
+sopravvissuto solo a metà. Il passo (b) esegue le parti servibili, il (c) dichiara ciò che non si
+è potuto fare, ma **nessun passo diceva di proporre l'alternativa quando questa cambia ciò che il
+cliente ottiene** — che è il caso del task 23: cancellare e riprenotare non è una parte da
+"eseguire", è una strada diversa che il cliente deve accettare. Un agente poteva restare
+formalmente conforme dicendo "non posso pagare con tre certificati" e fermarsi.
+
+Passo (c) riscritto per contenere sia la dichiarazione sia la proposta, senza aggiungere un quinto
+passo (minimalismo, `docs/regole-comportamentali-agenti.md` §2.5). Il "rather than… stopping
+there" finale è la coda dell'azione, non la regola, com'è per il "never $1.250" delle convenzioni
+di output.
+
+Vale come esempio del punto 4 della checklist applicato in senso inverso: il rischio di fondere
+due regole non è solo la sovrapposizione, è la **perdita silenziosa di una clausola** durante la
+fusione. Va cercata rileggendo la versione fusa contro le due originali, non fidandosi del fatto
+che il senso "c'è ancora".
