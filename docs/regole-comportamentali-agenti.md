@@ -193,7 +193,11 @@ di finire nel codice. Sono formulati come test binari, apposta.
    della conversazione, il posto giusto è il codice, non il prompt. (§2.4)
 7. **Procedura, se ha più passi.** I comportamenti in più passi si scrivono come passi numerati in
    ordine, non come principio. (§2.7)
-8. **Esempio, se riguarda un formato.** Le regole di formato portano un esempio canonico. (§2.6)
+8. **Esempio solo se serve, e mai preso dal caso osservato.** Un esempio si aggiunge solo quando
+   la regola descrive una forma difficile da dire a parole — tipicamente un formato. Se la regola
+   si esprime bene in prosa, l'esempio è solo token in più. E l'esempio deve essere *canonico*,
+   cioè rappresentativo della classe: costruirlo con i numeri o i dati del task che si sta
+   correggendo è overfitting travestito da buona pratica. (§2.6, e §2.5 sul minimalismo)
 9. **Costo di regressione dichiarato.** Prima di scrivere la regola, dire quale task già passante
    potrebbe rompere. È il motivo per cui il dataset `airline-s4-round2` contiene i tre canary
    (0, 41, 42) accanto ai sette fallimenti.
