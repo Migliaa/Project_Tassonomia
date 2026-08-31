@@ -592,12 +592,12 @@ più io al controllo del suo Chrome — quello resta solo per lavoro di setup/de
 
 ---
 
-## 2026-08-31 — S4: tassonomia dei fallimenti, cinque famiglie e una regola di metodo
+## 2026-08-31 — S4: tassonomia dei fallimenti chiusa, sei famiglie e due regole di metodo
 
 Scope allargato da 10 a 20 task di sviluppo (i 10 originali + altri 10 scelti per complessità,
 più azioni/assertion attese = più probabilità di far emergere bug reali). Su `custom_agent`:
-6 fallimenti sui 10 nuovi (18, 23, 33, 37, 39, 44) più il 7 già noto = **7 fallimenti da
-diagnosticare** su 20 task totali.
+6 fallimenti sui 10 nuovi (18, 23, 33, 37, 39, 44) più il 7 già noto = **7 fallimenti
+diagnosticati** su 20 task totali — diagnosi completa, tassonomia chiusa.
 
 **Metodo di diagnosi**: per ogni task fallito, non fidarsi mai della prima lettura — né
 dell'anteprima troncata della UI di Langfuse, né di un'ipotesi plausibile ma non verificata.
@@ -608,8 +608,8 @@ e — passaggio decisivo — verificare qualunque numero o regola citata contro 
 lavoro la prima ipotesi si è rivelata sbagliata dopo un controllo più attento, ed è stata
 corretta prima di essere accettata come famiglia.
 
-**Cinque famiglie trovate**, ciascuna con un caso concreto verificato dietro (nessuna inventata
-per simmetria o completezza):
+**Sei famiglie trovate**, ciascuna con almeno un caso concreto verificato dietro (nessuna
+inventata per simmetria o completezza):
 
 1. **Disambiguazione silenziosa** (task 7) — una domanda del cliente ammette più di una lettura
    ragionevole (qui: "altri voli" include o no le prenotazioni di cui si sta già parlando);
@@ -618,40 +618,75 @@ per simmetria o completezza):
 2. **Formattazione numerica non USD** (task 18) — azioni e calcolo perfetti, ma il totale
    comunicato in formato europeo ("$23.553") invece che USA ("$23,553"); il controllo di tau2
    cerca la stringa esatta e non la trova.
-3. **Non ripianifica quando il primo approccio si blocca** (task 23) — lo strumento non supporta
-   quello che serve (pagamento diviso su più certificati), l'agente lo scopre correttamente ma
-   invece di dedurre un percorso alternativo (cancellare e riprenotare separatamente) si arrende
-   e trasferisce a un umano.
+3. **Lo strumento risponde correttamente ma non permette l'operazione richiesta** (task 23) —
+   il cliente vuole pagare un upgrade di gruppo con 3 certificati diversi; la policy ammette un
+   solo certificato per prenotazione. L'agente scopre correttamente il limite, ma invece di
+   dedurre un percorso alternativo (cancellare e riprenotare separatamente, un certificato a
+   testa) si arrende e trasferisce a un umano.
 4. **L'utente chiude la chiamata nello stesso turno in cui conferma, prima che l'agente esegua**
-   (task 33) — non un errore dell'agente: `termination_reason: user_stop`, il simulatore-utente
-   genera `###STOP###` nello stesso messaggio in cui dice "sì, confermo", per regola propria
-   ("se l'obiettivo dell'istruzione è soddisfatto, fermati"). L'agente, che per policy propria
-   chiede conferma esplicita prima di ogni azione di scrittura, non ha mai il turno successivo
-   per eseguire. Confrontato con un task passato con successo, dove l'agente esegue prima e
-   riceve i ringraziamenti (con STOP) solo dopo — nessun rischio in quel caso.
+   (task 33) — non un errore di giudizio dell'agente: `termination_reason: user_stop`, il
+   simulatore-utente genera `###STOP###` nello stesso messaggio in cui dice "sì, confermo", per
+   regola propria del simulatore ("se l'obiettivo dell'istruzione è soddisfatto, fermati").
+   **Verificata come non correggibile**, non solo diagnosticata: letto `orchestrator.py:836-843`,
+   il controllo di stop scatta nell'istante in cui il simulatore genera il messaggio dell'utente,
+   *prima* che l'orchestratore assegni un turno successivo — l'agente non riceve mai
+   l'opportunità di intervenire, non c'è finestra utile per un avviso o un'esecuzione anticipata.
+   Discussa e scartata una correzione ("esegui subito per azioni a basso rischio, salta la
+   conferma"): introdurrebbe un giudizio soggettivo ("cos'è a basso rischio?") in un punto dove
+   vogliamo determinismo, cioè lo stesso problema che la regola di metodo qui sotto cerca di
+   evitare. **Family tenuta comunque nella tassonomia, ma nella categoria "solo monitorabile"**:
+   utile da tracciare (per non confonderla in futuro con un vero errore dell'agente), ma non
+   affrontabile con una regola comportamentale in questo progetto — richiederebbe far lavorare
+   l'agente "a chat chiusa", un progetto diverso da questo.
 5. **Usa un metodo di pagamento non specificato esplicitamente dal cliente, invece di
    chiederlo** (task 37) — la policy (`policy.md:130-131`) impone che il cliente fornisca
    esplicitamente il metodo di pagamento (carta, gift card o certificato) per una modifica ai
    voli; l'agente ha invece riusato di default il metodo già presente sulla prenotazione, senza
    mai chiederlo, risultando nel metodo sbagliato.
+6. **Richiesta multi-elemento con esiti misti** (task 39 e 44, due casi indipendenti) — una
+   richiesta del cliente comprende più elementi (più prenotazioni da cancellare o upgradare), di
+   cui alcuni sono permessi da policy e altri no. In entrambi i casi l'agente aveva già raccolto
+   tutti i dati necessari e in un caso (44) il cliente aveva già dato un consenso esplicito e
+   separato per la parte permessa — ma l'agente ha trasferito l'intera richiesta a un umano
+   invece di eseguire la parte già chiara, arrivando a zero azioni di scrittura in entrambi i
+   casi.
 
-**Una regola di metodo, decisa con Andrea e valida per il resto del progetto**: le famiglie
-vanno definite tenendo conto di **due rischi opposti**. Una famiglia troppo generica (es. "sceglie
-o assume invece di chiedere") descrive un sintomo, non una regola che un agente possa applicare
-mentre ragiona — non è abbastanza deterministica da permettere un auto-riconoscimento e una
-correzione affidabile. Una famiglia troppo specifica rischia l'overfitting: una regola tagliata
-sul singolo task che non generalizza. Il compromesso, applicato alla famiglia 5: non "l'agente
-assume invece di chiedere" (troppo vago), ma "prima di usare un metodo di pagamento del cliente,
-il cliente deve averlo specificato esplicitamente in chat — carta, gift card o certificato" (un
-controllo binario, verificabile ad ogni turno, esteso a tutti e tre i tipi di pagamento previsti
-dalla policy e non solo al caso osservato con la carta di credito). Stessa logica applicata a
-tenere separate la famiglia 5 dalla famiglia 1 (Disambiguazione silenziosa): sembrano imparentate
-("l'agente decide da solo invece di consultare il cliente") ma il meccanismo è diverso —
-interpretazione di una domanda vs. dato obbligatorio mancante prima di una scrittura — e
-accorparle avrebbe prodotto una regola troppo larga per essere utile in entrambi i casi.
+**Prima regola di metodo — determinismo vs. overfitting**: le famiglie vanno definite tenendo
+conto di **due rischi opposti**. Una famiglia troppo generica (es. "sceglie o assume invece di
+chiedere") descrive un sintomo, non una regola che un agente possa applicare mentre ragiona — non
+è abbastanza deterministica da permettere un auto-riconoscimento e una correzione affidabile. Una
+famiglia troppo specifica rischia l'overfitting: una regola tagliata sul singolo task che non
+generalizza. Il compromesso, applicato alla famiglia 5: non "l'agente assume invece di chiedere"
+(troppo vago), ma "prima di usare un metodo di pagamento del cliente, il cliente deve averlo
+specificato esplicitamente in chat — carta, gift card o certificato" (un controllo binario,
+verificabile ad ogni turno, esteso a tutti e tre i tipi di pagamento previsti dalla policy e non
+solo al caso osservato con la carta di credito). Stessa logica applicata a tenere separate la
+famiglia 5 dalla famiglia 1: sembrano imparentate ("l'agente decide da solo invece di consultare
+il cliente") ma il meccanismo è diverso — interpretazione di una domanda vs. dato obbligatorio
+mancante prima di una scrittura — e accorparle avrebbe prodotto una regola troppo larga per
+essere utile in entrambi i casi.
 
-Diagnosi in corso: task 39 e 44 ancora da analizzare prima di chiudere la tassonomia e passare
-alla progettazione della correzione dell'agente.
+**Seconda regola di metodo — il nome descrive il trigger, non l'errore**: ogni famiglia deve
+essere nominata dalla situazione che l'agente può riconoscere *prima* di agire, non dal
+comportamento sbagliato che ne è conseguito. "Non ripianifica quando il primo approccio si
+blocca" (nome iniziale della famiglia 3) descrive la diagnosi, non un segnale disponibile in
+anticipo — un agente non può "riconoscersi" in un errore che non ha ancora commesso. Rinominata
+in "lo strumento risponde correttamente ma non permette l'operazione richiesta": quella è la
+situazione osservabile subito dopo la risposta del tool, prima di decidere come reagire. Stesso
+principio applicato a monte alla famiglia 6 ("richiesta multi-elemento con esiti misti" invece di
+"trasferisce in blocco invece di eseguire la parte chiara"). La regola comportamentale corretta
+per ciascun trigger si definisce a parte, in fase di correzione — il nome della famiglia resta
+solo la situazione di innesco.
+
+**Corollario emerso discutendo la famiglia 4**: non tutte le famiglie sono ugualmente
+correggibili con una regola comportamentale. Quando la causa è un vincolo dell'ambiente (qui: la
+tempistica di terminazione del simulatore-utente, fuori dal controllo dell'agente) e l'unica
+correzione disponibile introdurrebbe essa stessa un giudizio non deterministico, la scelta
+corretta è tenere la famiglia nella tassonomia come categoria da *monitorare*, non forzare una
+correzione che peggiorerebbe la qualità delle altre.
+
+Prossimo passo: progettare la correzione dell'agente per le famiglie 1, 2, 3, 5, 6 (la 4 resta
+monitorata, non corretta), poi rilanciare `custom_agent` sul dataset `airline-s4-round2`.
 
 ---
 
