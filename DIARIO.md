@@ -539,6 +539,59 @@ Andrea, non fatto in autonomia: è la parte del tour di Langfuse che vale la pen
 
 ---
 
+## 2026-08-31 (mattina) — Dataset + Experiment: tre bug trovati verificando, non fidandosi
+
+Al risveglio di Andrea: rilanciato il **baseline** (`llm_agent`) sui 10 task di sviluppo, stavolta
+con tracing attivo fin dall'inizio (a differenza di S1, girato prima che Langfuse esistesse nel
+progetto — non uno spreco, solo ordine cronologico corretto). Stessa lezione RPM di stanotte
+riapplicata da subito: un task alla volta, 65s di pausa. Risultato pulito su tutti e 10, incluso
+un dato nuovo: **task 8 fallisce nel baseline** (reward 0, DB check non passato) dove
+`custom_agent` invece passa — prima differenza vera vista tra i due, non solo il 7 che fallisce
+per entrambi.
+
+**Creato il dataset `airline-dev-10`** su Langfuse (UI, dal vivo, con Andrea che guardava — non
+in autonomia, su sua richiesta esplicita di essere fermato e spiegato passo passo prima di
+procedere). Poi uno script (`scripts/setup_dataset_experiments.py`) per agganciare le tracce
+reali già esistenti come due Experiment ("baseline", "custom_agent"), usando l'endpoint
+`POST /api/public/dataset-run-items` — segnato deprecato nella migrazione v3→v4 (sunset 16 nov
+2026, ben oltre la chiusura del progetto).
+
+Tre versioni dello script, ognuna corretta da un bug reale trovato **verificando l'output invece
+di fidarsi di un "20/20 ok"**:
+1. **v1 — classificazione per orario** (custom_agent = notte, baseline = mattina): sbagliata.
+   L'ambiente è stato sospeso mentre Andrea dormiva e l'orologio ha fatto un salto in avanti di
+   ore — tracce vere di `custom_agent` sono finite "nel futuro" rispetto al taglio a mezzanotte,
+   scambiate per baseline.
+2. **v2 — classificazione per contenuto** (corretta: la traccia contiene una chiamata chiamata
+   `agent_response` o `custom_agent_response`, nome scritto nel codice, indipendente dall'ora),
+   ma **selezione per durata più lunga** tra tracce candidate: sbagliata anche questa. Il task 7
+   aveva 6 tracce con `agent_response` reale (20-27s, sembravano run completi) ma **solo una con
+   un reward attaccato** — le altre erano conversazioni interrotte a metà da un errore di quota,
+   mai valutate fino in fondo da tau2. "Più lunga" scambiava una conversazione parziale per quella
+   vera.
+3. **v3 — filtro "deve avere un reward vero"**: corretta. 19 collegamenti su 20 riusciti; l'unico
+   mancante (`task 1 / custom_agent`) ha una traccia reale ma senza reward mai arrivato a
+   Langfuse — non un bug dello script (che l'ha giustamente scartata), ma un vero buco di
+   tracciamento isolato dalla primissima esecuzione della notte. Non corretto a mano: inserire un
+   punteggio che Langfuse non ha mai registrato davvero avrebbe rotto la fiducia in tutto il resto.
+
+**Risultato finale (baseline vs custom_agent, 9 task su 10 verificabili)**: identico su 7 task,
+**entrambi falliscono sul 7** (stesso bug pre-esistente), **solo `custom_agent` passa l'8**.
+
+**Ultimo problema, non risolto per scelta**: la pagina "Experiments" di Langfuse non mostra
+niente dei dati scritti con l'endpoint deprecato — il modello v4 li ignora completamente
+nell'interfaccia, anche se sono reali e leggibili via API (verificato). La via v4 "nativa"
+(`dataset.run_experiment(...)`) richiede rilanciare dal vivo i task attraverso l'SDK — cosa che
+Andrea ha scelto di rimandare a quando si rifarà comunque su scala più grande (50 task in S6, poi
+di nuovo in S7 con l'ablation). Per ora il confronto resta vero e documentato qui e nello script,
+ma non ha una pagina cliccabile su Langfuse.
+
+**Cambio di modalità deciso con Andrea**: da qui in avanti, per l'uso quotidiano di Langfuse
+(leggere tracce, filtrare, guardare costi) guida a voce mentre naviga lui sul suo schermo, non
+più io al controllo del suo Chrome — quello resta solo per lavoro di setup/debug non ripetitivo.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
