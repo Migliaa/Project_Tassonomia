@@ -1047,7 +1047,7 @@ non lo mostra**. Riletti i `results.json` a livello di `action_checks` invece ch
 
 | Task | round1 | round2 | Lettura |
 |---|---|---|---|
-| 44 | 0/3 upgrade (trasferiva tutto) | **3/3 corretti** | la clausola 4 ha morso, poi ha ecceduto: ha anche cancellato `S61CZX`, che il ground truth vieta esplicitamente (`nl_assertion`: "Agent does not cancel reservation S61CZX as the user is healthy"), e senza chiedere conferma |
+| 44 | 0/3 upgrade (trasferiva tutto) | **3/3 corretti** | la clausola 4 ha morso, poi ha ecceduto: ha anche cancellato `S61CZX`, che il ground truth vieta esplicitamente (`nl_assertion`: "Agent does not cancel reservation S61CZX as the user is healthy"). **Correzione a caldo del passo 1**: il cliente *aveva* confermato (turno 29), quindi non e' una conferma mancata — l'errore e' a monte, vedi sotto |
 | 39 | 0/3 cancellazioni | **2/3** | manca `MSJ4OA`. Al turno 28 l'agente **cita la nostra riga riparata**: "un chemin bloque par la politique ne constitue pas un motif de transfert" — la regola e' letta e applicata alla lettera |
 | 23 | 4/4 scritture sbagliate (trasferiva) | cancella e **trova la strada alternativa** | fallisce su un dettaglio che nessuna famiglia copriva: una prenotazione per 3 passeggeri invece di tre separate (un certificato per passeggero) |
 | 18 | **DB 1.0** | **DB 0.0** | **regressione causata da noi**: `credit_card_2929732` su tutte e cinque le prenotazioni, mentre il ground truth ne vuole tre diverse. La clausola 3 dice "usa solo un metodo che il cliente ha nominato", il cliente ne ha nominato uno, l'agente l'ha applicato a tutto |
@@ -1133,6 +1133,46 @@ avrebbe rifatti solo quattro su dieci.
 
 Da qui parte il passo 1: correggere per sottrazione — restringere le clausole 3 e 4 e ancorare la
 regola sulla lingua — prima di aggiungere qualunque clausola nuova.
+
+### Passo 1 — correggere per sottrazione, e un ground truth incoerente
+
+Due modifiche a `custom_agent.py` (patch rigenerata), entrambe su regole che **avevamo introdotto
+noi** e che stavano causando i fallimenti:
+
+- **Clausola 3 riscritta.** Trattava il metodo di pagamento come un fatto globale della
+  conversazione; e' un fatto per prenotazione. Nel task 18 il cliente dice "rimetti sul metodo
+  originale di ciascuna prenotazione", la vecchia formulazione non aveva un ramo per la delega,
+  quindi l'agente ha chiesto lo stesso e poi ha applicato l'unica carta nominata a tutte e cinque.
+  Nel round1, **senza** questa regola, le azzeccava tutte. Ora ha tre rami espliciti: metodo
+  nominato per quella prenotazione, metodo originale letto dal `payment_history`, oppure chiedi.
+- **Clausola 4 nuova.** Nel task 44 l'agente ha dichiarato `S61CZX` "eligible for cancellation"
+  perche' conteneva un volo di 5,5 ore — il criterio del **cliente**, non le condizioni della
+  **policy**, che quella prenotazione non soddisfa. Non e' una regola inventata su un caso solo:
+  `policy.md:149` lo prescrive gia' ("the agent must make sure the rules apply before calling the
+  API!"), l'agente non lo stava onorando, e la clausola aggiunge il **quando**. La vecchia
+  clausola 4 diventa la 5.
+
+E una correzione a quanto avevo scritto poche ore fa: nel task 44 **il cliente aveva confermato**
+(turno 29). Non era una conferma mancata, l'errore era a monte. Riga del diario gia' corretta.
+
+**Task 39 dichiarato non correggibile, con la prova.** `MSJ4OA` (task 39, ground truth: cancellare)
+e `S61CZX` (task 44, ground truth: non cancellare) sono indistinguibili su ogni condizione della
+policy: entrambe economy, entrambe con assicurazione, entrambe prenotate da piu' di 24 ore, nessun
+volo annullato dalla compagnia, nessun motivo sanitario. Il task 39 contraddice anche se stesso: la
+sua `description` dice di cancellare solo cio' che e' idoneo al rimborso, e la policy concede
+l'assicurazione solo per motivi sanitari o meteo (`policy.md:101`), che li' non ricorrono.
+
+Le due letture si escludono. Scelta la lettura fedele alla policy: salva il task 44 (oggi a
+`write_action_score` 1.00 con una sola scrittura di troppo, quindi recuperabile per intero) e perde
+`MSJ4OA`, che pero' fallisce gia' oggi. Non si perde niente che si abbia. `MSJ4OA` va nella
+categoria "non correggibile — solo monitoraggio", accanto alla famiglia 4.
+
+Vale la pena dirlo per quello che e': un ground truth incoerente fra due task dello stesso
+benchmark, sulla stessa clausola di policy, trovato **solo** perche' avevamo smesso di guardare il
+punteggio binario e stavamo guardando le azioni. E' un risultato dell'osservabilita'.
+
+Task 23 e 7 restano senza diagnosi nuova, per decisione: prima si verifica se queste due modifiche
+mordono.
 
 ---
 

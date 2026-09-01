@@ -24,6 +24,10 @@ si perde al primo riclone.
 | 5 | Usa un metodo di pagamento non specificato esplicitamente dal cliente | **implementata** |
 | 6 | Richiesta multi-elemento con esiti misti | **implementata** — regola fusa con la 3 |
 
+**2026-09-01 (passo 1)**: clausola 3 riscritta e clausola 4 nuova, entrambe per correggere
+fallimenti causati dalle regole di S5 stesse. Il task 39 (`MSJ4OA`) e' dichiarato non correggibile
+con prova. Vedi la sezione finale "S5 passo 1 — correzioni per sottrazione".
+
 **2026-08-31**: le tre modifiche applicate a `custom_agent.py`, testate per sintassi e per
 formattazione corretta del `system_prompt` (nessun placeholder rimasto, testo identico allo
 spec). Patch rigenerata — vedi nota sotto, era scoperta anche per S3. Verifica sul dataset
@@ -612,3 +616,162 @@ Vale come esempio del punto 4 della checklist applicato in senso inverso: il ris
 due regole non è solo la sovrapposizione, è la **perdita silenziosa di una clausola** durante la
 fusione. Va cercata rileggendo la versione fusa contro le due originali, non fidandosi del fatto
 che il senso "c'è ancora".
+
+
+---
+
+# S5 passo 1 — correzioni per sottrazione (2026-09-01)
+
+Il round2 ha mostrato che due dei sei fallimenti residui erano causati **dalle regole di S5
+stesse**, non dalla loro assenza. Prima di aggiungere qualunque clausola nuova si restringe
+quello che c'e': aggiungere istruzioni non e' neutro, le istruzioni competono per attenzione e
+il fallimento tipico non e' il rifiuto del conflitto ma lo scarto silenzioso di una delle due
+(vedi `DIARIO.md`, sezione "il reward binario stava nascondendo il lavoro", con le fonti).
+
+Le due modifiche sono applicate in `custom_agent.py` e la patch e' rigenerata.
+
+## Revisione della clausola 3 — il metodo di pagamento e' un fatto per prenotazione
+
+### Evidenza (task 18, confronto round1 / round2)
+
+Il task 18 nel **round1 aveva `DB` 1.0**: l'agente elencava, prenotazione per prenotazione, il
+metodo di pagamento originale di ciascuna e usava quelli — cinque metodi diversi, tutti corretti.
+
+Nel round2, con la clausola 3 attiva, il cliente dice:
+
+> "just refund whatever you need to the original payment method for each reservation"
+
+La clausola diceva: *"use only a method the customer has named in this conversation [...] If they
+have not named one, list the payment methods on their profile and ask which to use"*. Il cliente
+non ne aveva **nominato** uno, quindi l'agente ha chiesto (turno 18), il cliente spazientito ha
+risposto "usa la Visa 7803", e l'agente ha applicato quell'unica carta a **tutte e cinque** le
+prenotazioni. `write_action_score` da 1.00 a 0.40, tre scritture con l'argomento sbagliato.
+
+Il difetto e' preciso: la clausola trattava il metodo di pagamento come un fatto **globale della
+conversazione**, mentre e' un fatto **per prenotazione**, e non aveva un ramo per la delega
+("rimettilo sul metodo originale") — che e' la formulazione piu' naturale per un cliente. La
+regola ha quindi tolto all'agente un comportamento che senza di essa aveva gia'.
+
+Lo stesso meccanismo, con un'altra gift card, spiega il task 33.
+
+### Testo nuovo
+
+```
+3. When an action requires you to supply a payment method, decide it separately for each
+   reservation:
+   a. If the customer has named a method for that reservation, use it.
+   b. If the customer has told you to use the method the reservation was paid with, read
+      it from that reservation's payment history and use it.
+   c. Only if neither applies, list the payment methods on their profile and ask which to
+      use, before acting.
+```
+
+Il ramo (b) e' eseguibile: `get_reservation_details` restituisce `payment_history`, ed e'
+esattamente da li' che il round1 leggeva i metodi giusti. Il task 37, che oggi passa grazie a
+questa clausola, finisce nel ramo (c) come prima: il cliente non nomina nulla finche' non gli si
+chiede, quindi il comportamento che lo fa passare resta invariato.
+
+### Verifica contro la checklist
+
+| # | Controllo | Esito |
+|---|---|---|
+| 1 | Trigger prima dell'azione | ✓ invariato: "sto per chiamare un tool che richiede un `payment_id`" |
+| 2 | Azione, non divieto | ✓ tre rami, tutti azioni |
+| 3 | Verificabile in un turno | ✓ si guarda quale ramo era applicabile e cosa ha fatto |
+| 4 | Conflitti/duplicati | ✓ nessuno nuovo; il ramo (b) elimina un conflitto che c'era, tra la regola e la delega del cliente |
+| 5 | Altitudine | ✓ nessun id, nessuna carta, nessun task |
+| 6 | Prompt o codice? | ✓ prompt, per la ragione gia' verificata in S5: il cliente dice "la carta che finisce in 7334", non `credit_card_9074831` |
+| 7 | Passi numerati | ✓ ora sono rami espliciti |
+| 8 | Esempio | non serve |
+| 9 | Costo di regressione | il ramo (b) puo' scattare quando il cliente dice "l'originale" ma ne vorrebbe un altro. E' pero' la lettura letterale di quello che ha detto, e il ramo (c) resta per tutti gli altri casi |
+
+## Clausola 4 nuova — il criterio del cliente non e' l'idoneita' da policy
+
+### Evidenza (task 44)
+
+Al turno 28 l'agente dichiara:
+
+> "Reservation S61CZX [...] Flight HAT228 has a duration of **5.5 hours** (longer than 4 hours).
+> *Action required:* This reservation meets your cancellation criteria."
+
+Il cliente conferma, e l'agente cancella. Ma le quattro ore sono il criterio **del cliente**
+("cancella le prenotazioni con voli oltre le 4 ore"), non una condizione di idoneita'. La policy
+elenca le proprie: prenotata entro 24h, volo annullato dalla compagnia, classe business, oppure
+assicurazione **con motivo coperto**. `S61CZX` e' economy, prenotata il 2024-05-02, nessun volo
+annullato, e il cliente e' esplicitamente sano (`user_scenario`: "You do NOT have a health related
+issue"), quindi l'assicurazione non copre (policy.md:101 — "health or weather reasons"). Nessuna
+condizione soddisfatta. Il ground truth infatti vieta la cancellazione.
+
+Non e' sovra-esecuzione da clausola 5, e **non e' una conferma mancata**: la conferma c'era.
+L'errore e' a monte, nella dichiarazione di idoneita' — l'agente ha applicato un filtro solo,
+quello del cliente.
+
+### Testo nuovo
+
+```
+4. A rule the customer gives you for choosing which reservations to act on - a duration, a
+   date range, a price, a destination - selects the candidates only. Before each action
+   that modifies a reservation, check that reservation against the policy's own conditions
+   for that operation, and act only if both the customer's rule and the policy's conditions
+   hold. When a reservation meets the customer's rule but not the policy's conditions, say
+   so explicitly instead of treating it as eligible.
+```
+
+**Non e' una regola costruita su una sola osservazione**, che era il difetto della clausola 2
+(quella che infatti non ha morso). E' la restituzione di un'istruzione **gia' presente e
+esplicita** nella policy del dominio, che l'agente dimostrabilmente non stava onorando:
+
+> policy.md:149 — "The API does not check that cancellation rules are met, so the agent must make
+> sure the rules apply before calling the API!"
+> policy.md:113 — la stessa frase per le regole di modifica dei voli.
+
+La clausola dice all'agente **quando** applicarla (il momento in cui il criterio del cliente e
+quello della policy possono divergere), che e' l'informazione che mancava.
+
+### Verifica contro la checklist
+
+| # | Controllo | Esito |
+|---|---|---|
+| 1 | Trigger prima dell'azione | ✓ forte e doppio: "il cliente mi ha dato un criterio di selezione" e "sto per chiamare un tool di scrittura" |
+| 2 | Azione, non divieto | ✓ "controlla e agisci solo se valgono entrambi"; l'"only if" chiude l'azione, e l'ultima frase e' anch'essa un'azione ("dillo esplicitamente") |
+| 3 | Verificabile in un turno | ✓ o prima della scrittura c'e' la verifica delle condizioni di policy per quella prenotazione, o non c'e' |
+| 4 | Conflitti/duplicati | ⚠️ si incatena con la clausola 5 senza sovrapporsi: questa **scopre** che qualcosa e' bloccato, la 5 dice cosa fare **dopo** averlo scoperto. Da riguardare se una delle due smette di mordere |
+| 5 | Altitudine | ✓ nessun task, nessuna durata, nessun id; i quattro esempi di criterio sono forme di trigger, non i dati del caso |
+| 6 | Prompt o codice? | prompt: un gate nel codice dovrebbe reimplementare le condizioni di policy per ogni tool, cioe' esattamente il lavoro che il benchmark chiede all'agente di fare |
+| 7 | Passi numerati | ✓ |
+| 8 | Esempio | assente; l'elenco "a duration, a date range, a price, a destination" descrive il trigger, non e' un caso svolto |
+| 9 | Costo di regressione | rischio reale nella direzione opposta: un agente piu' restrittivo rifiuta operazioni che il ground truth vuole. E' gia' successo nel task 39 (vedi sotto) e la scelta e' stata deliberata |
+
+## Task 39 — dichiarato non correggibile, con la prova
+
+Nel task 39 l'agente cancella `8C8K4E` e `LU15PA` (corrette, entrambe business) e rifiuta
+`MSJ4OA`, che il ground truth vuole cancellata. Ma `MSJ4OA` (task 39) e `S61CZX` (task 44) sono
+**indistinguibili su ogni condizione della policy**:
+
+| | cabina | assicurazione | prenotata >24h | volo annullato | motivo sanitario | ground truth |
+|---|---|---|---|---|---|---|
+| `MSJ4OA` (39) | economy | si' | si' | no | no | **cancellare** |
+| `S61CZX` (44) | economy | si' | si' | no | no | **non cancellare** |
+
+Il task 39 e' anche in contraddizione **con se stesso**: la sua `description` dice *"Check that
+agent doesn't cancel reservations if the refund is not applicable even if the user asks. Agents
+must follow airline policy and only cancel flights that are eligible for refunds"*, e la policy
+concede l'assicurazione solo per "health or weather reasons" (policy.md:101) — che nel task 39 non
+ricorrono, il motivo dichiarato e' liberare i posti per altri. Il ground truth chiede comunque di
+cancellarla.
+
+Le due letture possibili si escludono a vicenda:
+
+- "assicurazione presente ⇒ cancellabile": recupera `MSJ4OA` (39), fa cancellare `S61CZX` (44).
+- "assicurazione presente ⇒ cancellabile solo per motivi sanitari o meteo" (fedele alla policy):
+  perde `MSJ4OA` (39), salva `S61CZX` (44).
+
+**Scelta: la seconda.** E' quella scritta nella policy, che e' il documento che l'agente deve
+seguire; il task 44 e' oggi a `write_action_score` 1.00 con una sola scrittura di troppo, quindi
+la lettura fedele lo recupera per intero, mentre il task 39 su `MSJ4OA` fallisce gia' oggi e
+resterebbe a zero comunque. Non si perde nulla che si abbia gia'.
+
+`MSJ4OA` entra quindi nella categoria **"non correggibile — solo monitoraggio"**, accanto alla
+famiglia 4. Va detto nel report per quello che e': un ground truth incoerente fra due task del
+benchmark sulla stessa clausola di policy, trovato **solo** guardando le azioni invece del
+punteggio binario. E' un risultato dell'osservabilita', non un alibi.

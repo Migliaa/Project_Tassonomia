@@ -1,9 +1,9 @@
 diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
 new file mode 100644
-index 0000000..8d31d7a
+index 0000000..2ddc889
 --- /dev/null
 +++ b/src/tau2/agent/custom_agent.py
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,309 @@
 +from typing import Generic, List, Optional, TypeVar
 +
 +from pydantic import BaseModel
@@ -76,6 +76,23 @@ index 0000000..8d31d7a
 +# S5, famiglie 1, 3, 5, 6: regole comportamentali nate dalla tassonomia. Ordinate per
 +# flusso di conversazione, non per numero di famiglia. Vanno in fondo al system prompt
 +# (vedi docs/s5-correzioni.md, "Decisione strutturale").
++#
++# S5 passo 1 (2026-09-01, vedi DIARIO.md e docs/s5-correzioni.md): due modifiche
++# fatte per SOTTRAZIONE, dopo che le metriche per-azione hanno mostrato che due
++# fallimenti su sei erano causati da queste stesse regole.
++# - Clausola 3 riscritta: trattava il metodo di pagamento come un fatto globale
++#   della conversazione, ma e' un fatto PER PRENOTAZIONE. Nel task 18 il cliente
++#   dice "rimetti sul metodo originale di ciascuna prenotazione"; la vecchia
++#   formulazione non aveva un ramo per la delega, quindi l'agente chiedeva lo
++#   stesso, e poi applicava l'unica carta nominata a tutte e cinque. Il round1,
++#   senza questa regola, le azzeccava tutte.
++# - Clausola 4 nuova: nel task 44 l'agente ha dichiarato una prenotazione
++#   "eligible for cancellation" perche' soddisfaceva il criterio del CLIENTE
++#   (voli oltre le 4 ore), senza verificare le condizioni della POLICY. Non e'
++#   una regola inventata su un caso solo: policy.md:149 lo prescrive gia'
++#   esplicitamente ("The API does not check that cancellation rules are met, so
++#   the agent must make sure the rules apply before calling the API!"), e
++#   l'agente non lo stava onorando. La vecchia clausola 4 diventa la 5.
 +HANDLING_CUSTOMER_REQUESTS = """
 +1. When the customer's message contains more than one request, serve all of them before
 +   closing the conversation. If one request is an action and another is a question, answer
@@ -84,11 +101,20 @@ index 0000000..8d31d7a
 +   (for example "other", "the rest", "remaining", "all"), do not choose one reading
 +   silently. State which reading your answer refers to, and give the answer for the other
 +   reading as well, in the same message.
-+3. When an action requires you to supply a payment method, use only a method the customer
-+   has named in this conversation - the specific card, gift card, or certificate. If they
-+   have not named one, list the payment methods on their profile and ask which to use,
-+   before acting.
-+4. When part of the customer's request cannot be done, or the path you first tried is
++3. When an action requires you to supply a payment method, decide it separately for each
++   reservation:
++   a. If the customer has named a method for that reservation, use it.
++   b. If the customer has told you to use the method the reservation was paid with, read
++      it from that reservation's payment history and use it.
++   c. Only if neither applies, list the payment methods on their profile and ask which to
++      use, before acting.
++4. A rule the customer gives you for choosing which reservations to act on - a duration, a
++   date range, a price, a destination - selects the candidates only. Before each action
++   that modifies a reservation, check that reservation against the policy's own conditions
++   for that operation, and act only if both the customer's rule and the policy's conditions
++   hold. When a reservation meets the customer's rule but not the policy's conditions, say
++   so explicitly instead of treating it as eligible.
++5. When part of the customer's request cannot be done, or the path you first tried is
 +   blocked:
 +   a. Identify which parts of the request the policy still allows you to serve, including
 +      through a different sequence of actions than the one you first tried.
