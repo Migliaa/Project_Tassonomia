@@ -1325,6 +1325,44 @@ Decisione di Andrea, esplicita: si tiene la correzione anche se dovesse passare 
 e' difendibile in se', e si dichiara il limite invece di fingere un rigore che il budget non
 consente.
 
+### Sonda 5 — task 44 recuperato, reward 1.0
+
+Prima sonda con la clausola 3 ristrutturata e il limitatore RPM attivo. Verificato contro il
+`results.json` locale, non contro la UI:
+
+| | reward | DB | COMM | write | unex | wrarg |
+|---|---|---|---|---|---|---|
+| round1 (pre-S5) | 0.00 | 0.00 | 1.00 | 0.00 | 0 | 0 |
+| round2 | 0.00 | 0.00 | 1.00 | 1.00 | 1 | 0 |
+| sonda 3 | 0.00 | 0.00 | 1.00 | 0.67 | 0 | 2 |
+| **sonda 5** | **1.00** | **1.00** | **1.00** | **1.00** | **0** | **0** |
+
+Tre upgrade corretti con il `payment_id` giusto, nessuna scrittura di troppo, `db_match` True.
+Il task 44 passa da "trasferiva tutto" (round1) a completo.
+
+**Cosa e' stato davvero messo alla prova, e cosa no.** Il passo (a) della clausola 3 e' stato
+esercitato in modo severo: il cliente chiede di cancellare `S61CZX` **tre volte**, con pressione
+crescente, e l'agente rifiuta tre volte elencando le quattro condizioni della policy e spiegando
+che l'assicurazione copre solo motivi sanitari o meteo, non la durata dei voli. Alla fine il
+simulatore chiude con `###OUT-OF-SCOPE###`. E' il comportamento che il ground truth chiede.
+
+I passi (b) e (c) invece **non sono stati esercitati**: al turno 37 il cliente nomina direttamente
+la carta ("charge the total additional cost of $1,387.00 to my credit card ending in
+`credit_card_4196779`"), quindi il pagamento e' passato dal ramo (a) della clausola 2 e non c'e'
+mai stato un piano di pagamento inammissibile da intercettare. La ristrutturazione di (b) e (c)
+resta quindi **non verificata**: e' motivata dall'evidenza della sonda 3, ma nessun run l'ha
+ancora messa alla prova.
+
+Va detto per intero, perche' e' lo stesso limite di prima con il segno opposto: **sonda 3 e sonda 5
+non sono un confronto A/B**. Nella 3 il cliente proponeva un piano aggregato con i certificati,
+nella 5 nomina una carta sola. Parte della differenza fra 0.00 e 1.00 e' varianza del simulatore,
+non effetto delle nostre modifiche. Quello che si puo' affermare con sicurezza e' solo che il
+passo (a) regge sotto pressione ripetuta, perche' quello si legge nel testo.
+
+**Il limitatore RPM non e' mai intervenuto** (zero attese nel log): l'API era abbastanza lenta da
+sola, 48 messaggi in 128 secondi. Resta come assicurazione per i run in cui e' veloce, dove
+avevamo misurato 45 chiamate al minuto contro un limite di 15.
+
 ---
 
 ## Registro spesa API (tetto €20)
@@ -1338,3 +1376,4 @@ consente.
 | 2026-08-31 | batch S4 non registrato a suo tempo (12:33-12:52, 8 completati + 3 infra_error) | 8 | gemini-3.5-flash-lite | $0.3209 | $0.73 |
 | 2026-08-31/09-01 | S5 round2, tutti i tentativi (quota giornaliera + RPM, retry, arricchimento dataset) fino a 10/10 con dato reale | 15 simulazioni con costo (comprende retry falliti e riusciti) | $0.702 | $1.43 |
 | 2026-09-01 | S5 round3, sonde sul task 44 (1 troncata dal nostro timeout, 1 completata, 3 infrastructure_error a costo zero) | 2 simulazioni con costo | $0.157 | $1.59 |
+| 2026-09-01 | S5 sonda 5 sul task 44, con clausola 3 ristrutturata e limitatore RPM: **reward 1.0** | 1 simulazione | $0.095 | $1.69 |

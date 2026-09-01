@@ -96,7 +96,7 @@ DOMAIN = "airline"
 # Nome del Run dentro il dataset. Ogni iterazione del ciclo diagnosi-correzione-verifica
 # e' un Run distinto sullo STESSO dataset: cosi' in Langfuse restano confrontabili fianco
 # a fianco invece di disperdersi in dataset diversi. Cambiarlo a ogni lancio.
-RUN_NAME = "S5 round3 sonda 4 - clausola 3 ristrutturata (task 44)"
+RUN_NAME = "S5 round3 sonda 5 - clausola 3 ristrutturata + limitatore RPM (task 44)"
 MODEL = "gemini/gemini-3.5-flash-lite"
 PACING_SECONDS = 75
 RETRY_BACKOFF_SECONDS = 75
