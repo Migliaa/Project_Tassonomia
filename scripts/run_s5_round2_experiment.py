@@ -81,6 +81,12 @@ PACING_SECONDS = 75
 RETRY_BACKOFF_SECONDS = 75
 PER_TASK_TIMEOUT = 300  # safety net: nessun run S4 precedente si e' avvicinato
 
+# Se valorizzato, lancia solo questi task_id invece di tutto il dataset - per
+# rilanciare gli item senza dato di un run precedente (es. falliti per quota)
+# senza rispendere sui task gia' completati. Resta lo STESSO dataset: crea un
+# secondo Run piu' piccolo, confrontabile nella UI con il primo. None = tutti.
+TASK_IDS_FILTER = ["44", "33", "23", "7"]
+
 lf = get_client()
 
 
@@ -230,17 +236,31 @@ def main():
     prepare_dataset_items(dataset)
     dataset = lf.get_dataset(DATASET_NAME)  # ricarica con input/expected_output aggiornati
 
-    result = dataset.run_experiment(
+    items = dataset.items
+    description = (
+        "custom_agent con le tre modifiche S5 (docs/s5-correzioni.md), "
+        "stesso motore e stessi 10 task del round1 (S4)."
+    )
+    if TASK_IDS_FILTER is not None:
+        items = [it for it in items if it.input["task_id"] in TASK_IDS_FILTER]
+        description += (
+            f" Rilancio parziale di {TASK_IDS_FILTER}: item senza dato "
+            "(quota) nel run precedente sullo stesso dataset."
+        )
+        print(f"Rilancio solo {len(items)} item: {sorted(TASK_IDS_FILTER)}")
+
+    run_kwargs = dict(
         name="S5 correzioni comportamentali",
-        description=(
-            "custom_agent con le tre modifiche S5 (docs/s5-correzioni.md), "
-            "stesso motore e stessi 10 task del round1 (S4)."
-        ),
+        description=description,
         task=my_task,
         evaluators=[reward_evaluator, db_check_evaluator],
         max_concurrency=1,
         metadata={"sprint": "S5", "commit": "1a40172"},
     )
+    if TASK_IDS_FILTER is not None:
+        result = lf.run_experiment(data=items, **run_kwargs)
+    else:
+        result = dataset.run_experiment(**run_kwargs)
     print(result.format())
 
 
