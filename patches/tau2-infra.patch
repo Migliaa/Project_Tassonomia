@@ -1,5 +1,3 @@
-warning: in the working copy of 'pyproject.toml', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/tau2/utils/langfuse_tracing.py', LF will be replaced by CRLF the next time Git touches it
 diff --git a/pyproject.toml b/pyproject.toml
 index 55a9d9c..c25082f 100644
 --- a/pyproject.toml
@@ -283,10 +281,22 @@ index 0000000..284dfbd
 +            logger.warning(f"Could not close Langfuse trace: {e}")
 +        return False
 diff --git a/src/tau2/utils/llm_utils.py b/src/tau2/utils/llm_utils.py
-index cc70482..00127c2 100644
+index cc70482..1fa1d60 100644
 --- a/src/tau2/utils/llm_utils.py
 +++ b/src/tau2/utils/llm_utils.py
-@@ -59,14 +59,29 @@ llm_log_dir: ContextVar[Optional[Path]] = ContextVar("llm_log_dir", default=None
+@@ -2,9 +2,11 @@ import json
+ import logging
+ import os
+ import re
++import threading
+ import time
+ import uuid
+ import warnings
++from collections import deque
+ from contextvars import ContextVar
+ from datetime import datetime
+ from pathlib import Path
+@@ -59,14 +61,29 @@ llm_log_dir: ContextVar[Optional[Path]] = ContextVar("llm_log_dir", default=None
  # Context variable to store the LLM logging mode ("all" or "latest")
  llm_log_mode: ContextVar[str] = ContextVar("llm_log_mode", default="latest")
  
@@ -317,7 +327,58 @@ index cc70482..00127c2 100644
  
  litellm.drop_params = True
  
-@@ -379,6 +394,17 @@ def generate(
+@@ -352,6 +369,50 @@ def _write_llm_log(
+         json.dump(call_data, f, indent=2)
+ 
+ 
++# --- Limitatore di frequenza (modifica nostra, vedi patches/README.md) ---------
++#
++# Perche': il tier gratuito Gemini concede 15 richieste al minuto per progetto e
++# modello. Il pacing tra un task e l'altro non basta, perche' e' UN SINGOLO task a
++# superare il limite da solo: agente e simulatore-utente si alternano senza pause,
++# e nei run del 2026-09-01 abbiamo misurato fino a 18 chiamate in 24 secondi, cioe'
++# 45 al minuto. Il 429 arrivava quindi a meta' conversazione, o alla prima chiamata
++# del task successivo con la finestra ancora satura.
++#
++# Dove: `generate()` e' l'unico punto attraversato sia dall'agente
++# (agent/custom_agent.py) sia dall'utente simulato (user/user_simulator.py), quindi
++# limitare qui copre tutte le chiamate di una simulazione senza toccare altro.
++#
++# Come: finestra scorrevole, non pausa fissa. Una pausa fissa rallenterebbe anche
++# le conversazioni brevi che il limite non lo toccano mai; cosi' invece si aspetta
++# solo quando le ultime N chiamate stanno davvero saturando il minuto.
++#
++# Disattivabile: TAU2_RPM_LIMIT=0 lo spegne (per chiavi a pagamento, senza limite).
++_RPM_LIMIT = int(os.environ.get("TAU2_RPM_LIMIT", "13"))  # 13 e non 15: margine
++_RPM_WINDOW_SECONDS = 60.0
++_rpm_calls: deque[float] = deque()
++_rpm_lock = threading.Lock()
++
++
++def _throttle_rpm() -> None:
++    """Attende, se necessario, per restare sotto _RPM_LIMIT chiamate/minuto."""
++    if _RPM_LIMIT <= 0:
++        return
++    while True:
++        with _rpm_lock:
++            now = time.monotonic()
++            while _rpm_calls and now - _rpm_calls[0] >= _RPM_WINDOW_SECONDS:
++                _rpm_calls.popleft()
++            if len(_rpm_calls) < _RPM_LIMIT:
++                _rpm_calls.append(now)
++                return
++            wait = _RPM_WINDOW_SECONDS - (now - _rpm_calls[0]) + 0.05
++        logger.info(
++            f"Rate limit locale: attendo {wait:.1f}s "
++            f"({len(_rpm_calls)}/{_RPM_LIMIT} chiamate nell'ultimo minuto)"
++        )
++        time.sleep(wait)
++
++
+ def generate(
+     model: str,
+     messages: list[Message],
+@@ -379,6 +440,17 @@ def generate(
      if kwargs.get("num_retries") is None:
          kwargs["num_retries"] = DEFAULT_MAX_RETRIES
  
@@ -335,3 +396,12 @@ index cc70482..00127c2 100644
      # Vertex AI Gemini 3 models require VERTEXAI_LOCATION="global"
      if model.startswith("vertex_ai/gemini-3") and not os.environ.get(
          "VERTEXAI_LOCATION"
+@@ -404,6 +476,8 @@ def generate(
+     }
+     request_timestamp = datetime.now().isoformat()
+ 
++    _throttle_rpm()
++
+     start_time = time.perf_counter()
+     try:
+         response = completion(
