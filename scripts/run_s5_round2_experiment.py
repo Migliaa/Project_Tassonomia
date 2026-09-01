@@ -80,7 +80,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from langfuse import Evaluation, get_client  # noqa: E402
 
-from tau2.data_model.simulation import TextRunConfig  # noqa: E402
+from tau2.data_model.simulation import Results, TextRunConfig  # noqa: E402
 from tau2.runner.batch import run_domain  # noqa: E402
 from tau2.runner.helpers import get_tasks  # noqa: E402
 
@@ -96,7 +96,7 @@ DOMAIN = "airline"
 # Nome del Run dentro il dataset. Ogni iterazione del ciclo diagnosi-correzione-verifica
 # e' un Run distinto sullo STESSO dataset: cosi' in Langfuse restano confrontabili fianco
 # a fianco invece di disperdersi in dataset diversi. Cambiarlo a ogni lancio.
-RUN_NAME = "S5 round3 sonda 5 - clausola 3 ristrutturata + limitatore RPM (task 44)"
+RUN_NAME = "S5 round3 - agente dopo il passo 1"
 MODEL = "gemini/gemini-3.5-flash-lite"
 PACING_SECONDS = 75
 RETRY_BACKOFF_SECONDS = 75
@@ -111,7 +111,33 @@ PER_TASK_TIMEOUT = 900
 # rilanciare gli item senza dato di un run precedente (es. falliti per quota)
 # senza rispendere sui task gia' completati. Resta lo STESSO dataset: crea un
 # secondo Run piu' piccolo, confrontabile nella UI con il primo. None = tutti.
-TASK_IDS_FILTER = ["44"]
+TASK_IDS_FILTER = None
+
+# Task gia' misurati con QUESTA versione dell'agente: invece di rigiocarli si
+# riusa la simulazione salvata. Cosi' il Run del dataset resta completo a dieci
+# item - che serve per il confronto visivo nella pagina Experiments - senza
+# rispendere quota su un task il cui risultato conosciamo gia'.
+# Ogni item riusato porta "reused_from" nel proprio output: non e' una misura
+# nuova e non deve sembrarlo a chi legge il report.
+REUSE_EXISTING = {
+    # Round 3 completo del 2026-09-01: tutte e dieci le simulazioni sono gia' state
+    # eseguite e salvate in locale. Elencate qui per poter ripubblicare il Run con il
+    # nome corretto senza rigiocare nulla - il primo tentativo aveva ereditato il nome
+    # della sonda (una sostituzione di stringa che non aveva fatto match), e un Run mal
+    # nominato rende illeggibile il confronto nella pagina Experiments.
+    # Il campo reused_from finisce nell'output di ogni item: chi legge vede che quel
+    # risultato non e' stato prodotto da questa esecuzione.
+    "0": "20260901_225634_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "7": "20260901_224145_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "18": "20260901_224410_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "23": "20260901_224635_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "33": "20260901_224905_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "37": "20260901_225147_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "39": "20260901_225407_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "41": "20260901_225806_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "42": "20260901_230040_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+    "44": "20260901_223046_airline_custom_agent_gemini-3.5-flash-lite_user_simulator_gemini-3.5-flash-lite",
+}
 
 lf = get_client()
 
@@ -181,6 +207,17 @@ def build_transcript(messages):
     return "\n".join(lines)
 
 
+def load_saved_simulation(dir_name, task_id):
+    """Rilegge una simulazione gia' salvata come oggetto pydantic, cosi' il resto
+    del codice (transcript, reward_info) non distingue fra riusata e nuova."""
+    path = TAU2_ROOT / "data" / "simulations" / dir_name / "results.json"
+    results = Results.load(path)
+    for sim in results.simulations:
+        if sim.task_id == task_id:
+            return sim
+    return None
+
+
 def run_once(task_id):
     config = TextRunConfig(
         agent="custom_agent",
@@ -198,10 +235,15 @@ def run_once(task_id):
 
 def my_task(*, item, **kwargs):
     task_id = item.input["task_id"]
-    sim = run_once(task_id)
-    if sim is None or sim.reward_info is None:
-        time.sleep(RETRY_BACKOFF_SECONDS)
+    reused_from = REUSE_EXISTING.get(task_id)
+    if reused_from:
+        print(f"Task {task_id}: riuso la simulazione {reused_from} (nessuna chiamata LLM)")
+        sim = load_saved_simulation(reused_from, task_id)
+    else:
         sim = run_once(task_id)
+        if sim is None or sim.reward_info is None:
+            time.sleep(RETRY_BACKOFF_SECONDS)
+            sim = run_once(task_id)
 
     reward = None
     reward_breakdown = None
@@ -247,9 +289,11 @@ def my_task(*, item, **kwargs):
                 sim.model_dump(), golden, get_domain_tool_types(DOMAIN)
             )
 
-    time.sleep(PACING_SECONDS)
+    if not reused_from:
+        time.sleep(PACING_SECONDS)
     return {
         "task_id": task_id,
+        "reused_from": reused_from,
         "action_metrics": action_metrics,
         "reward": reward,
         "reward_breakdown": reward_breakdown,
@@ -336,10 +380,13 @@ def main():
 
     items = dataset.items
     description = (
-        "custom_agent dopo il passo 1 di S5 (docs/s5-correzioni.md): clausola "
-        "pagamenti riscritta per prenotazione, clausola di verifica policy prima "
-        "di ogni scrittura, clausola parole di scopo rimossa. Stesso motore e "
-        "stessi task del round1."
+        "Round 3. custom_agent dopo il passo 1 di S5 (docs/s5-correzioni.md): "
+        "clausola pagamenti riscritta per prenotazione, clausola di verifica "
+        "della policy prima di ogni scrittura, clausola sulle parole di scopo "
+        "rimossa. Stesso motore e stessi dieci task del round1 e del round2, "
+        "quindi confrontabile item per item. Il task 44 riusa la simulazione "
+        "gia' misurata della sonda 5 (campo reused_from nell'output): stessa "
+        "versione dell'agente, non rigiocato per non sprecare quota."
     )
     if TASK_IDS_FILTER is not None:
         items = [it for it in items if it.input["task_id"] in TASK_IDS_FILTER]

@@ -1363,6 +1363,74 @@ passo (a) regge sotto pressione ripetuta, perche' quello si legge nel testo.
 sola, 48 messaggi in 128 secondi. Resta come assicurazione per i run in cui e' veloce, dove
 avevamo misurato 45 chiamate al minuto contro un limite di 15.
 
+### Round 3 — 7 task su 10, quattro recuperi su sette
+
+Nove task eseguiti piu' il 44 riusato dalla sonda 5 (stessa versione dell'agente, campo
+`reused_from` nell'output di quell'item). Verificato contro i `results.json` locali:
+
+| Task | round1 | round2 | **round3** | note |
+|---|---|---|---|---|
+| 0 (canary) | 1.0 | 1.0 | **1.0** | nessuna regressione |
+| 41 (canary) | 1.0 | 1.0 | **1.0** | nessuna regressione |
+| 42 (canary) | 1.0 | 1.0 | **1.0** | nessuna regressione |
+| 7 | 0.0 | 0.0 | 0.0 | monitoraggio, atteso |
+| **18** | 0.0 | 0.0 | **1.0** | recuperato |
+| 23 | 0.0 | 0.0 | 0.0 | ma vedi sotto: e' cambiata la famiglia |
+| **33** | 0.0 | 0.0 | **1.0** | recuperato |
+| 37 | 0.0 | 1.0 | **1.0** | tenuto |
+| 39 | 0.0 | 0.0 | 0.0 | monitoraggio, atteso |
+| **44** | 0.0 | 0.0 | **1.0** | recuperato (sonda 5) |
+
+**4 dei 7 fallimenti originali recuperati**, canary intatti. E' esattamente il tetto realistico
+dichiarato *prima* del run ("il massimo raggiungibile e' 4 su 7, con il 23 come quinto in caso
+fortunato"): il 23 non e' arrivato, il 7 e il 39 sono rimasti dove li avevamo messi.
+
+**Il task 23 e' il risultato piu' importante del round, e il reward lo nasconde di nuovo.** I
+passi (b) e (c) della clausola 3 — quelli che la sonda 5 non aveva potuto mettere alla prova —
+qui hanno sparato entrambi. Turno 22:
+
+> "According to our policy, when changing flights, only a single payment method (gift card or
+> credit card) can be used for the transaction, so we cannot combine certificates, gift cards,
+> and your Mastercard."
+
+E' il controllo di ammissibilita' degli argomenti fatto **prima** della chiamata, e comunicato al
+cliente prima di proporre. Al turno 23 il simulatore reagisce esattamente come lo scenario del task
+prevedeva:
+
+> "I have a great idea: can we cancel the current reservation and book three separate reservations
+> instead? [...] For Raj's reservation, we can use `certificate_9984806`."
+
+Al turno 24 l'agente stende il piano corretto, con l'allocazione giusta dei tre certificati. Al
+turno 25 il cliente dice "Yes, please proceed" **e chiude con `###STOP###` nello stesso messaggio**.
+La conversazione finisce prima che l'agente possa eseguire.
+
+Cioe': la catena che avevamo progettato ha funzionato in tutti i suoi passaggi, e il task fallisce
+ora per la **famiglia 4** — "l'utente chiude la chiamata nello stesso turno in cui conferma" — che
+avevamo dichiarato non correggibile in S4 leggendo `orchestrator.py:836-843`. Il task 23 e' passato
+da un fallimento correggibile a uno non correggibile. Il reward resta 0.0 in entrambi i casi.
+
+**Caveat sulle nostre stesse metriche**: il task 33 passa con `reward` 1.0 pur avendo
+`write_action_score` 0.50 e tre scritture con argomenti fuori dal ground truth. Il DB finale
+coincide comunque, quindi il `db_check` passa. Le metriche per-azione misurano l'aderenza alla
+traiettoria attesa, non l'esito: una sequenza diversa che arriva allo stesso stato le fa scendere
+senza che nulla sia sbagliato. Vanno lette insieme al reward, non al posto suo.
+
+### Cura del dataset Langfuse
+
+Il Run del round3 era nato con il nome sbagliato: una sostituzione di stringa nello script non
+aveva fatto match e il Run aveva ereditato il nome della sonda 5. Un Run mal nominato rende
+illeggibile il confronto nella pagina Experiments, che e' proprio il materiale che serve al report.
+Risolto ripubblicando lo stesso identico contenuto con il nome giusto tramite `REUSE_EXISTING`,
+che rilegge le simulazioni salvate invece di rigiocarle: punteggi identici, **zero chiamate LLM,
+zero costo**. Resta da eliminare il duplicato mal nominato.
+
+Struttura del dataset `airline-s4-round2` a fine giornata: un solo dataset, un Run per iterazione,
+dieci item con scenario (`input`) e ground truth (`expected_output`), cinque score per item
+(`reward`, `db_check`, `write_action_score`, `unexpected_writes`, `wrong_argument_writes`) e il
+dialogo completo leggibile nella colonna Output senza saltare a Tracing. I Run del round2 non
+hanno i tre score per-azione, nati con il passo 0: per quelli il confronto sta nelle tabelle qui
+sopra, ricostruito dai file locali.
+
 ---
 
 ## Registro spesa API (tetto €20)
@@ -1377,3 +1445,4 @@ avevamo misurato 45 chiamate al minuto contro un limite di 15.
 | 2026-08-31/09-01 | S5 round2, tutti i tentativi (quota giornaliera + RPM, retry, arricchimento dataset) fino a 10/10 con dato reale | 15 simulazioni con costo (comprende retry falliti e riusciti) | $0.702 | $1.43 |
 | 2026-09-01 | S5 round3, sonde sul task 44 (1 troncata dal nostro timeout, 1 completata, 3 infrastructure_error a costo zero) | 2 simulazioni con costo | $0.157 | $1.59 |
 | 2026-09-01 | S5 sonda 5 sul task 44, con clausola 3 ristrutturata e limitatore RPM: **reward 1.0** | 1 simulazione | $0.095 | $1.69 |
+| 2026-09-01 | **S5 round3 completo**: 9 task eseguiti (il 44 riusato dalla sonda 5 a costo zero) — 7/10, quattro recuperi su sette | 9 simulazioni | $0.426 | $2.11 |
