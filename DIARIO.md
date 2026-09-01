@@ -1240,6 +1240,91 @@ affatto (allora il problema e' di posizione o di competizione nel prompt, non di
 la mossa successiva e' spostarla, non riscriverla). Sono due diagnosi opposte e le metriche le
 distinguono in un colpo d'occhio, che e' esattamente il motivo per cui il passo 0 e' venuto prima.
 
+### Sonda sul task 44 — la clausola 3 spara, ma solo per meta'
+
+Invece di lanciare subito i dieci task, una sonda sul solo task 44: costa una simulazione invece
+di dieci e risponde alla domanda da cui dipende tutto il resto, cioe' se la clausola nuova spara.
+Quattro tentativi, di cui due andati a vuoto per motivi che non riguardano l'agente.
+
+| # | Esito | Costo |
+|---|---|---|
+| 1 | troncata dal **nostro** timeout a 300s: l'agente era ancora nelle letture | $0.044 |
+| 2 | `infrastructure_error`, 0 messaggi — DNS caduto (`getaddrinfo failed`) | $0 |
+| 3 | **completata** | $0.113 |
+| 4 | `infrastructure_error` x2 — rate limit RPM (15/min) | $0 |
+
+Il tentativo 1 ha insegnato una cosa che e' finita nel codice: **il timeout non va tarato sulla
+durata osservata**. Il task 44 era durato 134s nel round2 e ne ha impiegati 321 quella sera — la
+latenza dell'API varia di un fattore tre nella stessa giornata. Un run troncato costa comunque i
+suoi token e non risponde a niente. Alzato a 900s con la motivazione nel commento.
+
+I due `infrastructure_error` hanno confermato l'utilita' del passo 0 in modo inatteso: con il solo
+reward avrei visto `0.0` in tutti e quattro i tentativi e avrei potuto scambiare un problema di
+rete per una regressione dell'agente. Le metriche per-azione distinguono a colpo d'occhio un
+troncamento (`act 0.47`, `write 0.00`, breakdown assente) da un fallimento vero da un
+`infrastructure_error` (tutto a zero, 0 messaggi, 0 secondi).
+
+**Il risultato della sonda 3**, contro il round2 sullo stesso task:
+
+| | reward | DB | COMM | write | unex | wrarg |
+|---|---|---|---|---|---|---|
+| round2 | 0.00 | 0.00 | 1.00 | **1.00** | **1** | 0 |
+| sonda 3 | 0.00 | 0.00 | 1.00 | 0.67 | **0** | **2** |
+
+**Il passo (a) funziona, ed e' verificato sul testo.** Turno 34:
+
+> "we cannot cancel reservation `S61CZX`. [...] Since `S61CZX` is an economy class booking made
+> more than 24 hours ago, and your reason for cancellation (**flights longer than 4 hours** /
+> change of plans) is not covered by travel insurance (which only covers health or weather
+> reasons), this cancellation cannot be processed."
+
+Ha riconosciuto le quattro ore come criterio del *cliente* e le ha tenute separate dalle condizioni
+della *policy* — la clausola in azione, alla lettera. `unexpected_writes` da 1 a 0. E regge la
+pressione: al turno 35 il cliente insiste, l'agente non cede. Soprattutto **non sovra-rifiuta**: i
+tre upgrade li esegue comunque. Il rischio numero 1 che avevo dichiarato prima del run — "spara e
+produce l'errore opposto" — su questo task non si e' materializzato.
+
+**Ma i passi (b) e (c) no, ed erano scritti male.** Al turno 38 l'agente prova a pagare un upgrade
+con `certificate_8045380`; `policy.md:131` per un cambio volo ammette solo "a single gift card or
+credit card". Il ramo (b) diceva *"including how many payment methods of each type"* — parlava di
+QUANTI, non di QUALI, e il divieto violato era di tipo: **la clausola letteralmente non copriva
+quel controllo**. E' lo stesso frammento che l'audit anti-overfitting aveva segnalato come il piu'
+orientato a un caso specifico; si e' rivelato anche troppo stretto. L'ha fermato il tool, non la
+regola.
+
+Il passo (c) diceva *"tell the customer before proposing anything"*, ma era una frase in coda a una
+clausola lunga invece che un passo. L'agente ha fatto l'opposto: ha eseguito le tre scritture e ha
+messo la spiegazione in una nota a fine messaggio, al turno 46. Avendo deciso da solo come allocare
+un piano di pagamento che era in parte inammissibile, ha messo `H8Q05L` sulla gift card invece che
+sulla Visa che il ground truth si aspetta — da cui `write_action_score` 0.67.
+
+Quindi una catena sola con tre sintomi: **(b) troppo stretto -> non rileva l'inammissibilita' ->
+(c) non scatta -> l'agente decide al posto del cliente -> `payment_id` sbagliato.**
+
+**Correzione, per ristrutturazione e non per aggiunta**: (b) passa da "quanti" a "quali e quanti",
+(c) diventa un passo invece di una frase in coda. Stessa lunghezza, nessuna idea nuova.
+
+Va pero' dichiarato un limite metodologico, e va dichiarato nel report: la sonda 3 e il round2 **non
+sono un confronto A/B pulito**. Nel round2 il cliente diceva "using my credit card
+`credit_card_4196779`" — un metodo solo, nominato; nella sonda dice "use my gift card and both
+travel certificates toward the total, and charge the remaining balance to my Visa" — un piano
+aggregato sui tre. Il simulatore-utente ha detto un'altra cosa, quindi parte della differenza e'
+varianza conversazionale, non effetto della regola.
+
+### Nota metodologica da riportare nel report
+
+Da qui in avanti stiamo iterando su un singolo task con **una sola esecuzione per iterazione**.
+Questo non permette di distinguere un miglioramento reale dalla varianza, ed e' overfitting per
+costruzione. Il presidio che abbiamo adottato e' sul **contenuto** delle regole, non sul metodo
+statistico: ogni clausola deve stare in piedi leggendola senza sapere quale task l'ha generata, e
+deve citare la policy del dominio invece dei dati del caso. La misura corretta sarebbe `pass^k` con
+piu' esecuzioni per task; non e' stata fatta per il tetto di spesa e le quote gratuite. E' una
+limitazione del progetto, non una scelta difendibile, e nel report va scritta cosi'.
+
+Decisione di Andrea, esplicita: si tiene la correzione anche se dovesse passare per fortuna, perche'
+e' difendibile in se', e si dichiara il limite invece di fingere un rigore che il budget non
+consente.
+
 ---
 
 ## Registro spesa API (tetto €20)
@@ -1252,3 +1337,4 @@ distinguono in un colpo d'occhio, che e' esattamente il motivo per cui il passo 
 | 2026-08-30 | smoke test S4 (task 2, 7 + tentativi falliti per quota) | 2 | gemini-3.5-flash-lite | $0.0622 | $0.41 |
 | 2026-08-31 | batch S4 non registrato a suo tempo (12:33-12:52, 8 completati + 3 infra_error) | 8 | gemini-3.5-flash-lite | $0.3209 | $0.73 |
 | 2026-08-31/09-01 | S5 round2, tutti i tentativi (quota giornaliera + RPM, retry, arricchimento dataset) fino a 10/10 con dato reale | 15 simulazioni con costo (comprende retry falliti e riusciti) | $0.702 | $1.43 |
+| 2026-09-01 | S5 round3, sonde sul task 44 (1 troncata dal nostro timeout, 1 completata, 3 infrastructure_error a costo zero) | 2 simulazioni con costo | $0.157 | $1.59 |

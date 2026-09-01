@@ -1,9 +1,9 @@
 diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
 new file mode 100644
-index 0000000..4124e88
+index 0000000..068dd22
 --- /dev/null
 +++ b/src/tau2/agent/custom_agent.py
-@@ -0,0 +1,325 @@
+@@ -0,0 +1,336 @@
 +from typing import Generic, List, Optional, TypeVar
 +
 +from pydantic import BaseModel
@@ -98,9 +98,19 @@ index 0000000..4124e88
 +#   caso: policy.md:113 e :149 lo prescrivono gia' ("The API does not check
 +#   these for the agent, so the agent must make sure the rules apply before
 +#   calling the API!"), l'agente non lo stava onorando, e la clausola aggiunge
-+#   il QUANDO. L'ultima frase e' quella che sblocca il 23: lo scenario prevede
++#   il QUANDO. Il passo (c) e' quello che sblocca il 23: lo scenario prevede
 +#   che sia il cliente a proporre le tre prenotazioni separate, ma solo dopo che
 +#   l'agente gli abbia detto del limite di un certificato.
++#   RISTRUTTURATA dopo la sonda sul task 44 (2026-09-01 sera): il passo (a)
++#   funzionava - l'agente rifiuta la cancellazione non idonea e regge la
++#   pressione, unexpected_writes da 1 a 0 - ma (b) e (c) no. (b) diceva "how
++#   many payment methods of each type": parlava di QUANTI, non di QUALI, e il
++#   divieto violato era di tipo (policy.md:131 ammette per un cambio volo solo
++#   "a single gift card or credit card", quindi niente certificati). (c) era una
++#   frase in coda a una clausola lunga invece che un passo, e l'agente ha
++#   eseguito prima e spiegato dopo, decidendo al posto del cliente come
++#   allocare i pagamenti. Nessuna aggiunta: (b) passa a "quali e quanti" e (c)
++#   diventa un passo.
 +#
 +# - Clausola 2 vecchia (parole di scopo, "other"/"the rest") RIMOSSA. Era
 +#   l'unica regola di S5 scritta su una sola osservazione. Nel round2 ha sparato
@@ -123,13 +133,14 @@ index 0000000..4124e88
 +   c. Only if neither applies, list the payment methods on their profile and ask which to
 +      use, before acting.
 +3. The tools do not enforce the policy: a call can succeed and still be wrong. Before each
-+   action that creates or modifies a reservation, check two things against the policy:
-+   a. that this reservation qualifies for the operation, and
-+   b. that the arguments you are about to pass are allowed - including how many payment
-+      methods of each type a single reservation may use.
-+   A rule the customer gives you for choosing what to act on - a duration, a date range, a
-+   price - selects the candidates only; it never replaces (a). When something fails (a) or
-+   (b), tell the customer before proposing anything, so they can decide with you.
++   action that creates or modifies a reservation:
++   a. Check that this reservation qualifies for the operation. A rule the customer gives
++      you for choosing what to act on - a duration, a date range, a price - selects the
++      candidates only; it never replaces this check.
++   b. Check that every argument is allowed for this operation, including which payment
++      methods the policy permits for it and how many of each.
++   c. If either check fails, tell the customer what is not possible and let them decide
++      how to proceed, before you call the tool.
 +4. When part of the customer's request cannot be done, or the path you first tried is
 +   blocked:
 +   a. Identify which parts of the request the policy still allows you to serve, including

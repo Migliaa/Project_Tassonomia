@@ -92,16 +92,26 @@ from action_metrics import (  # noqa: E402
 DATASET_NAME = "airline-s4-round2"
 TASK_SET_NAME = "airline"
 DOMAIN = "airline"
+
+# Nome del Run dentro il dataset. Ogni iterazione del ciclo diagnosi-correzione-verifica
+# e' un Run distinto sullo STESSO dataset: cosi' in Langfuse restano confrontabili fianco
+# a fianco invece di disperdersi in dataset diversi. Cambiarlo a ogni lancio.
+RUN_NAME = "S5 round3 sonda 4 - clausola 3 ristrutturata (task 44)"
 MODEL = "gemini/gemini-3.5-flash-lite"
 PACING_SECONDS = 75
 RETRY_BACKOFF_SECONDS = 75
-PER_TASK_TIMEOUT = 300  # safety net: nessun run S4 precedente si e' avvicinato
+# Safety net, NON un limite di lavoro. Alzato a 900s il 2026-09-01 dopo che la
+# sonda sul task 44 e' stata troncata a 321s: il task era durato 134s nel round2,
+# ma la latenza dell'API varia di un fattore 3 nella stessa giornata, quindi un
+# timeout tarato sulla durata osservata taglia il task piu' lungo. Un run troncato
+# costa comunque i suoi token e non risponde a niente: meglio largo.
+PER_TASK_TIMEOUT = 900
 
 # Se valorizzato, lancia solo questi task_id invece di tutto il dataset - per
 # rilanciare gli item senza dato di un run precedente (es. falliti per quota)
 # senza rispendere sui task gia' completati. Resta lo STESSO dataset: crea un
 # secondo Run piu' piccolo, confrontabile nella UI con il primo. None = tutti.
-TASK_IDS_FILTER = None
+TASK_IDS_FILTER = ["44"]
 
 lf = get_client()
 
@@ -326,19 +336,21 @@ def main():
 
     items = dataset.items
     description = (
-        "custom_agent con le tre modifiche S5 (docs/s5-correzioni.md), "
-        "stesso motore e stessi 10 task del round1 (S4)."
+        "custom_agent dopo il passo 1 di S5 (docs/s5-correzioni.md): clausola "
+        "pagamenti riscritta per prenotazione, clausola di verifica policy prima "
+        "di ogni scrittura, clausola parole di scopo rimossa. Stesso motore e "
+        "stessi task del round1."
     )
     if TASK_IDS_FILTER is not None:
         items = [it for it in items if it.input["task_id"] in TASK_IDS_FILTER]
         description += (
-            f" Rilancio parziale di {TASK_IDS_FILTER}: item senza dato "
-            "(quota) nel run precedente sullo stesso dataset."
+            f" Eseguito solo su {TASK_IDS_FILTER}, sullo stesso dataset "
+            "(crea un Run in piu', non un dataset in piu')."
         )
         print(f"Rilancio solo {len(items)} item: {sorted(TASK_IDS_FILTER)}")
 
     run_kwargs = dict(
-        name="S5 correzioni comportamentali",
+        name=RUN_NAME,
         description=description,
         task=my_task,
         evaluators=[
@@ -349,7 +361,7 @@ def main():
             wrong_argument_writes_evaluator,
         ],
         max_concurrency=1,
-        metadata={"sprint": "S5", "commit": "1a40172"},
+        metadata={"sprint": "S5", "commit": "51946b6", "iterazione": "round3-sonda"},
     )
     if TASK_IDS_FILTER is not None:
         result = lf.run_experiment(data=items, **run_kwargs)
