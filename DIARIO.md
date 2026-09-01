@@ -1479,6 +1479,44 @@ storia), le sonde 3 e 5 sul task 44 — le due con dati veri, che raccontano l'i
 round3 completo. Ripubblicare il round3 con la colonna nuova e' costato **zero**: `REUSE_EXISTING`
 rilegge le dieci simulazioni salvate invece di rigiocarle.
 
+### Revisione del piano — 2026-09-01
+
+`TASSONOMIA.md` (fuori dal repo) aggiornato con il via libera di Andrea, dopo aver scoperto che
+quello che stavamo chiamando S5 non era l'S5 del piano. Backup del file precedente accanto
+all'originale come `.bak-20260901`. Quattro modifiche:
+
+**S5 riscritto in due parti.** S5a — correzioni all'agente e metriche per-azione — e' fatto, e non
+era in quella forma nel piano: e' nato da S4, che chiedeva di verificare se le famiglie fossero
+correggibili. Registrato che **le assertion deterministiche del piano sono state fatte sotto altro
+nome**: `action_metrics.py` e' esattamente il "codice dove basta" che il piano considerava meta'
+del valore, con la prova sperimentale che serviva (senza quelle metriche il round2 sembrava un
+fallimento mentre le regole stavano gia' mordendo su tre task).
+
+**S5b — il giudice — ridotto e ridefinito.** Le "2-3 famiglie piu' frequenti" del piano non sono
+determinabili: con dieci task e un run per task non c'e' base per dire cosa sia frequente, e
+sceglierle sarebbe stato inventare una statistica. Lo scopo nuovo e' piu' stretto e piu' utile: un
+giudice che assegna la **famiglia di fallimento** leggendo la traccia, cioe' automatizza il lavoro
+diagnostico fatto a mano. Le etichette di riferimento esistono gia' — la colonna `failure_family`
+piu' le diagnosi di S4 — per **~16 fallimenti**, non i 30 del piano: il numero va dichiarato per
+quello che e'.
+
+**S7 ridimensionato da run da 50 task a paragrafo del report.** L'ablation e' gia' stata fatta
+senza volerlo durante S5, con nesso causale documentato in tre casi: la lingua di
+`POLICY_HIGHLIGHTS` (10 task su 20 contro 0 su 49 del baseline), l'"if and only if" perso nella
+nostra sintesi, la clausola sui pagamenti che ha fatto passare il task 18 da `DB 1.0` a `DB 0.0`.
+Quest'ultima ha la forma di un esperimento controllato vero, con il round1 come controllo. Rifarla
+su 50 task costerebbe due giorni di quota per la stessa conclusione: la quota va al 50+50 di S6.
+
+**Il decreto "non si ottimizza il prompt per alzare il pass rate" e' stato revocato**, su decisione
+di Andrea. Nasceva da una preoccupazione giusta — tarare finche' il numero non e' bello — ma
+proibiva la cosa sbagliata. Sostituito da un **obbligo**: ogni miglioramento di pass rate va
+riportato insieme al metodo, cioe' quante iterazioni, quante esecuzioni per task, quali task erano
+irrecuperabili e perche'. Il caso da dichiarare e' il nostro: 7/10 ottenuto con **n=1 per
+iterazione**, che non distingue il miglioramento dalla varianza.
+
+**S6 aggiornato**: sono **due** run da 50 (baseline `llm_agent` e `custom_agent`) e non uno, con la
+nota su quota e pianificazione — circa 2.000 richieste contro un tetto di 500 al giorno.
+
 ---
 
 ## Registro spesa API (tetto €20)
