@@ -999,6 +999,46 @@ quando riprovare.
 
 ---
 
+## 2026-09-01 — S5: dato reale su tutti e dieci i task, e un recupero molto più piccolo dell'atteso
+
+Tre tentativi in più dopo la quota giornaliera di ieri (cambio chiave API due volte, quota RPM
+15/min ancora prima della giornaliera), un dataset arricchito con scenario e ground truth per
+item (vedi commit `fe64f17`), e un rilancio mirato solo sugli item senza dato invece di rifare
+tutti i dieci (`58fcc8a`). Alla fine: **10/10 task con reward reale**, verificato contro i
+`results.json` locali (non la console, non la UI) — la fonte è autorevole per definizione di
+progetto.
+
+| Task | round1 (pre-S5) | round2 (post-S5) | Esito |
+|---|---|---|---|
+| 0 (canary) | 1.0 | 1.0 | invariato |
+| 41 (canary) | 1.0 | 1.0 | invariato |
+| 42 (canary) | 1.0 | 1.0 | invariato |
+| 7 | 0.0 | 0.0 | invariato (COMMUNICATE 0.0, DB 1.0 — pattern invertito) |
+| 18 | 0.0 | 0.0 | invariato (DB 0.0, COMMUNICATE 1.0) |
+| 23 | 0.0 | 0.0 | invariato (DB 0.0, COMMUNICATE 1.0) |
+| 33 | 0.0 | 0.0 | invariato (DB 0.0, COMMUNICATE 1.0) |
+| **37** | 0.0 | **1.0** | ✅ recuperato |
+| 39 | 0.0 | 0.0 | invariato (DB 0.0, COMMUNICATE 1.0) |
+| 44 | 0.0 | 0.0 | invariato (DB 0.0, COMMUNICATE 1.0) |
+
+**Solo 1 fallimento su 7 recuperato**, non i 6/7 stimati come "coperti" in `docs/s5-correzioni.md`.
+Nessuna regressione sui tre canary — le regole nuove non hanno rotto ciò che già passava, buona
+notizia ma minore di quella sperata.
+
+Un segnale che vale la pena portarsi dietro prima di diagnosticare: su 18, 23, 33, 39, 44 il check
+`COMMUNICATE` ora passa (prima falliva anche quello - es. il `$23.553` della famiglia 2), mentre
+il check `DB` (le azioni giuste sul sistema) continua a fallire sugli stessi cinque. La correzione
+lingua/formato sembra funzionare; il problema decisionale che porta alle azioni sbagliate no. Il
+task 7 fa eccezione col pattern opposto (DB ok, COMMUNICATE no) — proprio il task su cui la
+famiglia 1 (clausola 2, evidenza singola) era stata scritta.
+
+**Non ancora diagnosticato**: perché il DB check fallisce ancora su 18, 23, 33, 39, 44 nonostante
+le regole che avrebbero dovuto coprirli, e perché il task 7 fallisce ora sul comunicare invece che
+sull'agire. Prossimo passo, rimandato a sessione successiva per la compattazione della
+conversazione — vedi handoff in `C:\Users\andre\AppData\Local\Temp\`.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -1008,4 +1048,4 @@ quando riprovare.
 | 2026-08-29 | baseline 10 task sviluppo (id 0-9) | 10 | gemini-3.5-flash-lite | $0.2642 | $0.35 |
 | 2026-08-30 | smoke test S4 (task 2, 7 + tentativi falliti per quota) | 2 | gemini-3.5-flash-lite | $0.0622 | $0.41 |
 | 2026-08-31 | batch S4 non registrato a suo tempo (12:33-12:52, 8 completati + 3 infra_error) | 8 | gemini-3.5-flash-lite | $0.3209 | $0.73 |
-| 2026-08-31 | S5 round2, 1/10 completato prima della quota giornaliera (task 42) | 1 | gemini-3.5-flash-lite | $0.0387 | $0.77 |
+| 2026-08-31/09-01 | S5 round2, tutti i tentativi (quota giornaliera + RPM, retry, arricchimento dataset) fino a 10/10 con dato reale | 15 simulazioni con costo (comprende retry falliti e riusciti) | $0.702 | $1.43 |
