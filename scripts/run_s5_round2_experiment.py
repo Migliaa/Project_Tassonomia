@@ -373,6 +373,87 @@ def wrong_argument_writes_evaluator(
     return Evaluation(name="wrong_argument_writes", value=float(spur - unex))
 
 
+# Triage dei fallimenti: etichetta categoriale pubblicata accanto al reward.
+#
+# Perche': il reward di tau2-bench e' binario e mette nello stesso mucchio tre cose
+# molto diverse - l'agente ha sbagliato; l'agente ha fatto la cosa giusta ma il
+# ground truth ne voleva un'altra; il simulatore-utente ha chiuso prima che l'agente
+# potesse agire. Senza un'etichetta, chi apre la pagina Experiments legge dieci
+# righe e vede solo "0.0" o "1.0", e un caso noto e spiegato sembra un errore
+# dell'agente. Questa colonna dice a chi guarda *di che tipo* e' il fallimento.
+#
+# I valori sono pochi e stabili di proposito, cosi' la colonna resta filtrabile:
+#   - "famiglia N - <titolo>"   : una delle famiglie della tassonomia S4
+#   - "ground truth incoerente" : l'atteso del benchmark contraddice la policy del
+#                                 dominio o non e' ricostruibile dalla conversazione
+#   - "da diagnosticare"        : fallimento non ancora classificato. E' il default,
+#                                 apposta: un fallimento senza etichetta non deve
+#                                 poter passare per "gia' capito".
+#   - "run non riuscito"        : nessun risultato (quota, rete). Non e' un
+#                                 fallimento dell'agente e non va contato come tale.
+#
+# La classificazione e' la NOSTRA diagnosi alla data indicata, non un dato del
+# benchmark: va riverificata quando cambia l'agente. Il task 23 e' l'esempio -
+# fino al round2 era un fallimento correggibile, nel round3 e' diventato famiglia 4.
+KNOWN_FAILURE_FAMILIES = {
+    "7": (
+        "ground truth incoerente",
+        "L'atteso e' $1.628, che somma anche due prenotazioni cancellate durante "
+        "la telefonata stessa, valorizzate al prezzo di prima delle modifiche. "
+        "L'agente dichiara entrambe le letture di 'other' ($708 e $2.076) e nessuna "
+        "coincide; anche il baseline llm_agent rispondeva $708. Non correggibile "
+        "con una regola difendibile. Vedi docs/s5-correzioni.md.",
+    ),
+    "23": (
+        "famiglia 4 - utente chiude nel turno della conferma",
+        "Round3: la catena progettata ha funzionato per intero - l'agente comunica "
+        "il limite di un solo metodo di pagamento, il cliente propone le tre "
+        "prenotazioni separate, l'agente stende il piano corretto - e il "
+        "simulatore risponde 'Yes, please proceed' chiudendo con ###STOP### nello "
+        "stesso messaggio, prima dell'esecuzione. Famiglia dichiarata non "
+        "correggibile in S4 leggendo orchestrator.py:836-843.",
+    ),
+    "39": (
+        "ground truth incoerente",
+        "Il ground truth chiede di cancellare MSJ4OA, che non soddisfa nessuna "
+        "condizione di cancellazione della policy - ed e' indistinguibile da "
+        "S61CZX (task 44), che lo stesso benchmark vieta di cancellare. La "
+        "description del task contraddice il proprio elenco di azioni attese. "
+        "Scelta la lettura fedele alla policy, che salva il 44. Vedi "
+        "docs/s5-correzioni.md, 'Task 39 - dichiarato non correggibile'.",
+    ),
+}
+
+
+def failure_family_evaluator(*, input, output, expected_output, metadata, **kwargs):
+    """Etichetta categoriale sul tipo di fallimento. Nessuna etichetta sui task
+    che passano: la colonna serve a leggere gli zeri, non a decorare gli uni."""
+    if not isinstance(output, dict):
+        return []
+    reward = output.get("reward")
+    if reward is None:
+        return Evaluation(
+            name="failure_family",
+            value="run non riuscito",
+            data_type="CATEGORICAL",
+            comment=f"nessun risultato (termination_reason={output.get('termination_reason')})",
+        )
+    if float(reward) >= 1.0:
+        return []
+    family, why = KNOWN_FAILURE_FAMILIES.get(
+        output.get("task_id"),
+        (
+            "da diagnosticare",
+            "Fallimento non ancora classificato nella tassonomia. Va letto con le "
+            "metriche per-azione (write_action_score, unexpected_writes, "
+            "wrong_argument_writes) prima di concludere.",
+        ),
+    )
+    return Evaluation(
+        name="failure_family", value=family, data_type="CATEGORICAL", comment=why
+    )
+
+
 def main():
     dataset = lf.get_dataset(DATASET_NAME)
     prepare_dataset_items(dataset)
@@ -406,6 +487,7 @@ def main():
             write_action_evaluator,
             unexpected_writes_evaluator,
             wrong_argument_writes_evaluator,
+            failure_family_evaluator,
         ],
         max_concurrency=1,
         metadata={"sprint": "S5", "commit": "51946b6", "iterazione": "round3-sonda"},

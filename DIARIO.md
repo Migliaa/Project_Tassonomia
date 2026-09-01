@@ -1431,6 +1431,54 @@ dialogo completo leggibile nella colonna Output senza saltare a Tracing. I Run d
 hanno i tre score per-azione, nati con il passo 0: per quelli il confronto sta nelle tabelle qui
 sopra, ricostruito dai file locali.
 
+### Una colonna per leggere gli zeri: `failure_family`
+
+Osservazione di Andrea, e ha ragione: il "monitoraggio" non riguarda i singoli task ma le
+**famiglie** di cui fanno parte, e se un fallimento e' gia' diagnosticato e dichiarato fuori
+portata, chi apre la pagina Experiments deve poterlo vedere senza rileggersi il diario. Un reward
+0.0 mette nello stesso mucchio tre cose molto diverse:
+
+1. l'agente ha sbagliato;
+2. l'agente ha fatto la cosa giusta ma il ground truth ne voleva un'altra;
+3. il simulatore-utente ha chiuso prima che l'agente potesse agire.
+
+Aggiunto quindi uno **score categoriale** (`data_type="CATEGORICAL"`, il meccanismo standard di
+Langfuse per le etichette non numeriche) chiamato `failure_family`, pubblicato accanto agli altri
+cinque. Valori pochi e stabili di proposito, cosi' la colonna resta filtrabile nella UI:
+
+| Valore | Significato | Task nel round3 |
+|---|---|---|
+| `famiglia N - <titolo>` | una delle famiglie della tassonomia S4 | 23 (famiglia 4) |
+| `ground truth incoerente` | l'atteso contraddice la policy del dominio o non e' ricostruibile dalla conversazione | 7, 39 |
+| `da diagnosticare` | fallimento non ancora classificato — **e' il default** | nessuno |
+| `run non riuscito` | nessun risultato (quota, rete): non e' un fallimento dell'agente | nessuno |
+
+Due scelte di progetto che vale la pena aver fatto apposta:
+
+- **Nessuna etichetta sui task che passano.** La colonna serve a leggere gli zeri, non a decorare
+  gli uni; lasciandola vuota sui successi, filtrare per "non vuoto" da' esattamente l'elenco dei
+  fallimenti classificati.
+- **`da diagnosticare` come default.** Un fallimento senza etichetta non deve poter passare per
+  "gia' capito". Se domani un task nuovo fallisce, la colonna lo dice invece di tacere.
+
+Il commento di ogni score porta la motivazione per esteso, con il rimando a
+`docs/s5-correzioni.md`. E porta anche l'avvertenza che conta: **la classificazione e' la nostra
+diagnosi a quella data, non un dato del benchmark, e va riverificata quando cambia l'agente.** Il
+task 23 e' l'esempio vivo: fino al round2 era un fallimento correggibile, nel round3 e' diventato
+famiglia 4.
+
+### Pulizia del dataset
+
+Cancellati cinque Run: le sonde 1, 2 e 4 (troncata dal timeout, DNS caduto, quota RPM — un item
+ciascuna, **non vuote come avevo detto**: contenevano il record del fallimento, ma nessun dato
+utile), il duplicato del round3 col nome della sonda, e la versione del round3 pubblicata prima di
+`failure_family`, superata dalla ripubblicazione.
+
+Restano sette Run: i quattro del round2 (compresi quelli parziali per quota, che fanno parte della
+storia), le sonde 3 e 5 sul task 44 — le due con dati veri, che raccontano l'iterazione — e il
+round3 completo. Ripubblicare il round3 con la colonna nuova e' costato **zero**: `REUSE_EXISTING`
+rilegge le dieci simulazioni salvate invece di rigiocarle.
+
 ---
 
 ## Registro spesa API (tetto €20)
