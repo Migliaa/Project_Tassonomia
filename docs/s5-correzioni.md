@@ -775,3 +775,84 @@ resterebbe a zero comunque. Non si perde nulla che si abbia gia'.
 famiglia 4. Va detto nel report per quello che e': un ground truth incoerente fra due task del
 benchmark sulla stessa clausola di policy, trovato **solo** guardando le azioni invece del
 punteggio binario. E' un risultato dell'osservabilita', non un alibi.
+
+
+## Revisione 2 dello stesso passo — dopo la diagnosi di 23 e 7
+
+La prima stesura del passo 1 aveva scritto una clausola 4 tarata sul solo task 44. Diagnosticando
+anche il 23 e il 7 e' emerso che era **troppo stretta in un caso e superflua in un altro**.
+
+### Il task 23 ha la stessa radice del 44
+
+Turno 16, l'agente propone la nuova prenotazione pagandola con **tre certificati insieme**:
+
+> "**Certificates:** $1,000.00 total (Certificate `certificate_3765853` for $500.00, Certificate
+> `certificate_2765295` for $250.00, and Certificate `certificate_9984806` for $250.00)"
+
+`policy.md:78` ammette **un solo** certificato per prenotazione. L'API accetta comunque, perche'
+`policy.md:113` dice esplicitamente che non controlla. Il danno e' a catena: lo scenario del
+cliente prevede che sia **lui** a proporre le tre prenotazioni separate, ma *"if the agent tells
+you that due to policy only one certificate can be used"*. L'agente non gliel'ha mai detto, quindi
+l'idea non e' mai arrivata e si e' chiuso con una prenotazione invece di tre.
+
+Quindi il 23 non era, come ipotizzato in prima battuta, un problema di "una prenotazione per
+passeggero": e' lo stesso meccanismo del 44 — **una scrittura che la policy vieta, e un tool che
+non la ferma**. Nel 44 il vincolo violato e' l'idoneita' alla cancellazione, nel 23 la composizione
+del pagamento.
+
+### Clausola 3 (era la 4) — generalizzata ai due casi
+
+```
+3. The tools do not enforce the policy: a call can succeed and still be wrong. Before each
+   action that creates or modifies a reservation, check two things against the policy:
+   a. that this reservation qualifies for the operation, and
+   b. that the arguments you are about to pass are allowed - including how many payment
+      methods of each type a single reservation may use.
+   A rule the customer gives you for choosing what to act on - a duration, a date range, a
+   price - selects the candidates only; it never replaces (a). When something fails (a) or
+   (b), tell the customer before proposing anything, so they can decide with you.
+```
+
+La prima riga e' la resa quasi letterale di `policy.md:113` e `:149`. Il ramo (a) copre il 44, il
+ramo (b) copre il 23, e l'ultima frase e' quella che sblocca la conversazione del 23.
+
+### Il task 7 — la clausola sulle parole di scopo ha sparato, e non e' bastata
+
+Va corretto quanto scritto in prima battuta ("la clausola 2 non ha morso"): ha morso alla lettera.
+Turno 32 del round2:
+
+> "**Reading 'other' as excluding XEHM4B**: [...] total cost of **$708.00**"
+> "**Reading 'other' as including XEHM4B**: [...] is **$2,076.00**"
+
+Entrambe le letture dichiarate, come chiesto. Ma il valore atteso e' `1628`, che non e' nessuna
+delle due:
+
+`7WPL39 ($402) + 3EMQJ6 ($306) + XEHM4B ($296) + 59XX6W ($624)`
+
+Per arrivarci l'agente dovrebbe includere due prenotazioni **che ha cancellato lui stesso durante
+la telefonata**, e valorizzare `XEHM4B` al prezzo di prima dell'upgrade ($296) invece che a quello
+appena addebitato al cliente ($1.368). Il baseline `llm_agent`, in due run indipendenti, aveva
+risposto $708: la stessa lettura della nostra.
+
+Nessuna regola difendibile ci arriva senza ricalcare questo caso specifico — cioe' senza rifare
+l'overfitting che il punto 5 della checklist vieta e che era gia' stato corretto una volta in S5.
+**Il task 7 entra in "non correggibile — solo monitoraggio"**, con la famiglia 4 e `MSJ4OA`.
+
+### Rimozione della clausola sulle parole di scopo
+
+Conseguenza diretta: la regola era l'unica di S5 scritta su una sola osservazione, ha fatto
+esattamente cio' per cui era stata scritta, e il task per cui era stata scritta resta a zero per un
+motivo che nessuna regola copre. Nel frattempo costa token e fa produrre risposte doppie in ogni
+caso ambiguo — verbosita' che puo' confondere il simulatore-utente altrove, e i turni sono
+contingentati a 30. **Rimossa.**
+
+La clausola 1 ("servi tutte le richieste prima di chiudere") **resta**: e' quella che nel round2 ha
+eliminato l'abbandono della domanda, che era il fallimento del round1 sul task 7, ed e' l'unica
+delle due sostenuta da piu' di un'osservazione.
+
+### Bilancio del passo 1 sul prompt
+
+Una clausola riscritta (pagamenti), una generalizzata (verifica di policy), **una rimossa** (parole
+di scopo), zero aggiunte. Il blocco `<handling_customer_requests>` passa da cinque clausole a
+quattro e si accorcia. Dopo il danno documentato sul task 18 — dove una regola in piu' ha tolto
+all'agente un comportamento che aveva gia' — non e' un dettaglio estetico ma il punto del passo.

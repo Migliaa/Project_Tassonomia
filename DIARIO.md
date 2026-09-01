@@ -1174,6 +1174,72 @@ punteggio binario e stavamo guardando le azioni. E' un risultato dell'osservabil
 Task 23 e 7 restano senza diagnosi nuova, per decisione: prima si verifica se queste due modifiche
 mordono.
 
+### Passo 1, seconda revisione — diagnosi di 23 e 7, e una regola tolta
+
+Diagnosticati anche gli ultimi due task. Il risultato ha cambiato la clausola scritta poche ore
+prima e ne ha fatta togliere un'altra.
+
+**Il task 23 ha la stessa radice del 44.** Al turno 16 l'agente propone di pagare una prenotazione
+sola con **tre certificati**; `policy.md:78` ne ammette uno. L'API accetta lo stesso, perche'
+`policy.md:113` dice esplicitamente che non controlla. E il danno e' a catena: lo scenario prevede
+che sia il **cliente** a proporre le tre prenotazioni separate, ma solo *"if the agent tells you
+that due to policy only one certificate can be used"*. L'agente non l'ha mai detto, l'idea non e'
+mai arrivata. Quindi non era un problema di "una prenotazione per passeggero" come avevo ipotizzato:
+e' una scrittura vietata dalla policy che nessun tool ferma, esattamente come nel 44.
+
+**Il task 7 non e' correggibile, e la clausola sulle parole di scopo va tolta.** Altra correzione a
+quello che avevo scritto stamattina: quella clausola **ha morso**, alla lettera. Al turno 32
+l'agente dichiara entrambe le letture, $708 e $2.076. Solo che il valore atteso e' 1628, cioe'
+`402 + 306 + 296 + 624`: include due prenotazioni **cancellate durante la telefonata stessa**, e
+valorizza `XEHM4B` al prezzo di prima dell'upgrade invece che a quello appena addebitato. Il
+baseline rispondeva $708, come noi. Nessuna regola difendibile ci arriva senza ricalcare il caso —
+cioe' senza rifare l'overfitting gia' corretto una volta in S5. Il task 7 va in monitoraggio.
+
+E quindi la regola si toglie: era l'unica di S5 scritta su una sola osservazione, ha fatto quello
+per cui era nata, il task per cui era nata resta a zero per un motivo che nessuna regola copre, e
+nel frattempo costa token e fa produrre risposte doppie in ogni caso ambiguo. La clausola 1
+("servi tutte le richieste prima di chiudere") resta: e' quella che ha eliminato l'abbandono della
+domanda, ed e' sostenuta da piu' di un'osservazione.
+
+**Bilancio del passo 1 sul prompt**: una clausola riscritta (pagamenti, ora per prenotazione), una
+generalizzata (verifica di policy prima di ogni scrittura, che copre 44 e 23), una rimossa (parole
+di scopo), zero aggiunte. Da cinque clausole a quattro. Dopo aver documentato che sul task 18 una
+regola in piu' aveva **tolto** all'agente un comportamento che gia' aveva, accorciare non e'
+estetica.
+
+### Cosa mi aspetto dal round3, e dove guarderei se non funziona
+
+Recuperi plausibili: **18 e 33** (meccanismo identificato con precisione, e il round1 dimostra che
+senza la nostra regola l'agente li faceva giusti — e' l'unico caso in cui abbiamo la prova che il
+comportamento corretto e' alla portata del modello); **44** (mancava una sola scrittura di troppo,
+tutto il resto era gia' corretto); **23** solo in parte, perche' richiede che l'agente dica il
+limite *e* che il simulatore-utente produca l'idea delle tre prenotazioni *e* che l'agente le
+esegua tutte e tre con lo split di pagamento giusto — tre passaggi in serie, ognuno dei quali puo'
+saltare.
+
+Fuori portata per costruzione: **7** e **39** (`MSJ4OA`), entrambi in monitoraggio.
+
+Dubbi, in ordine di quanto mi preoccupano:
+
+1. **La clausola 3 e' la piu' ambiziosa che abbiamo scritto.** Chiede una verifica di conformita'
+   prima di ogni scrittura, su una policy lunga, a un modello piccolo. Puo' produrre l'errore
+   opposto — rifiutare operazioni legittime — che e' esattamente come abbiamo perso `MSJ4OA`. I
+   canary 0, 41 e 42 sono la spia: se uno regredisce, e' quasi certamente questa.
+2. **Il ramo (b) della clausola 2 puo' scattare a sproposito**, leggendo "l'originale" quando il
+   cliente ne voleva un altro.
+3. **Le clausole 3 e 4 si incatenano** (la 3 scopre il blocco, la 4 dice cosa fare dopo). In teoria
+   non confliggono; e' lo stesso ragionamento ottimista che nel round2 si e' rivelato sbagliato.
+4. **n=1 resta il limite di fondo**: un delta di uno o due task non distingue il miglioramento dal
+   rumore, in nessuna delle due direzioni.
+
+Se il round3 non migliora, il primo posto dove guarderei **non** e' il testo delle regole: sono le
+metriche per-azione, `write_action_score` e `unexpected_writes` prima del reward. La domanda e' se
+la clausola 3 stia sparando e sbagliando bersaglio (allora si legge il turno in cui l'agente
+dichiara l'idoneita' e si vede quale condizione ha valutato male) oppure se non stia sparando
+affatto (allora il problema e' di posizione o di competizione nel prompt, non di formulazione — e
+la mossa successiva e' spostarla, non riscriverla). Sono due diagnosi opposte e le metriche le
+distinguono in un colpo d'occhio, che e' esattamente il motivo per cui il passo 0 e' venuto prima.
+
 ---
 
 ## Registro spesa API (tetto €20)
