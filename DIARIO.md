@@ -1039,6 +1039,103 @@ conversazione — vedi handoff in `C:\Users\andre\AppData\Local\Temp\`.
 
 ---
 
+## 2026-09-01 (2) — il reward binario stava nascondendo il lavoro
+
+Ripresa dopo la compattazione, per capire perche' su sette fallimenti se ne fosse recuperato uno
+solo. La premessa era sbagliata: **le regole hanno morso quasi ovunque, e' il reward binario che
+non lo mostra**. Riletti i `results.json` a livello di `action_checks` invece che di reward:
+
+| Task | round1 | round2 | Lettura |
+|---|---|---|---|
+| 44 | 0/3 upgrade (trasferiva tutto) | **3/3 corretti** | la clausola 4 ha morso, poi ha ecceduto: ha anche cancellato `S61CZX`, che il ground truth vieta esplicitamente (`nl_assertion`: "Agent does not cancel reservation S61CZX as the user is healthy"), e senza chiedere conferma |
+| 39 | 0/3 cancellazioni | **2/3** | manca `MSJ4OA`. Al turno 28 l'agente **cita la nostra riga riparata**: "un chemin bloque par la politique ne constitue pas un motif de transfert" — la regola e' letta e applicata alla lettera |
+| 23 | 4/4 scritture sbagliate (trasferiva) | cancella e **trova la strada alternativa** | fallisce su un dettaglio che nessuna famiglia copriva: una prenotazione per 3 passeggeri invece di tre separate (un certificato per passeggero) |
+| 18 | **DB 1.0** | **DB 0.0** | **regressione causata da noi**: `credit_card_2929732` su tutte e cinque le prenotazioni, mentre il ground truth ne vuole tre diverse. La clausola 3 dice "usa solo un metodo che il cliente ha nominato", il cliente ne ha nominato uno, l'agente l'ha applicato a tutto |
+| 33 | scritture 0.50 | scritture **0.00** | voli ora corretti, gift card sbagliata (`_1646646` invece di `_6941833`). Ed era classificato famiglia 4 ("non correggibile"): **e' famiglia 5**, la mappa famiglia-task era sbagliata |
+| 7 | DB 1.0 / COMM 0.0 | identico | la clausola 2 non ha morso per niente |
+
+Piu' un effetto collaterale non previsto: nel task 39 il cliente infila francesismi e l'agente
+**passa interamente al francese**. La nostra regola "reply in the language the customer is writing
+in" ha tolto l'italiano e introdotto il mirroring del francese; li' e' passata liscia solo perche'
+il task 39 non ha `communicate_info`.
+
+Bilancio onesto: tre vittorie comportamentali reali (23, 39, 44), due regressioni causate da noi
+(18 e 33), una sovra-esecuzione causata da noi (44), un no-op (7). Il reward comprime tutto in
+"1 su 7".
+
+### La ricerca: cosa dice il processo corretto
+
+- **Error analysis, non eval-driven development** ([Husain & Shankar](https://hamel.dev/blog/posts/evals-faq/)):
+  open coding -> axial coding -> tassonomia -> saturazione, guardando **il primo** fallimento in
+  ogni traccia perche' quelli a valle sono conseguenze. Consigliano ~100 tracce per ciclo. Noi ne
+  abbiamo dieci, con n=1: la tassonomia e' metodologicamente giusta, il campione e' troppo sottile
+  per reggerci sopra sei regole.
+- **Il reward binario va affiancato, non sostituito** ([Langfuse](https://langfuse.com/resources/engineering/ai-agent-evaluation),
+  [prefactor](https://prefactor.tech/learn/agent-benchmarks)): prima il successo end-to-end per
+  capire *quali* flussi falliscono, poi le metriche per-step. Eravamo fermi al primo stadio pur
+  avendo gia' i dati del secondo dentro ogni `results.json`.
+- **n=1 non distingue il miglioramento dal rumore.** E' il motivo per cui tau2-bench nasce con
+  `pass^k`. Gia' dichiarato nella spec S5, ora e' il vincolo principale.
+- **Aggiungere istruzioni e' un intervento a rischio, non neutro** ([prompt bloat](https://www.mindstudio.ai/blog/prompt-bloat-vs-skill-systems-ai-agents),
+  [instruction position](https://tianpan.co/blog/2026/04/14/the-instruction-position-problem)): le
+  istruzioni competono per attenzione e il fallimento tipico non e' il rifiuto del conflitto ma lo
+  **scarto silenzioso** di una delle due. E' il meccanismo di 18 e 44. Sul fronte opposto,
+  [IRMA (EMNLP 2025)](https://arxiv.org/abs/2508.20931) ottiene su tau-bench i guadagni
+  riformulando l'input turno per turno con le regole pertinenti, non ingrossando il system prompt.
+
+### Passo 0 — cambiare il metro prima dell'agente
+
+Nuovo `scripts/action_metrics.py`: metriche per-azione calcolate dai `results.json` locali, a costo
+zero e senza consumare quota, retroattive su tutti i run gia' fatti.
+
+- `action_score` — frazione delle azioni attese eseguite. Generosa, include le letture: il task 9
+  passa con `action_score` 0.00 perche' la sua unica azione attesa e' una lettura che l'agente ha
+  saltato. Serve come indicatore grossolano, non come verdetto.
+- `write_action_score` — la stessa cosa sulle sole azioni che modificano il database. E' quella che
+  conta: il DB check dipende solo da queste. E' la metrica che rende visibile "due cancellazioni su
+  tre" contro "nessuna".
+- `unexpected_writes` — scritture su prenotazioni che il ground truth non modifica **mai**:
+  sovra-esecuzione vera.
+- `wrong_argument_writes` — scritture sulla prenotazione giusta con un argomento sbagliato.
+
+Le ultime due erano una sola all'inizio, e le ho separate perche' confondevano due casi opposti: il
+task 18 sbaglia il metodo di pagamento su prenotazioni corrette (difetto di precisione), il task 44
+cancella una prenotazione che nessuno gli ha chiesto di toccare (difetto di eccesso). Si correggono
+in modo opposto. Nella prima versione il conteggio degli `unexpected` dava 0 anche per il 44,
+perche' confrontavo con **tutte** le azioni attese e `S61CZX` compare tra quelle di lettura.
+Corretto confrontando solo con le scritture attese: che il ground truth legga una prenotazione non
+autorizza a modificarla.
+
+Nessun criterio di matching inventato: si riusa `Action.compare_with_tool_call()`, lo stesso metodo
+di `ActionEvaluator`, e la classificazione read/write viene da `get_tool_types()` sul toolkit del
+dominio invece che da una lista scritta a mano.
+
+Quadro completo sui dieci task del dataset (`write` = `write_action_score`, `unex` =
+`unexpected_writes`, `wrarg` = `wrong_argument_writes`):
+
+| Task | reward r1 -> r2 | write r1 -> r2 | unex r2 | wrarg r2 |
+|---|---|---|---|---|
+| 0, 41, 42 (canary) | 1.0 -> 1.0 | invariati | 0 | 0 |
+| 7 | 0.0 -> 0.0 | 1.00 -> 1.00 | 0 | 0 |
+| 18 | 0.0 -> 0.0 | **1.00 -> 0.40** | 0 | **3** |
+| 23 | 0.0 -> 0.0 | 0.00 -> **0.25** | 0 | 1 |
+| 33 | 0.0 -> 0.0 | **0.50 -> 0.00** | 0 | 2 |
+| 37 | 0.0 -> **1.0** | 0.00 -> **1.00** | 0 | 0 |
+| 39 | 0.0 -> 0.0 | 0.00 -> **0.67** | 0 | 0 |
+| 44 | 0.0 -> 0.0 | 0.00 -> **1.00** | **1** | 0 |
+
+Le stesse tre metriche sono ora pubblicate come score su Langfuse da
+`scripts/run_s5_round2_experiment.py` accanto a `reward` e `db_check`, quindi ogni run futuro le
+avra' senza lavoro in piu'. Verificate a costo zero contro tre simulazioni reali gia' salvate,
+prima di committare. Nello stesso passaggio `TASK_IDS_FILTER` e' tornato a `None`: era rimasto
+valorizzato con i quattro task del rilancio mirato di ieri, e un run lanciato per distrazione ne
+avrebbe rifatti solo quattro su dieci.
+
+Da qui parte il passo 1: correggere per sottrazione — restringere le clausole 3 e 4 e ancorare la
+regola sulla lingua — prima di aggiungere qualunque clausola nuova.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |

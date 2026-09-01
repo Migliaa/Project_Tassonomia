@@ -50,6 +50,15 @@ un rilancio cieco dell'intero esperimento, ma l'automazione della regola di
 progetto "dopo un fallimento da rate limit si aspetta". Se fallisce di nuovo,
 l'item resta a reward=None/0.0 e va rilanciato in un secondo momento.
 
+AGGIUNTA 2026-09-01 (passo 0 della ripresa di S5): oltre a `reward` e
+`db_check` il run pubblica ora tre score per-azione calcolati da
+`scripts/action_metrics.py` - `write_action_score`, `unexpected_writes`,
+`wrong_argument_writes`. Motivo: il reward binario aveva nascosto quasi tutto il
+segnale del round2 (vedi DIARIO.md, "il reward binario stava nascondendo il
+lavoro"), e senza queste tre non si distingue una regola che non morde da una che
+morde nella direzione sbagliata. Costo zero: si calcolano dalla simulazione gia'
+prodotta, nessuna chiamata a un LLM.
+
 Pacing: 75s di pausa dopo ogni task completato (alzato da 65s dopo aver
 osservato un 429 anche con 65s), max_concurrency=1 per esecuzione
 sequenziale.
@@ -67,6 +76,7 @@ load_dotenv(TAU2_ROOT / ".env")
 import sys
 
 sys.path.insert(0, str(TAU2_ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from langfuse import Evaluation, get_client  # noqa: E402
 
@@ -74,8 +84,14 @@ from tau2.data_model.simulation import TextRunConfig  # noqa: E402
 from tau2.runner.batch import run_domain  # noqa: E402
 from tau2.runner.helpers import get_tasks  # noqa: E402
 
+from action_metrics import (  # noqa: E402
+    compute_action_metrics,
+    get_domain_tool_types,
+)
+
 DATASET_NAME = "airline-s4-round2"
 TASK_SET_NAME = "airline"
+DOMAIN = "airline"
 MODEL = "gemini/gemini-3.5-flash-lite"
 PACING_SECONDS = 75
 RETRY_BACKOFF_SECONDS = 75
@@ -85,7 +101,7 @@ PER_TASK_TIMEOUT = 300  # safety net: nessun run S4 precedente si e' avvicinato
 # rilanciare gli item senza dato di un run precedente (es. falliti per quota)
 # senza rispendere sui task gia' completati. Resta lo STESSO dataset: crea un
 # secondo Run piu' piccolo, confrontabile nella UI con il primo. None = tutti.
-TASK_IDS_FILTER = ["44", "33", "23", "7"]
+TASK_IDS_FILTER = None
 
 lf = get_client()
 
@@ -112,6 +128,19 @@ def prepare_dataset_items(dataset):
             expected_output=expected,
             metadata=item.metadata,
         )
+
+
+_TASKS_CACHE = {}
+
+
+def _task_definitions():
+    """Definizioni dei task del dominio, caricate una volta sola: servono per il
+    ground truth delle azioni, che le metriche per-azione confrontano con quello
+    che l'agente ha davvero chiamato."""
+    if not _TASKS_CACHE:
+        for t in get_tasks(task_set_name=TASK_SET_NAME):
+            _TASKS_CACHE[t.id] = t
+    return _TASKS_CACHE
 
 
 def build_transcript(messages):
@@ -196,9 +225,22 @@ def my_task(*, item, **kwargs):
                     {"info": c.info, "met": c.met} for c in ri.communicate_checks
                 ]
 
+    # Metriche per-azione (scripts/action_metrics.py): il reward binario da solo
+    # non distingue una regola che non morde da una che morde troppo. Calcolate
+    # qui e non solo a posteriori cosi' finiscono su Langfuse insieme al run.
+    action_metrics = None
+    if sim is not None:
+        task = _task_definitions().get(task_id)
+        if task is not None and task.evaluation_criteria is not None:
+            golden = [a.model_dump() for a in (task.evaluation_criteria.actions or [])]
+            action_metrics = compute_action_metrics(
+                sim.model_dump(), golden, get_domain_tool_types(DOMAIN)
+            )
+
     time.sleep(PACING_SECONDS)
     return {
         "task_id": task_id,
+        "action_metrics": action_metrics,
         "reward": reward,
         "reward_breakdown": reward_breakdown,
         "termination_reason": termination_reason,
@@ -231,6 +273,52 @@ def db_check_evaluator(*, input, output, expected_output, metadata, **kwargs):
     return Evaluation(name="db_check", value=1.0 if db_check["passed"] else 0.0)
 
 
+def _metric(output, key):
+    am = output.get("action_metrics") if isinstance(output, dict) else None
+    return (am or {}).get(key)
+
+
+def write_action_evaluator(*, input, output, expected_output, metadata, **kwargs):
+    """Quante delle scritture attese sono state eseguite: 0.0-1.0 invece del
+    binario. Distingue "non ha fatto niente" da "ne ha fatte due su tre"."""
+    v = _metric(output, "write_action_score")
+    if v is None:
+        return []
+    return Evaluation(name="write_action_score", value=float(v))
+
+
+def unexpected_writes_evaluator(*, input, output, expected_output, metadata, **kwargs):
+    """Sovra-esecuzione: scritture su prenotazioni che il ground truth non
+    modifica mai. Un task puo' avere write_action_score 1.0 e fallire il DB check
+    solo per queste (task 44, round2)."""
+    v = _metric(output, "unexpected_writes")
+    if v is None:
+        return []
+    detail = [
+        s["name"]
+        for s in (_metric(output, "spurious_writes_detail") or [])
+        if s.get("new_target")
+    ]
+    return Evaluation(
+        name="unexpected_writes",
+        value=float(v),
+        comment=", ".join(detail) or None,
+    )
+
+
+def wrong_argument_writes_evaluator(
+    *, input, output, expected_output, metadata, **kwargs
+):
+    """Scritture sulla prenotazione giusta ma con un argomento sbagliato (tipico:
+    il metodo di pagamento). Problema opposto alla sovra-esecuzione e con una
+    correzione opposta, quindi conta separatamente."""
+    spur = _metric(output, "spurious_writes")
+    unex = _metric(output, "unexpected_writes")
+    if spur is None or unex is None:
+        return []
+    return Evaluation(name="wrong_argument_writes", value=float(spur - unex))
+
+
 def main():
     dataset = lf.get_dataset(DATASET_NAME)
     prepare_dataset_items(dataset)
@@ -253,7 +341,13 @@ def main():
         name="S5 correzioni comportamentali",
         description=description,
         task=my_task,
-        evaluators=[reward_evaluator, db_check_evaluator],
+        evaluators=[
+            reward_evaluator,
+            db_check_evaluator,
+            write_action_evaluator,
+            unexpected_writes_evaluator,
+            wrong_argument_writes_evaluator,
+        ],
         max_concurrency=1,
         metadata={"sprint": "S5", "commit": "1a40172"},
     )
