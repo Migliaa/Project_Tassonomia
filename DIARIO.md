@@ -1519,6 +1519,92 @@ nota su quota e pianificazione — circa 2.000 richieste contro un tetto di 500 
 
 ---
 
+## 2026-09-02 (notte) — S6: i 100 task, baseline contro il nostro agente
+
+Cento simulazioni sui 50 task airline, due agenti, eseguite mentre Andrea dormiva. **Zero
+fallimenti infrastrutturali**: dieci blocchi su dieci chiusi con `falliti 0`. La sera prima, sullo
+stesso volume di lavoro, ne avevamo persi tre fra quota, DNS e timeout — la differenza sono il
+limitatore RPM e la divisione per chiave.
+
+### Il numero
+
+| | baseline `llm_agent` | `custom_agent` |
+|---|---|---|
+| **reward** | **34/50 — 68%** | **39/50 — 78%** |
+| `db_check` | 0.70 | **0.80** |
+| `write_action_score` | 0.62 | **0.69** |
+| `unexpected_writes` | 0.02 | **0.00** |
+| `wrong_argument_writes` | **0.06** | 0.14 |
+
+**+5 task netti, +10 punti percentuali.** Sei task recuperati (9, 12, 20, 21, 37, 44), **uno perso**
+(11), 33 passati da entrambi, 10 falliti da entrambi.
+
+Due colonne raccontano più del reward. `unexpected_writes` **a zero** contro 0.02 del baseline: la
+clausola sulla verifica della policy prima di ogni scrittura fa il suo mestiere su scala, non solo
+sul task 44 dove l'avevamo sondata. Ma `wrong_argument_writes` è **più che doppio** del baseline
+(0.14 contro 0.06): la clausola sui pagamenti continua a produrre scritture sulla prenotazione
+giusta con l'argomento sbagliato. È il difetto che avevamo identificato in S5 e corretto solo in
+parte — su cinquanta task si vede che non è risolto.
+
+### L'unica regressione, ed è la famiglia 4
+
+Il **task 11** è l'unico caso in cui il baseline passa e noi no. Verificato sulla traccia:
+
+- il **baseline** esegue `update_reservation_flights` e poi comunica l'esito → `reward` 1.0;
+- il **nostro agente** descrive la modifica correttamente (`COMMUNICATE` 1.0), chiede la conferma
+  esplicita, e al turno 19 il cliente risponde *"Yes, please just get this done quickly!"*
+  **chiudendo con `###STOP###` nello stesso messaggio**. Zero scritture eseguite, `DB` 0.0.
+
+È esattamente la famiglia 4, e stavolta con il controllo perfetto che al task 23 mancava: **la
+nostra regola di conferma esplicita — decisione 1 di S3, presa leggendo la policy — ci costa un
+task, perché il simulatore chiude la conversazione nell'atto stesso di confermare.** Il baseline
+vince proprio per essere meno scrupoloso.
+
+Vale la pena scriverlo nel report senza addolcirlo: una regola **corretta rispetto alla policy del
+dominio** produce un punteggio peggiore su un benchmark il cui simulatore-utente non aspetta.
+Non è un difetto del nostro agente, è il costo di aderire alla policy quando il grader misura solo
+lo stato finale.
+
+### Come è stato eseguito
+
+Cinque chiavi API di cinque progetti Google diversi, venti task ciascuna (10 baseline + 10 custom),
+cinque processi in parallelo. Tre cose hanno retto:
+
+- **Le chiavi non passano mai dalla riga di comando**: il worker riceve il nome della variabile e
+  legge il valore dal `.env`, quindi non finiscono nella lista dei processi né nei log.
+- **`load_dotenv` con `override=False`** fa vincere la chiave passata nell'ambiente del processo,
+  quindi lo smistamento non ha richiesto una riga di modifica al codice di terzi.
+- **Il limitatore RPM è per-processo**, quindi ogni chiave si autolimita sui propri 13/minuto senza
+  sapere delle altre — che è la cosa giusta, perché anche le quote sono per progetto.
+
+Un `save_to` per singolo task invece che per blocco: un processo che muore perde un task e non
+venti, e al riavvio il worker salta quelli già fatti. Non è servito, ma è il motivo per cui potevo
+lasciarlo girare senza sorveglianza continua.
+
+Esecuzione e pubblicazione separate: i worker hanno scritto solo su disco, e `s6_publish.py` ha
+consolidato in **due Run da 50 item sullo stesso dataset** (`airline-50-baseline-vs-custom`).
+Pubblicare dai worker avrebbe prodotto dieci frammenti da dieci item, e il confronto item-per-item
+— il motivo per cui il dataset esiste — sarebbe stato illeggibile. Come effetto collaterale, la
+ripubblicazione costa zero: si può aggiungere uno score o correggere un nome senza rigiocare nulla.
+
+Su `failure_family` sono state applicate **solo le etichette intrinseche al task** (il ground truth
+incoerente dei task 7 e 39). L'etichetta "famiglia 4" del task 23 era la diagnosi di una traccia
+specifica del round3, non una proprietà del task: riusarla su cento esecuzioni mai lette avrebbe
+significato etichettare fallimenti che nessuno ha guardato. Tutto il resto è `da diagnosticare`,
+che è la verità — e sono **dieci task falliti da entrambi gli agenti**, il materiale naturale per
+il giudice di S5b.
+
+### Cosa resta aperto
+
+- I dieci task falliti da entrambi non sono ancora diagnosticati: è il corpus su cui far girare il
+  giudice, molto più ricco dei sedici fallimenti ripetuti dei round precedenti.
+- `wrong_argument_writes` più che raddoppiato rispetto al baseline è un difetto **nostro**, noto e
+  non risolto.
+- Resta n=1 per task: cinque task di differenza su cinquanta non sono statisticamente separati
+  dalla varianza, e va scritto nel report accanto al numero.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -1532,3 +1618,4 @@ nota su quota e pianificazione — circa 2.000 richieste contro un tetto di 500 
 | 2026-09-01 | S5 round3, sonde sul task 44 (1 troncata dal nostro timeout, 1 completata, 3 infrastructure_error a costo zero) | 2 simulazioni con costo | $0.157 | $1.59 |
 | 2026-09-01 | S5 sonda 5 sul task 44, con clausola 3 ristrutturata e limitatore RPM: **reward 1.0** | 1 simulazione | $0.095 | $1.69 |
 | 2026-09-01 | **S5 round3 completo**: 9 task eseguiti (il 44 riusato dalla sonda 5 a costo zero) — 7/10, quattro recuperi su sette | 9 simulazioni | $0.426 | $2.11 |
+| 2026-09-02 | **S6: i 100 task** (50 baseline `llm_agent` + 50 `custom_agent`), cinque chiavi in parallelo, zero fallimenti | 100 simulazioni | $3.680 | $5.79 |
