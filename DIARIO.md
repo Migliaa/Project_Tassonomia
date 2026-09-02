@@ -1832,6 +1832,72 @@ rientrati al primo colpo. Costo dell'incidente: circa $0.05 e mezz'ora.
 
 ---
 
+## 2026-09-02 (notte) — La v3 falsifica l'attribuzione, ed e' il risultato piu' importante
+
+**v3 = 35/50.** Regola pre-registrata applicata di nuovo: regredisce, quindi **resta pubblicata la
+v1** (patch di nuovo verificata byte-identica). Quattro Run sullo stesso dataset Langfuse.
+
+| | baseline | **custom v1** | custom v2 | custom v3 |
+|---|---|---|---|---|
+| reward | 34/50 | **39/50** | 38/50 | 35/50 |
+| `db_check` | 0.70 | 0.80 | 0.78 | 0.72 |
+| `write_action_score` | 0.62 | 0.69 | 0.70 | 0.58 |
+| `unexpected_writes` | 0.02 | 0.00 | 0.00 | 0.04 |
+
+### Cosa doveva dimostrare la v3, e cosa ha dimostrato invece
+
+L'ipotesi era precisa: l'attribuzione per clausola sulla v2 diceva che la clausola del
+**trasferimento** valeva +1 senza perdite (recuperava il task 24) e quella del **pagamento** valeva
+−2. La v3 teneva solo la prima. Previsione: 40-42 su 50.
+
+Ha fatto 35, e il modo conta piu' del numero:
+
+| task | v1 | v2 | v3 | trasferisce a un umano? |
+|---|---|---|---|---|
+| 24 | 0.0 | **1.0** | 0.0 | SI / **no** / SI |
+| 32 | 0.0 | 0.0 | 0.0 | SI / **no** / SI |
+
+**Nella v3 i task 24 e 32 tornano a trasferire, pur essendo la v3 la versione che contiene la
+clausola sul trasferimento.** Nella v2 - stessa identica clausola, parola per parola - non
+trasferivano. L'unica differenza fra le due versioni e' la clausola sui **pagamenti**, che col
+trasferimento non c'entra niente.
+
+Conclusione obbligata: **quel comportamento non era causato dalla clausola.** Era causato dalla
+perturbazione del prompt nel suo insieme. L'attribuzione per clausola che avevo scritto poche ore
+prima - con sicurezza, e con tanto di tabella - era **anch'essa un artefatto del rimescolamento**.
+
+### Il risultato metodologico, che vale piu' di tutti e tre i numeri
+
+Tre varianti di prompt sullo stesso agente, stesso motore, `temperature: 0.0`, stessi 50 task:
+**39, 38, 35**. Tutti i confronti a coppie fra le tre sono statisticamente indistinguibili
+(McNemar `p=1.0`), e le coppie discordanti sono 9, 10 e 5 - cioe' ogni modifica sposta l'esito di
+5-10 task su 50 in entrambe le direzioni.
+
+**Con un'esecuzione per task, una modifica al prompt non e' separabile dal rumore, e nemmeno
+attribuibile a una clausola.** Non e' un limite del nostro metodo diagnostico: la diagnosi sulle
+tracce era corretta ogni volta (il task 33 usa davvero la carta giusta con la clausola nuova; il
+task 44 viene davvero scavalcato). Il problema e' che il *risultato* di una modifica si misura solo
+su ripetizioni, e noi non ne abbiamo.
+
+Retroattivamente questo mette una condizione anche sul risultato principale: **v1 contro baseline
+resta il confronto meglio sostenuto** - delta piu' grande (+5), `p=0.125`, e soprattutto e' un
+confronto fra "nessuna regola" e "tutte le regole", non fra due varianti vicine. Ma la stessa
+cautela va scritta accanto anche a quello.
+
+### Cosa cambia nel piano
+
+**La leva del prompt e' chiusa.** Non per stanchezza: perche' abbiamo misurato che sotto i ~5 task
+di differenza questo apparato non distingue nulla, e tre tentativi su tre lo confermano. Una v4
+sarebbe una scommessa, non un esperimento.
+
+Il budget residuo va dove ripara la causa: **ripetizioni**. Con `n=2` o `n=3` per task si passa da
+"39 contro 34" a "39 contro 34, e il divario ha tenuto su esecuzioni indipendenti", e diventa
+possibile misurare la varianza invece di subirla.
+
+Speso finora **$9.68 su €20**.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -1847,3 +1913,4 @@ rientrati al primo colpo. Costo dell'incidente: circa $0.05 e mezz'ora.
 | 2026-09-01 | **S5 round3 completo**: 9 task eseguiti (il 44 riusato dalla sonda 5 a costo zero) — 7/10, quattro recuperi su sette | 9 simulazioni | $0.426 | $2.11 |
 | 2026-09-02 | **S6: i 100 task** (50 baseline `llm_agent` + 50 `custom_agent`), cinque chiavi in parallelo, zero fallimenti | 100 simulazioni | $3.680 | $5.79 |
 | 2026-09-02 | **S7: la v2 sui 50 task** (piu' 5 ripetuti dopo la caduta di rete) | 55 simulazioni | $1.997 | $7.79 |
+| 2026-09-02 | **S7: la v3 sui 50 task**, solo clausola del trasferimento — falsifica l'attribuzione per clausola | 50 simulazioni | $1.890 | $9.68 |

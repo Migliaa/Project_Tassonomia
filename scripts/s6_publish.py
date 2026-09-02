@@ -136,6 +136,21 @@ RUNS = [
         "risposta, poi eventualmente si trasferisce. Stesso motore, stessi task, "
         "stesso n=1: l'unica variabile rispetto alla v1 sono queste due clausole.",
     ),
+    (
+        "s8",
+        "custom_agent",
+        "custom_agent v3 - solo trasferimento",
+        "La v1 con la sola clausola del trasferimento riscritta, senza quella sul "
+        "pagamento: doveva isolare la modifica che nella v2 sembrava aver "
+        "funzionato. Ha invece falsificato l'attribuzione. Nella v3 i task 24 e 32 "
+        "tornano a trasferire a un umano, pur essendo questa la versione che "
+        "contiene la clausola sul trasferimento, mentre nella v2 - stessa clausola "
+        "- non trasferivano. La differenza fra le due e' la clausola sui pagamenti, "
+        "che col trasferimento non c'entra: quindi il comportamento non e' "
+        "attribuibile alla clausola, ma alla perturbazione del prompt nel suo "
+        "insieme. Con un'esecuzione per task le singole modifiche non sono "
+        "separabili dal rumore.",
+    ),
 ]
 
 

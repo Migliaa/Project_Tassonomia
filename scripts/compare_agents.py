@@ -40,6 +40,7 @@ VERSIONS = [
     ("s6", "llm_agent", "baseline"),
     ("s6", "custom_agent", "custom v1"),
     ("s7", "custom_agent", "custom v2"),
+    ("s8", "custom_agent", "custom v3"),
 ]
 
 
