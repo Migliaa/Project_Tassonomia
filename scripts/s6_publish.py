@@ -103,6 +103,7 @@ def failure_family_evaluator(*, input, output, expected_output, metadata, **kwar
 
 RUNS = [
     (
+        "s6",
         "llm_agent",
         "baseline - llm_agent",
         "L'agente di default di tau2-bench, senza nessuno dei nostri cablaggi: "
@@ -113,13 +114,27 @@ RUNS = [
         "dalla varianza).",
     ),
     (
+        "s6",
         "custom_agent",
-        "custom_agent - dopo S5",
+        "custom_agent v1 - dopo S5",
         "Il nostro agente: system prompt in sezioni XML con riassunto della "
         "policy, limite di turni e gestione degli errori dei tool (S3), piu' le "
         "regole comportamentali nate dalla tassonomia dei fallimenti di S4 e "
         "corrette in S5 (docs/s5-correzioni.md). Stesso motore, stessi task e "
         "stesso n=1 del baseline: l'unica variabile sono i cablaggi.",
+    ),
+    (
+        "s7",
+        "custom_agent",
+        "custom_agent v2 - pagamento e trasferimento",
+        "La v1 con due sole clausole riscritte, entrambe sostituzioni e nessuna "
+        "aggiunta. (1) Quando il cliente non indica un metodo di pagamento, "
+        "l'agente propone quello con cui la prenotazione e' stata pagata invece "
+        "di elencare il profilo e chiedere: chiedere portava il cliente fuori "
+        "dalla sua stessa intenzione. (2) Il trasferimento a un umano passa da "
+        "condizione a sequenza: prima si dichiara l'ostacolo e si aspetta la "
+        "risposta, poi eventualmente si trasferisce. Stesso motore, stessi task, "
+        "stesso n=1: l'unica variabile rispetto alla v1 sono queste due clausole.",
     ),
 ]
 
@@ -130,10 +145,13 @@ def main() -> None:
     items = list(dataset.items)
     print(f"dataset '{DATASET_NAME}': {len(items)} item")
 
-    for agent, run_name, description in RUNS:
+    wanted = set(sys.argv[1:]) or None
+    for prefix, agent, run_name, description in RUNS:
+        if wanted and prefix not in wanted:
+            continue
         mapping, missing = {}, []
         for task_id in TASK_IDS:
-            d = f"s6_{agent}_t{task_id}"
+            d = f"{prefix}_{agent}_t{task_id}"
             if (TAU2_ROOT / "data" / "simulations" / d / "results.json").exists():
                 mapping[task_id] = d
             else:
@@ -159,7 +177,7 @@ def main() -> None:
             ],
             max_concurrency=1,
             metadata={
-                "sprint": "S6",
+                "sprint": "S6" if prefix == "s6" else "S7",
                 "agent": agent,
                 "modello": "gemini/gemini-3.5-flash-lite",
                 "esecuzioni_per_task": 1,
