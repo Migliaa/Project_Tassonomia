@@ -1603,6 +1603,51 @@ il giudice di S5b.
 - Resta n=1 per task: cinque task di differenza su cinquanta non sono statisticamente separati
   dalla varianza, e va scritto nel report accanto al numero.
 
+### Cosa fare adesso — analisi post-S6 e piano concordato
+
+Andrea si aspettava di piu' dal 68% -> 78%, temendo che i cinque task di guadagno fossero solo
+quelli corretti a mano. **Verificato: non e' cosi'.** Dei sei recuperi (9, 12, 20, 21, 37, 44)
+**quattro sono su task mai guardati**; solo 37 e 44 erano nel set di sviluppo.
+
+| | baseline | custom |
+|---|---|---|
+| i 10 task del set di sviluppo | 4/10 | 6/10 |
+| i **40 task mai visti** | 30/40 | **33/40** |
+
+**Le correzioni generalizzano**, ed e' questo il risultato del progetto, non la percentuale: regole
+scritte leggendo sette fallimenti su dieci task migliorano il comportamento su quaranta task nuovi.
+Con overfitting la riga dei "mai visti" sarebbe piatta.
+
+**Ma il risultato non e' statisticamente stabilito.** Test esatto di McNemar (quello corretto per
+esiti binari appaiati): 7 coppie discordanti, 6 a favore, **p = 0.125 a due code**, sopra la soglia
+di 0.05. La letteratura sulla valutazione di agenti indica di leggere con cautela differenze sotto
+gli 8-10 punti percentuali su un singolo benchmark; siamo a 10 esatti con n=1 per task. Da scrivere
+nel report accanto al numero, non in nota.
+
+**Il bersaglio residuo e' uno solo.** Dei 10 task falliti da entrambi gli agenti, **nove hanno la
+stessa firma**: `DB` 0.0 con `COMMUNICATE` 1.0 - l'agente dice la cosa giusta e scrive la cosa
+sbagliata (task 14, 23, 24, 25, 29, 32, 33, 35, 39). L'unica eccezione e' il 7, firma opposta e
+gia' dichiarato non correggibile. Nove task su cinquanta valgono 18 punti potenziali: e' l'unica
+leva rimasta grande abbastanza da giustificare una spesa, tutto il resto vale 2-4 punti, cioe'
+rumore.
+
+**Cosa dice la ricerca quando il prompt plafona**: la verifica e' l'intervento con piu' ritorno
+(togliere la fase di verifica costa 7.1 punti contro i 3.5 della pianificazione, in uno studio su
+planning verification-aware), le descrizioni dei tool sono una leva mai toccata, e su tau2-bench una
+riscrittura di prompt ha portato un modello piccolo a +20%. **Ma il "verifier tax" e' documentato e
+noi lo paghiamo gia'**: il task 11 e' la nostra regola di conferma esplicita che costa un task
+perche' il simulatore chiude nell'atto di confermare. Aggiungere verifica puo' ripetere quel danno
+su scala, con i turni contingentati a 30.
+
+**Piano concordato**: (1) diagnosticare il grappolo dei nove a costo zero, chiedendosi se sia UN
+meccanismo o nove cause diverse - in S5 la stessa domanda ebbe risposta "cinque cause diverse";
+(2) se e' un meccanismo solo, una correzione mirata e il rilancio del solo custom sui 50 (~$1.8),
+altrimenti **non si corregge** e diventa la tassonomia del report; (3) il giudice di S5b su questo
+corpus, molto migliore dei sedici fallimenti ripetuti di prima; (4) il report, e stop.
+
+Handover per la prossima sessione: `tassonomia-handoff-S6-dopo-i-100-task.md` nella cartella
+temporanea dell'utente.
+
 ---
 
 ## Registro spesa API (tetto €20)
