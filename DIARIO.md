@@ -1748,6 +1748,90 @@ Il rischio e' reale e asimmetrico: la 2c e' stretta e ancorata, la 4d tocca 18 r
 
 ---
 
+## 2026-09-02 (notte) — Il verdetto sulla v2: regola pre-registrata applicata
+
+**v2 = 38/50, v1 = 39/50.** La regola scritta prima di lanciare dice che la v2 resta pubblicata
+solo se non regredisce. Non e' cosi', quindi **l'agente del repo torna a essere la v1** (patch
+verificata byte-identica a quella pre-modifica), e la v2 resta qui documentata con il suo numero,
+nel commit `fec7be5` e come terzo Run su Langfuse.
+
+| | baseline | custom v1 | custom v2 |
+|---|---|---|---|
+| reward | 34/50 | **39/50** | 38/50 |
+| `db_check` | 0.70 | 0.80 | 0.78 |
+| `write_action_score` | 0.62 | 0.69 | 0.70 |
+| `unexpected_writes` | 0.02 | 0.00 | 0.00 |
+| `wrong_argument_writes` | 0.06 | 0.14 | **0.20** |
+
+### Ma l'aggregato nasconde due storie opposte
+
+Un task di differenza non dice niente (`p=1.0`). Quello che dice qualcosa e' l'attribuzione per
+clausola, che il reward complessivo distrugge:
+
+**Clausola 2 (trasferimento): ha funzionato. +1, nessuna perdita.**
+- task 24: trasferiva a un umano, ora no -> **reward 0 -> 1.0**
+- task 32: trasferiva, ora no. Comportamento corretto, task ancora fallito per altro
+- nessuno dei task persi dalla v2 contiene un trasferimento: il raggio d'azione dichiarato (18 run)
+  non ha prodotto danni
+
+**Clausola 1 (pagamento): ha fatto danno. -2.**
+- task 33, il suo bersaglio: la v1 usava `gift_card_1646646`, la v2 usa **`gift_card_6941833`**,
+  cioe' esattamente il metodo atteso. **La clausola ha centrato il proprio obiettivo.** Il task
+  resta 0.0 perche' l'agente si ferma dopo la prima azione e non esegue
+  `update_reservation_baggages`: un difetto diverso, che era nascosto sotto quello del pagamento.
+  Progresso a livello di azione, zero a livello di reward - il fenomeno per cui esiste
+  `action_metrics.py`
+- task 44: perso. Il cliente dice *"use my Visa credit card ending in 7238"*, e la v2 usa un misto
+  che include `gift_card_5094406`, cioe' l'originale della prenotazione. **La clausola ha scavalcato
+  un'istruzione esplicita del cliente**, che e' precisamente cio' che l'allargamento di 2a a "named
+  or otherwise identified" doveva impedire. Non e' bastato
+- task 21: perso. Il cliente chiede *"la gift card col saldo piu' basso"*; la v1 la trovava, la v2
+  ne usa un'altra
+- `wrong_argument_writes` sale da 0.14 a **0.20**: peggiora proprio la metrica che doveva sanare
+
+**Il costo di regressione dichiarato si e' materializzato.** Nel diario, prima di lanciare, avevo
+scritto che il rischio della clausola 1 erano i task 21, 32, 37, 44 - quelli in cui il ground truth
+usa un metodo diverso dall'originale - e che 2a li avrebbe protetti. Due dei quattro si sono rotti
+lo stesso. La previsione del *dove* era giusta, quella del *se* era sbagliata.
+
+### Il resto e' rimescolamento, e va detto
+
+Fra v1 e v2 ci sono **9 coppie discordanti** su 50 task, fra due versioni che differiscono per due
+clausole, a `temperature: 0.0`. Tre dei quattro recuperi (11, 25, 29) e tre delle cinque perdite
+(8, 20, 42) non c'entrano ne' col pagamento ne' col trasferimento: sono task che cambiano esito
+perche' un prompt piu' lungo fa prendere al dialogo un percorso diverso dal primo messaggio, e a
+cascata cambia **quali task finiscono nella trappola della conferma** - che ha un tasso di base del
+12% sui turni di conferma.
+
+Il task 20 e' l'esempio: la v2 lo perde perche' l'utente risponde *"Yes, I confirm and wish to
+proceed. ###STOP###"*. Non e' una regressione delle clausole, e' la trappola che si e' spostata.
+
+**Conseguenza per il report**: con n=1 per task, qualunque modifica al prompt ridistribuisce una
+trappola stocastica su tutto il campione. Un delta di uno o due task fra due versioni dello stesso
+agente non e' misurabile in questo modo. L'attribuzione per clausola, fatta sulle tracce, e' l'unico
+strumento che ha separato il segnale dal rumore - e ha detto una cosa che il reward diceva al
+contrario: **una delle due modifiche era buona.**
+
+### Ipotesi non testata (costo ~$2)
+
+Una v3 con la sola clausola del trasferimento, senza quella del pagamento: +1 dalla 2, +2 dai task
+21 e 44 non piu' rotti. Stima 40-42/50. **Non lanciata**: Andrea aveva autorizzato un run solo, e
+l'autorizzazione non si estende da sola. Decide lui da sveglio.
+
+### Nota infrastrutturale: il retry era rotto da sempre
+
+Durante il run e' caduta la connessione e sono morti cinque task, uno per blocco. Il ritentativo
+automatico dopo 90s non ne ha salvato nessuno, e **non per la rete**: `run_domain`, trovando un
+`results.json` gia' presente, chiede a schermo *"Do you want to resume the run? (y/n)"*, e in un
+processo senza stdin quella domanda e' un `EOFError`. Il primo tentativo moriva per la rete
+lasciando la cartella a meta', il secondo moriva per la domanda.
+
+Era un difetto latente da S6, mai emerso perche' il retry non era mai servito davvero. Ora
+`s6_worker.py` scarta da se' le simulazioni senza reward prima di ritentare, e i cinque task sono
+rientrati al primo colpo. Costo dell'incidente: circa $0.05 e mezz'ora.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -1762,3 +1846,4 @@ Il rischio e' reale e asimmetrico: la 2c e' stretta e ancorata, la 4d tocca 18 r
 | 2026-09-01 | S5 sonda 5 sul task 44, con clausola 3 ristrutturata e limitatore RPM: **reward 1.0** | 1 simulazione | $0.095 | $1.69 |
 | 2026-09-01 | **S5 round3 completo**: 9 task eseguiti (il 44 riusato dalla sonda 5 a costo zero) — 7/10, quattro recuperi su sette | 9 simulazioni | $0.426 | $2.11 |
 | 2026-09-02 | **S6: i 100 task** (50 baseline `llm_agent` + 50 `custom_agent`), cinque chiavi in parallelo, zero fallimenti | 100 simulazioni | $3.680 | $5.79 |
+| 2026-09-02 | **S7: la v2 sui 50 task** (piu' 5 ripetuti dopo la caduta di rete) | 55 simulazioni | $1.997 | $7.79 |

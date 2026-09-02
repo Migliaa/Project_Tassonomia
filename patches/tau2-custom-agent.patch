@@ -1,9 +1,9 @@
 diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
 new file mode 100644
-index 0000000..31d08f5
+index 0000000..068dd22
 --- /dev/null
 +++ b/src/tau2/agent/custom_agent.py
-@@ -0,0 +1,342 @@
+@@ -0,0 +1,336 @@
 +from typing import Generic, List, Optional, TypeVar
 +
 +from pydantic import BaseModel
@@ -60,7 +60,8 @@ index 0000000..31d08f5
 +- Each turn is either a message to the user or a tool call. Never both, never neither.
 +- Extra compensation is offered ONLY if the user is a silver/gold member, or has travel
 +  insurance, or is flying business. Never offer it on your own initiative.
-+- A blocked path is not the same as a request outside your scope.
++- Transfer to a human agent only if no action available to you can serve the customer's
++  goal. A blocked path is not the same as a request outside your scope.
 +- If a tool returns an error, re-read the customer's message and the policy to check
 +  whether the procedure was correct, before retrying.
 +""".strip()
@@ -126,14 +127,11 @@ index 0000000..31d08f5
 +   the question in the same message in which you ask for confirmation of the action.
 +2. When an action requires you to supply a payment method, decide it separately for each
 +   reservation:
-+   a. If the customer has named or otherwise identified a method for that reservation,
-+      use it.
++   a. If the customer has named a method for that reservation, use it.
 +   b. If the customer has told you to use the method the reservation was paid with, read
 +      it from that reservation's payment history and use it.
-+   c. Only if neither applies: when the action changes a reservation that already exists,
-+      propose the method it was paid with, naming it, and let the customer replace it with
-+      another from their profile. When there is no earlier payment to read from, list the
-+      payment methods on their profile and ask which to use. Settle this before acting.
++   c. Only if neither applies, list the payment methods on their profile and ask which to
++      use, before acting.
 +3. The tools do not enforce the policy: a call can succeed and still be wrong. Before each
 +   action that creates or modifies a reservation:
 +   a. Check that this reservation qualifies for the operation. A rule the customer gives
@@ -152,11 +150,7 @@ index 0000000..31d08f5
 +   c. Tell the customer plainly which part could not be done and why. If an alternative
 +      route exists but changes what they would get, describe it and let them choose,
 +      rather than deciding for them or stopping there.
-+   d. Transferring to a human agent ends the conversation, so it is the last step and
-+      never the first answer to an obstacle: state the obstacle to the customer and wait
-+      for their reply. They may accept a cost, give up a constraint, or raise a further
-+      request you can serve. Transfer once they have answered and step (a) still leaves
-+      nothing you can serve.
++   d. Transfer to a human agent only if step (a) leaves nothing you can serve.
 +""".strip()
 +
 +# S3, decisione 2: se un tool sbaglia 3 volte di fila, e' il codice - non il

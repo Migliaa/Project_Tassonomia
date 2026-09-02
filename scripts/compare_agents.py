@@ -50,7 +50,10 @@ def load(prefix: str, agent: str, tasks: dict) -> dict:
         if not os.path.exists(fp):
             continue
         rows = analyze_results_file(fp, "airline", tasks)
-        if rows:
+        # Una simulazione interrotta (rete caduta, timeout) lascia comunque la
+        # cartella e il results.json, ma senza reward. Va esclusa: contarla come
+        # zero direbbe che l'agente ha sbagliato, mentre non ha mai giocato.
+        if rows and rows[0].get("reward") is not None:
             out[rows[0]["task_id"]] = rows[0]
     return out
 
@@ -92,7 +95,7 @@ def main() -> None:
     print(head)
     print("-" * len(head))
     rows = [
-        ("reward", lambda d: sum(1 for t in ids if d[t]["reward"] == 1.0), "{:>10}/50"),
+        ("reward", lambda d: f"{sum(1 for t in ids if d[t]['reward'] == 1.0)}/{len(ids)}", "{:>12}"),
         ("db_check", lambda d: mean(( (d[t].get('reward_breakdown') or {}).get('DB') for t in ids)), "{:>12.2f}"),
         ("write score", lambda d: mean((d[t]["write_action_score"] for t in ids)), "{:>12.2f}"),
         ("scrit. inattese", lambda d: mean((d[t]["unexpected_writes"] for t in ids)), "{:>12.2f}"),

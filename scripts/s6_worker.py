@@ -90,6 +90,28 @@ def already_done(save_to: str) -> bool:
         return False
 
 
+def discard_incomplete(save_to: str) -> bool:
+    """Rimuove una cartella di simulazione senza reward.
+
+    Serve perche' `run_domain` non e' pensato per girare senza un terminale: se
+    trova un `results.json` gia' presente chiede a schermo "Do you want to resume
+    the run? (y/n)", e in un processo senza stdin quella domanda diventa un
+    EOFError. E' cosi' che in S7 una caduta di rete ha fatto perdere cinque task
+    invece di zero: il primo tentativo moriva per la rete lasciando la cartella a
+    meta', e il secondo non falliva per la rete ma per quella domanda.
+
+    Si cancella solo quando `already_done()` ha gia' detto di no, cioe' quando il
+    reward manca: non c'e' nulla da salvare in quel file, solo un dialogo troncato.
+    """
+    import shutil
+
+    path = SIM_DIR / save_to
+    if not path.exists():
+        return False
+    shutil.rmtree(path, ignore_errors=True)
+    return True
+
+
 def run_task(task_id: str, save_to: str):
     config = TextRunConfig(
         domain="airline",
@@ -130,6 +152,8 @@ def main() -> None:
         sim = None
         for attempt in (1, 2):
             try:
+                if discard_incomplete(save_to):
+                    print(f"{label} task {task_id}: scarto una simulazione incompleta", flush=True)
                 sim = run_task(task_id, save_to)
             except Exception as e:
                 print(f"{label} task {task_id} tentativo {attempt}: eccezione {type(e).__name__}: {e}", flush=True)
