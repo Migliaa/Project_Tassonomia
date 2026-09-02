@@ -1650,6 +1650,104 @@ temporanea dell'utente.
 
 ---
 
+## 2026-09-02 (notte) — Diagnosi del grappolo, e la v2 dell'agente
+
+### Un meccanismo o nove cause?
+
+La domanda del piano ha risposta: **sette cause per nove task**. Ma due risultati valgono piu'
+della tassonomia.
+
+**I task 14 e 23 non sono errori dell'agente.** L'unico campo che diverge dal ground truth e'
+l'*ordine* di due gift card dentro `payment_methods`: stesse quattro carte, stessi importi, stesso
+totale, due gift card invertite. Il cliente non aveva chiesto nessun ordine, e infatti
+`COMMUNICATE` vale 1.0. Verificato nel codice invece che dedotto: `evaluator_env.py:118` confronta
+`get_db_hash()`, che in `toolkit.py:244` e' `get_dict_hash(self.db.model_dump())` - **un hash del
+dizionario serializzato**. Le liste conservano l'ordine. Due prenotazioni finanziariamente
+identiche prendono 1.0 e 0.0.
+
+**Correzione a quanto scritto ieri sul task 11.** Avevo scritto che la nostra regola di conferma
+esplicita ci costa un task. Misurato sui 100 run: delle **69 richieste di conferma**, solo **8**
+sono seguite da `###STOP###`, cioe' il 12%. Il baseline ci finisce sopra 4 volte e perde tutte e
+quattro (12, 20, 24, 25); noi 5 volte e ne salviamo 2. In quella famiglia **vinciamo 2-0**, non
+perdiamo: due dei nostri sei recuperi (12 e 20) sono esattamente task in cui il baseline e' caduto
+nella trappola e noi no. Il "5 su 5" che avevo riportato prima era vero ma selezionato - guardavo
+solo i run *finiti* su una conferma, e un run fallito finisce li' per definizione.
+
+**E quella famiglia non e' correggibile.** `policy.md:7`: *"you must list the action details and
+obtain explicit user confirmation (yes) to proceed"*. Sui task 11 e 25 la conferma e' l'ultimo
+turno prima dell'unica scrittura: per evitare la trappola l'agente dovrebbe agire senza attendere
+il "si'", cioe' violare la regola aziendale che l'esercizio serve a implementare. Un punto
+guadagnato disobbedendo al committente non e' un punto.
+
+### Cosa abbiamo cambiato, e cosa no
+
+Due modifiche, entrambe **sostituzioni**, nessuna aggiunta - la forma che in S5 e' stata l'unica a
+funzionare.
+
+**Clausola 2c, il metodo di pagamento predefinito.** Prima diceva: se il cliente non ha indicato
+nulla, *elenca i metodi del profilo e chiedi*. Sul task 33 questo produce il danno: l'agente offre
+`gift_card_1646646` o `gift_card_6941833`, il cliente ne sceglie una, e il ground truth voleva
+l'altra - quella con cui la prenotazione era stata pagata. **Chiedere ha causato la risposta
+sbagliata**, portando il cliente fuori dalla sua stessa istruzione (*"you are ok with paying using
+the original form of payment"*). Ora la clausola propone il metodo con cui la prenotazione e' stata
+pagata, nominandolo, e lascia sostituire.
+
+Ancoraggio: `policy.md:152`, *"The refund will go to original payment methods"*. Non e' letta dal
+task 33. Verifica sul db: `HXDUBJ` ha `payment_history` = `gift_card_6941833`, esattamente il
+metodo atteso.
+
+**Costo di regressione misurato prima di scrivere** (checklist §4.9): sulle 25 azioni attese dei 50
+task che portano un `payment_id`, **19 usano il metodo originale e 6 no**. Le sei che divergono
+stanno nei task 21, 32, 37, 44 - e in tutte il cliente **indica lui** il metodo ("la carta che
+finisce per 7334", "la gift card col saldo piu' basso"), quindi le copre la clausola 2a, che viene
+prima. Per proteggerle davvero 2a e' stata allargata da "named" a "named or otherwise identified":
+se il modello leggesse "named" in senso stretto, una carta descritta a parole cadrebbe in 2c e la
+nuova 2c e' assertiva dove la vecchia era innocua. Rischio residuo dichiarato: un task in cui il
+cliente tace *e* il ground truth diverge dall'originale. Nei 50 non esiste.
+
+**Clausola 4d, il trasferimento.** Sui task 24 e 32 l'agente trasferisce a un umano nello stesso
+turno in cui scopre l'ostacolo. Sul 24 aveva appena scritto *"se avevi un'altra richiesta, fammi
+sapere"*, e la seconda richiesta del cliente non viene mai servita; sul 32 il cliente era pronto a
+pagare l'upgrade a economy - c'era scritto nelle sue istruzioni - ma non gliene e' stata data
+l'occasione. La clausola era una *condizione* ("trasferisci solo se non resta nulla"); ora e' una
+*sequenza*: dichiara l'ostacolo, aspetta la risposta, e solo dopo trasferisci.
+
+Il mio istinto era "trasferisce troppo". **E' falso, e averlo verificato ha cambiato la regola**:
+su 18 run in cui il nostro agente trasferisce, **16 passano**. Trasferire e' spesso la mossa giusta.
+Una regola che lo scoraggia in generale avrebbe messo a rischio 16 task funzionanti - l'errore di
+S5, ripetuto. Per questo la regola parla del *momento*, non della frequenza. Raggio d'azione
+comunque largo: 18 run. E' la piu' rischiosa delle due.
+
+Stessa occasione, **rimosso un duplicato**: la regola sul trasferimento era scritta sia in
+`POLICY_HIGHLIGHTS` sia nella 4d. Il checklist §4.4 dice di fondere. In `POLICY_HIGHLIGHTS` resta
+solo la distinzione di merito; la procedura la possiede la 4d.
+
+### Cosa NON abbiamo cambiato, potendo
+
+**L'ordine dei metodi di pagamento** (task 14 e 23) recupererebbe due task addebitando le gift card
+dalla piu' capiente alla meno capiente. Scartata: le due prove vengono dallo **stesso profilo
+cliente**, quindi e' un dato solo; nessuna riga di policy stabilisce un ordine; e la regola non
+descriverebbe un comportamento corretto ma *l'ordine in cui il ground truth ha scritto una lista*.
+Alla domanda "perche' la piu' capiente prima?" l'unica risposta onesta sarebbe "perche' cosi'
+combaciava l'hash". Vale piu' raccontata che spesa.
+
+**La selezione per rango** (task 35, "il secondo volo piu' economico"): sarebbe un passo di verifica
+in piu' su ogni ricerca voli, con i turni contingentati a 30, per **un** task. Rimandata.
+
+### Regola di decisione, scritta PRIMA di lanciare
+
+Perche' scegliere fra v1 e v2 dopo aver visto i numeri sarebbe cherry-picking:
+
+- **v2 diventa l'agente pubblicato se non regredisce** rispetto ai 39/50 della v1.
+- **Se regredisce, resta pubblicata la v1** e la v2 va nel report come iterazione fallita, **con il
+  suo numero**, non cancellata.
+- In entrambi i casi il baseline resta quello di S6: task e baseline non cambiano, quindi il
+  confronto 34/50 resta valido.
+
+Il rischio e' reale e asimmetrico: la 2c e' stretta e ancorata, la 4d tocca 18 run.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |

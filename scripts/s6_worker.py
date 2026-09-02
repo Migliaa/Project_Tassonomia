@@ -53,6 +53,10 @@ parser.add_argument("--tasks", required=True, help="task_id separati da virgola"
 parser.add_argument("--model", default="gemini/gemini-3.5-flash-lite")
 parser.add_argument("--timeout", type=int, default=900)
 parser.add_argument("--retry-wait", type=int, default=90)
+# Prefisso della cartella di salvataggio. Serve a tenere separate le versioni
+# dell'agente: S6 ha usato "s6", la v2 delle clausole usa "s7". Default "s6" per
+# non invalidare la ripresa dei run gia' su disco.
+parser.add_argument("--prefix", default="s6")
 args = parser.parse_args()
 
 # La chiave va messa in ambiente PRIMA di importare tau2/litellm.
@@ -117,7 +121,7 @@ def main() -> None:
 
     ok, skipped, failed = 0, 0, []
     for i, task_id in enumerate(task_ids, 1):
-        save_to = f"s6_{args.agent}_t{task_id}"
+        save_to = f"{args.prefix}_{args.agent}_t{task_id}"
         if already_done(save_to):
             skipped += 1
             print(f"{label} ({i}/{len(task_ids)}) task {task_id}: gia' fatto, salto", flush=True)
