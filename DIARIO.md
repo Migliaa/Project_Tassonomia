@@ -2587,6 +2587,34 @@ per il canale vocale e non per quello testuale, e ora sappiamo anche quanto pesa
 Nota di metodo: è la seconda volta in questa sessione che una misura da pochi centesimi ribalta
 una raccomandazione che avevo dato con sicurezza. La prima era il tetto dei turni.
 
+### Regola di arresto per i 4 trial, registrata PRIMA di girare
+
+Deciso di puntare ai **4 trial** dello standard Sierra (`docs/leaderboard-submission.md`, requisito
+5) accettando lo sforamento del tetto di ~$2: con 1 trial il report finirebbe come tutti i round
+precedenti — «dentro il rumore» — mentre 4 trial danno il pass^k, cioè la potenza statistica che
+manca al progetto da tre sprint, **e** rendono la sottomissione conforme.
+
+Proposta di Andrea, respinta con i dati: fermare il trial appena la v5 perde **un** task che il
+baseline passa. Non regge per quattro motivi, tutti misurati sui nostri stessi run:
+
+1. **Avrebbe ucciso la v1**, il miglior agente del progetto. La v1 vince 6 task che il baseline
+   perde e ne perde **uno solo, il task 11**: la regola si sarebbe attivata lì, buttando via il 78%.
+2. **Un singolo task che si ribalta è rumore, non segnale.** Girando *lo stesso* agente v1 due
+   volte cambiano esito **8 task**; il baseline, girato due volte, ne cambia 5. La regola si
+   attiverebbe quasi subito, e su rumore.
+3. **Sarebbe sovradattamento sul set di valutazione**, e per una sottomissione pubblica
+   comprometterebbe la credibilità che la PR dovrebbe comprare.
+4. **Un trial interrotto non è utilizzabile**: non entra nel pass^k e non è sottomissibile. I token
+   spesi fino all'interruzione sono persi davvero.
+
+**Regola adottata, sull'aggregato invece che sul singolo task**: si completa il **trial 1 per
+intero**. Se la v5 non raggiunge **37/50 (74%)** ci si ferma e si analizza, senza spendere i ~$6
+dei trial 2-4. La soglia è il pass rate della v4: sotto quella, il segnale sarebbe più debole di
+una versione già scartata, e non ha senso comprare precisione per misurare bene un miglioramento
+che non c'è. Costa quanto lo scenario peggiore proposto da Andrea, ma lascia un trial completo e
+utilizzabile in ogni caso, decide su 50 osservazioni invece che su una, ed è dichiarabile: un'
+analisi intermedia con regola pre-registrata è prassi, non una toppa.
+
 Nota infrastrutturale: il primo lancio è morto perché la chiave era stata cancellata, e il
 processo killato ha continuato a scrivere sullo stesso log del rilancio a offset diverso — il
 file risulta binario e contiene righe di due run diverse. **La fonte attendibile sono i
