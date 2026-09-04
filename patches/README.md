@@ -73,3 +73,25 @@ cd tau2-bench && git add -N src/tau2/agent/custom_agent.py && git diff -- src/ta
 
 `uv.lock` è escluso di proposito: è enorme e conflittuale, e `uv sync` lo rigenera da
 `pyproject.toml`.
+
+## `tau2-user-simulator.patch`
+
+Una riga aggiunta a `data/tau2/user_simulator/simulation_guidelines.md`.
+
+**Non e' una modifica nostra: e' un backport.** La riga e' copiata *testualmente* da
+`simulation_guidelines_voice.md:42`, dove Sierra l'ha gia' scritta contro questo esatto
+fallimento — «Agreeing to an action is not the same as the action being completed». Nelle
+linee guida testuali manca.
+
+Perche' serviva: sui task 17 e 21 il cliente simulato dice "si" all'ultima conferma e chiude
+la conversazione **nello stesso messaggio**, prima che l'agente possa eseguire l'azione. Il
+punteggio di comunicazione resta 1.0 e quello di database va a 0.0: l'agente e' penalizzato
+per un'azione che il simulatore non gli ha lasciato compiere. E' un artefatto dello strumento
+di misura, non un errore dell'agente — nella realta' una UI impedisce di chiudere la sessione
+mentre un'operazione confermata e' in corso.
+
+**Vincolo di misura**: cambia lo strumento, quindi ogni numero prodotto con questa patch
+attiva e' confrontabile solo con altri numeri prodotti con la patch attiva. Il baseline va
+rigirato nelle stesse condizioni, e la cosa va dichiarata nel report (precedente: la
+submission Anthropic `claude-sonnet-4-5_anthropic_2025-10-02` sulla leaderboard ufficiale fa
+la stessa cosa e la dichiara).
