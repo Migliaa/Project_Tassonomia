@@ -2620,6 +2620,81 @@ processo killato ha continuato a scrivere sullo stesso log del rilancio a offset
 file risulta binario e contiene righe di due run diverse. **La fonte attendibile sono i
 `results.json` su disco, non il log.**
 
+## 2026-09-05 — Il trial 1 della v5, due difetti nostri, e la sottomissione a Sierra
+
+**Trial 1 completo: v5 = 38/50 (76%).** Baseline 34/50 (68%), v1 39/50 (78%), v4 37/50 (74%).
+Contro il baseline: 6 vinti, 2 persi, McNemar p=0,289. Contro v1: 3 vinti, 4 persi, p=1,000.
+Costo per successo $0,0534 (v1 $0,0435, baseline $0,0449).
+
+La regola di arresto (≥37/50) è rispettata. Ma il quadro onesto è un altro: **le differenze fra le
+nostre versioni sono rumore** — 74%, 76%, 78% sono uno o due task, e lo stesso agente girato due
+volte ne cambia otto. Il task 33 lo mostra da solo: passa in `s11`, passa in `s12`, fallisce qui.
+**L'unica cosa solida è che tutte le versioni battono il baseline**, sempre nella stessa direzione,
+mai una volta sotto: +10 (v1), +8 (v5), +6 (v4). Nessuna presa da sola è significativa; la
+coerenza fra quattro esperimenti indipendenti dice più di ciascuno.
+
+Correzione a una memoria imprecisa: al secondo giro la v1 fece **27/36 = 75%**, non 35/50, e sui
+36 task comuni fece 27 entrambe le volte — fu **stabile**. A muoversi fu il baseline (26 → 29).
+
+### Le due regressioni contro il baseline sono nostre, e il meccanismo è nel testo
+
+**Task 2** (azioni attese: zero) — la v5 emette `send_certificate` per $100. È il buco previsto
+**prima** del lancio della v4: la clausola v1 «non offrire compensazioni di tua iniziativa» fu
+rimossa, e avevo scritto che lo slot «Allowed because» non la copre perché scatta solo sulle
+chiamate a tool. Previsione registrata prima, confermata dopo.
+
+**Task 8** — tutto corretto tranne `total_baggages`: atteso 0, inviato 2, con il cliente che dice
+«You don't have any baggages». La giustificazione scritta dall'agente è:
+
+> Allowed because: *regular members get 1 free checked bag per passenger in economy*
+
+e l'esempio che avevo scritto io in `CONFIRMATION_FORMAT` dice:
+
+> Allowed because: *gold members get 3 free checked bags per passenger in economy*
+
+Stessa frase, cambiati livello e numero. **L'esempio ha innescato il comportamento**: l'agente ha
+preso un *diritto* e l'ha trattato come un *ordine*. È il rischio del «mettiamo esempi più
+espliciti», manifestatosi dove non lo aspettavo. Difetto introdotto dalla v5: la v4, che non
+aveva quell'esempio, passava il task 8.
+
+Radice comune: **un diritto non è un'istruzione.** Compensazione permessa ≠ da dare, bagaglio
+incluso ≠ richiesto. Una riga sola le copre entrambe, ed è un principio generale, non una toppa
+sui due task — distinzione che tengo perché correggere dopo aver visto fallire è la stessa
+categoria di mossa che avevo respinto ad Andrea il giorno prima, e va dichiarata nel report.
+
+### Sottomissione a Sierra: cosa è valido e cosa no
+
+Deciso di puntare alla PR sul repo pubblico. Vincoli letti in `docs/leaderboard-submission.md`:
+
+- **Non serve nessuna registrazione**: è una pull request. Fork, `submission.json`, una riga in
+  `manifest.json`, tracce ospitate fuori dal repo e linkate nella PR.
+- **Un solo dominio è ammesso** («you may submit results for a single domain»). Airline basta.
+- **I 4 trial sono una preferenza dichiarata** («we strongly prefer»), non un requisito.
+- La nostra è **Custom**: `submission_type: "custom"`, note metodologiche complete,
+  `modified_prompts: true`, link all'implementazione (questo repo).
+
+**Piano scartato**: 1 trial di v5 + 3 di v6 dichiarati come «4 trial». Viola il requisito 2
+(«all trajectory files must use the same agent… with identical arguments») e svuota di senso il
+pass^k, che misura *lo stesso sistema* ripetuto. Sarebbe l'unica cosa del progetto che un
+revisore potrebbe chiamare scorretta. Le strade valide sono tre: v5 a 1 trial (costo zero, già
+conforme salvo la preferenza), v5 a 4 trial (~$6, consolida i due difetti noti), v6 a 4 trial
+(~$8, il trial 1 resta dato del report ma non della sottomissione).
+
+### Chi si vede accettato — con il limite del dato
+
+67 submission accettate, 9 custom e 58 standard. Fuori dai grandi laboratori: Distyl AI, Pine AI,
+LiveKit (aziende), Pickle (indipendente), NEU (università). **Nessuna da un individuo senza
+organizzazione.** Il regolamento non chiede alcun accreditamento — i criteri sono tutti tecnici —
+ma non esiste precedente di una persona singola: assenza di precedenti, non divieto. Limite del
+dato, dichiarato: stiamo guardando solo le submission **accettate**, non quelle rifiutate.
+
+### In coda, non fatto
+
+La segnalazione del bug dell'hash (`scratch_issue_taubench.md`) resta **non inviata**. Bozza
+verificata da un secondo agente in ruolo di avvocato del diavolo, quattro correzioni applicate.
+È contenuto pubblico e permanente su un repo di terzi a nome di Andrea: la manda lui, o serve un
+`gh auth login` fatto da lui più un via libera esplicito.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2640,3 +2715,5 @@ file risulta binario e contiene righe di due run diverse. **La fonte attendibile
 | 2026-09-04 | **Seconda esecuzione** di baseline e custom v1, interrotta a 73/100 dalla morte delle chiavi | 73 simulazioni | $2.523 | $12.25 |
 | 2026-09-04 | **S8: la v4 sui 50 task** (`s10`), un solo processo, zero fallimenti — 74%, sotto v1 | 50 simulazioni | $2.103 | $14.35 |
 | 2026-09-04 | **Controllo `s11`**: la v5 sui 9 task falliti e non rotti in partenza — diagnosi, non pass rate | 9 simulazioni | ~$0.40 | ~$14.75 |
+| 2026-09-05 | **`s12`**: v5 senza backport sui task 17, 21, 33 — isola le due correzioni | 3 simulazioni | ~$0.13 | ~$14.88 |
+| 2026-09-05 | **Trial 1 della v5** (`s13`), 50 task — 38/50, sopra la soglia di arresto | 50 simulazioni | $2.028 | ~$16.91 |
