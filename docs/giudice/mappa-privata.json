@@ -1,0 +1,50 @@
+{
+  "T01": {
+    "prefisso": "s8",
+    "task_id": "42"
+  },
+  "T02": {
+    "prefisso": "s6",
+    "task_id": "43"
+  },
+  "T03": {
+    "prefisso": "s7",
+    "task_id": "8"
+  },
+  "T04": {
+    "prefisso": "s6",
+    "task_id": "2"
+  },
+  "T05": {
+    "prefisso": "s6",
+    "task_id": "13"
+  },
+  "T06": {
+    "prefisso": "s7",
+    "task_id": "42"
+  },
+  "T07": {
+    "prefisso": "s6",
+    "task_id": "27"
+  },
+  "T08": {
+    "prefisso": "s6",
+    "task_id": "47"
+  },
+  "T09": {
+    "prefisso": "s8",
+    "task_id": "34"
+  },
+  "T10": {
+    "prefisso": "s8",
+    "task_id": "22"
+  },
+  "T11": {
+    "prefisso": "s8",
+    "task_id": "37"
+  },
+  "T12": {
+    "prefisso": "s6",
+    "task_id": "5"
+  }
+}

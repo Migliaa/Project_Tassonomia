@@ -116,7 +116,7 @@ RUNS = [
     (
         "s6",
         "custom_agent",
-        "custom_agent v1 - dopo S5",
+        "custom_agent v1 - le regole di S3 e S5",
         "Il nostro agente: system prompt in sezioni XML con riassunto della "
         "policy, limite di turni e gestione degli errori dei tool (S3), piu' le "
         "regole comportamentali nate dalla tassonomia dei fallimenti di S4 e "
@@ -160,9 +160,11 @@ def main() -> None:
     items = list(dataset.items)
     print(f"dataset '{DATASET_NAME}': {len(items)} item")
 
+    # Filtro da riga di comando: o il solo prefisso ("s6"), o prefisso e agente
+    # ("s6:custom_agent") quando su uno stesso prefisso convivono due agenti.
     wanted = set(sys.argv[1:]) or None
     for prefix, agent, run_name, description in RUNS:
-        if wanted and prefix not in wanted:
+        if wanted and prefix not in wanted and f"{prefix}:{agent}" not in wanted:
             continue
         mapping, missing = {}, []
         for task_id in TASK_IDS:
