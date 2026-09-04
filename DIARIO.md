@@ -2562,6 +2562,31 @@ Due letture di traccia prima di dichiarare qualcosa, e danno esiti diversi:
 
 Il 42, che era il gruppo di controllo, resta fallito come previsto.
 
+### Le due correzioni, isolate — e il backport esce dal disegno
+
+In `s11` erano attive due correzioni insieme (conferma unica + backport), quindi non si sapeva
+quale salvasse 17, 21 e 33. Separarle è costato $0,13: `s12` gira la v5 sugli stessi tre task
+**senza** backport. **Passano 21 e 33, non il 17** — che fallisce con la stessa firma di sempre,
+domanda in sospeso e cliente che riaggancia. La conferma unica fa quindi da sola quasi tutto il
+lavoro; il backport vale **+1 task**.
+
+E a quel punto il conto si rovescia. Misurando la firma sui run già in archivio, i task che il
+backport potrebbe recuperare sono 3 per la v4 (17, 21, 33) ma **2 per il baseline** (21, 24).
+Attivarlo darebbe +1 a noi e ~+2 al baseline: **costerebbe $1,55 di baseline da rigirare per
+ridurre il nostro stesso margine.** In più introduce un rischio identificato per nome — il task
+43 è un task **riuscito** che finisce con una domanda in sospeso, quindi tenere il cliente in
+linea gli dà altri turni per fare qualcosa di non richiesto — e obbligherebbe a dichiarare nel
+report uno strumento di misura modificato.
+
+**Decisione: backport fuori dal disegno sperimentale.** Il clone torna alle linee guida originali;
+la patch resta versionata in `patches/tau2-user-simulator.patch` come contributo documentato, non
+come componente del nostro numero. Il ritrovamento vale comunque: Sierra ha scritto quella riga
+per il canale vocale e non per quello testuale, e ora sappiamo anche quanto pesa — +1 sulla v5,
+~+2 sul baseline, 4 task su 50 di raggio d'azione.
+
+Nota di metodo: è la seconda volta in questa sessione che una misura da pochi centesimi ribalta
+una raccomandazione che avevo dato con sicurezza. La prima era il tetto dei turni.
+
 Nota infrastrutturale: il primo lancio è morto perché la chiave era stata cancellata, e il
 processo killato ha continuato a scrivere sullo stesso log del rilancio a offset diverso — il
 file risulta binario e contiene righe di due run diverse. **La fonte attendibile sono i
