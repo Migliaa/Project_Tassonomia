@@ -2372,6 +2372,23 @@ ora un dizionario per prefisso).
 
 Deciso: **niente pilota di 5-10 task**. Si gira tutto il primo giro da 50 direttamente.
 
+### v4 implementata, patch rigenerata
+
+`custom_agent.py` sostituito con la v4 (inclusi i due checkpoint di rilettura), patch rigenerata
+in `patches/tau2-custom-agent.patch`. Verificato che il modulo importa e il `system_prompt` si
+formatta senza errori prima di committare - nessuna simulazione lanciata.
+
+**`AGENT_TURN_LIMIT` alzato 30->50.** Verifica nel codice, non supposizione: il limite riguarda
+solo `CustomAgent` (un contatore nostro, `S3, decisione 3`) - il baseline (`LLMAgent`) non ne ha
+mai avuto uno, e' vincolato solo dal tetto di framework `DEFAULT_MAX_STEPS=200`. Alzarlo per v4
+non introduce quindi nessuna asimmetria col Run baseline `s6` con cui si confronta: correzione a
+quanto scritto in una bozza di handover di questa stessa sessione, che raccomandava di lasciarlo a
+30 proprio per timore di un'asimmetria che una lettura del codice ha escluso.
+
+**Conferma sul dettaglio in Langfuse**: la colonna Output del Dataset Run mostra gia' il dialogo
+turno per turno (UTENTE/AGENTE/TOOL) dentro l'item stesso, senza dover aprire la Trace - fissato
+il 2026-09-01 dopo la stessa osservazione di Andrea, riusato identico per v4 via `base.my_task`.
+
 ---
 
 ## Registro spesa API (tetto €20)
