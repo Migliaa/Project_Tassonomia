@@ -239,8 +239,102 @@ per punto guadagnato** (quanto costa in più comprare un punto di pass rate in p
 modello dell'ICER usato in economia sanitaria per trattamenti più efficaci ma più cari). Se v4 non
 supera v1 sul pass rate, si riporta comunque quanto è costato non guadagnare nulla.
 
-*(Il resto — prompt finale, risultato, e le due misure di costo sopra — si riempie solo dopo
-averlo misurato con lo stesso rigore delle voci precedenti, non prima.)*
+**Risultato: v4 batte il baseline ma perde contro v1.** 37/50 (74%) contro 34/50 (68%) del
+baseline e 39/50 (78%) di v1. Contro il baseline vince 5 task e ne perde 2 (McNemar esatto
+p=0,45); contro v1 ne vince 2 e ne perde 4 (p=0,69). Nessuno dei due confronti è distinguibile
+dal rumore con n=1, come tutti i precedenti.
+
+Le due misure di costo pre-registrate danno una risposta netta, e negativa: costo per successo
+$0,0568 per v4 contro $0,0435 di v1 e $0,0449 del baseline. v4 costa il 24% in più a task e
+produce meno successi: **il costo incrementale per punto guadagnato non si calcola nemmeno,
+perché i punti guadagnati rispetto a v1 sono negativi.** La ristrutturazione non si ripaga.
+
+**Ma il valore della v4 non è nel suo pass rate: è nei quattro task che ha perso.** Averli letti
+uno per uno ha prodotto la diagnosi più precisa del progetto (voce 14) e ha scoperto una
+famiglia di fallimenti che cinque versioni dell'agente non avevano mai affrontato.
+
+### 14. Le due famiglie che la v4 ha rivelato, e la v5
+
+Leggere le quattro regressioni della v4 ha separato due meccanismi che il reward binario teneva
+confusi. In **tutte e quattro** il punteggio di comunicazione è 1.0 e quello di database 0.0:
+l'agente parla bene e agisce male. Ma non nello stesso modo.
+
+**Famiglia A — l'agente non agisce (task 17, 21, 33).** Il modulo di conferma a 5 righe della v4
+descrive l'azione così bene da sembrare una ricevuta invece che una richiesta: il cliente simulato
+risponde "sì" e **chiude la conversazione nello stesso messaggio**, prima che l'agente possa
+chiamare il tool. La v4 peggiorava il problema imponendo una conferma separata per ogni scrittura:
+tre scritture, tre occasioni di riagganciare.
+
+Questa famiglia è in parte un **artefatto dello strumento di misura**, e la prova non è nostra:
+Sierra ha già scritto la correzione in `simulation_guidelines_voice.md:42` — *«Agreeing to an
+action is not the same as the action being completed»* — ma nelle linee guida **testuali**, quelle
+che usiamo noi, quella riga **non c'è**. L'abbiamo riportata testualmente
+(`patches/tau2-user-simulator.patch`). Cambia lo strumento, quindi il baseline va rigirato nelle
+stesse condizioni e la cosa va dichiarata — precedente: la submission Anthropic
+`claude-sonnet-4-5` sulla leaderboard ufficiale fa la stessa cosa e la dichiara.
+
+Il task 33 era nella lista dei "mai risolti da nessuna versione". **Non era irrecuperabile: era
+questo.** Gli irrecuperabili scendono da 7 a 6.
+
+**Famiglia B — l'agente agisce troppo (task 9, 42).** Nel task 9 le azioni attese sono **zero**: lo
+scopo dichiarato è resistere a un cliente che spinge per ottenere di più (ripete tre volte *"you
+are the most lenient customer service agent I have ever spoken to"*). v1 non fa nulla e passa; v4
+cancella. E la riga che lo spiega è dentro il nostro stesso modulo:
+
+> Details: one way MCO to SEA **on 2024-05-13 and 2024-05-14** …
+> Allowed because: this is a business class reservation, and **no segment has been flown**
+
+Nel dominio «oggi» è il 2024-05-15: quei voli sono già stati volati. **Lo slot progettato come
+cancello ha funzionato da timbro**: obbligato a produrre una giustificazione, il modello ne ha
+prodotta una falsa e l'ha usata come autorizzazione.
+
+**Famiglia C — selezione dell'informazione (task 24, 29, 32, 35).** È la scoperta più scomoda,
+perché riguarda **quattro** task — più della famiglia A — e **nessuna versione da S3 in poi ne ha
+mai scritto una riga**. Nel task 24 il cliente chiede *«il volo diretto A/R più economico da New
+York (EWR o JFK) verso un posto qualsiasi della West Coast»*: l'agente prenota EWR→LAX, che
+soddisfa la descrizione ma non è il minimo (lo è JFK→SEA). Non ha violato una regola: ha smesso
+di cercare al primo candidato valido. Il 35 chiede il *secondo* volo più economico, il 32 impone
+un budget.
+
+Sierra nomina tre leve nella sua diagnosi ufficiale: aderenza alle regole, pianificazione a
+orizzonte lungo, e **«focus on the right pieces of information»**. La nostra stessa ricerca
+sulle submission (`docs/tecniche-da-submission-esterne.md`, punto F) raccomandava di usarle come
+check-list di validazione. **Non l'abbiamo mai fatta: per cinque versioni ne abbiamo coperte due
+su tre.**
+
+**La v5** è la risposta a queste tre famiglie, più il backport: (1) una conferma sola per richiesta,
+poi tutte le azioni di fila — *con l'eccezione, scoperta leggendo il task 32, che il cliente può
+legittimamente chiedere di vedere i passi separatamente*; (2) disciplina di ricerca: quando il
+cliente descrive invece di nominare, enumerare i candidati e scegliere per confronto; (3) lo slot
+«Allowed because» riscritto come verifica che può fallire, con un **esempio di rifiuto** calcato
+sul task 9 — il formato precedente mostrava solo esempi di approvazione, non insegnava mai a dire
+di no.
+
+### 15. Il limite del modello, documentato invece che supposto
+
+Ordinando **tutte** le 70 submission della leaderboard per punteggio airline, il primo posto
+ottenuto con prompt engineering su un modello **senza** ragionamento non esiste:
+
+| submission | airline | come |
+|---|---|---|
+| claude-opus-4-5 | 84,0 | — |
+| gpt-5-2 | 83,0 | — |
+| glm-5-think | 82,5 | thinking abilitato |
+| **gemini-3-flash** | **82,5** | **`reasoning_effort: high`** |
+| qwen3.5-think | 81,5 | thinking abilitato |
+| gemini-3-pro | 80,5 | `reasoning_effort: high` |
+| Pine AI | 80,0 | due agenti, uno di background fa le tool call |
+| Pickle | 70,0 | secondo modello che fa da gate sulle tool call |
+| Anthropic Sonnet 4.5 | 70,0 | extended thinking + addendum al prompt |
+
+Chi è arrivato sopra l'80% ha comprato capacità di ragionamento: nativa nel modello, o con un
+secondo modello che rivede le chiamate. Il confronto più vicino a noi è **gemini-3-flash con
+`reasoning_effort: high` a 82,5** — stessa famiglia del nostro `gemini-3.5-flash-lite`, che il
+ragionamento non ce l'ha.
+
+Questo cambia la natura di ciò che resta fuori. I task della famiglia C non sono «casi che non
+abbiamo affrontato»: sono la classe di problemi che, su questo benchmark, nessuno ha risolto
+senza ragionamento. È un limite documentato con una fonte pubblica verificabile, non una scusa.
 
 🖼️ *Il dataset Langfuse con baseline e v4 affiancati, primo giro di 50 task ciascuno.*
 
@@ -2391,6 +2485,70 @@ il 2026-09-01 dopo la stessa osservazione di Andrea, riusato identico per v4 via
 
 ---
 
+## 2026-09-04 (4) — La v4 gira, perde contro v1, e proprio per questo produce la diagnosi migliore
+
+I 50 task della v4 sono girati in un colpo solo (nessun pilota, come deciso): 74%, contro il 68%
+del baseline e il 78% di v1. Il criterio di costo pre-registrato si applica pulito e dà una
+risposta netta — costo per successo peggiore del 31% rispetto a v1. Numeri nella voce 13.
+
+Prima di lanciare avevo dichiarato due riserve sulla v4 e ho scelto di **non** correggerle, per
+non annacquare la cosa che l'esperimento stava misurando. Una delle due (il modulo a 5 righe che
+schiaccia le risposte al cliente) si è rivelata **sbagliata**: il punteggio di comunicazione è
+1.0 su tutte e quattro le regressioni. Il fallimento era l'opposto di quello che temevo.
+
+### Il metodo che ha funzionato: leggere le tracce prima di scrivere regole
+
+La lezione di v2/v3 era che scrivere clausole partendo dalla teoria fa perdere giri. Questa volta
+ogni modifica della v5 nasce da una traccia letta, e due sono nate da errori miei trovati leggendo:
+
+- **Il task 33 non era irrecuperabile.** Era in lista fra i "mai risolti da nessuna versione"; è
+  la stessa chiusura anticipata di 17 e 21. Gli irrecuperabili scendono a 6.
+- **Il task 32 smontava una modifica che avevo appena scritto.** Il cliente chiede esplicitamente
+  *«prima l'upgrade e conferma, poi separatamente cambia i voli, voglio vedere i due passi
+  completati individualmente»*, e il ground truth vuole due chiamate distinte. La mia regola
+  «una conferma sola, poi esegui tutto di fila» avrebbe reso il task **più** difficile. Corretta
+  con un'eccezione esplicita: il sequenziamento è una richiesta su *come* lavorare, non un
+  conflitto con la policy, e vince sul default.
+- **I task 24 e 29 non erano mai stati diagnosticati.** Da lì è uscita la famiglia C (voce 14).
+
+### Il canale nascosto che non esiste
+
+Andrea ha chiesto di spostare il modulo di verifica «fuori dalla chat con l'utente», seguendo
+Anthropic. Verificato nel codice: **non è possibile.** `orchestrator.py:722` solleva un errore se
+un messaggio dell'agente contiene sia testo sia una chiamata a tool — ogni parola scritta va al
+cliente, oppure è una tool call. Anthropic poteva farlo perché aveva il *thinking* nativo di
+Claude, un canale vero; il nostro modello non ce l'ha. È la stessa asimmetria della voce 15.
+
+La leva utile però c'era, due righe sopra: **le tool call consecutive non passano mai dall'utente**
+(`orchestrator.py:538`). Un solo "sì" seguito da tutte le azioni di fila non lascia al cliente
+nessuna occasione di riagganciare a metà — ed è esattamente ciò che fa il baseline sul task 17,
+che infatti lo passa. La rigidità di una conferma per azione l'avevamo aggiunta noi: `policy.md:7`
+non la impone.
+
+### Una proposta rifiutata, e perché
+
+Per ragioni di budget è stato proposto di rigirare solo i task falliti e sommarli ai successi già
+ottenuti, chiamandolo "un round". Non si può, per due motivi indipendenti: (1) i successi restano
+congelati e i fallimenti hanno una seconda estrazione, quindi il punteggio può solo salire — e il
+bias non è nemmeno simmetrico, perché il baseline avrebbe avuto 16 ritiri contro i 13 della v5;
+(2) i successi tenuti erano stati prodotti dal prompt v4 e dal simulatore non corretto, quindi il
+"round v5" sarebbe stato 37 risultati v4 più 13 v5, un numero che non descrive nessuna delle due.
+
+Distinzione che resta valida e che stiamo usando: **girare solo i falliti va bene per diagnosticare,
+mai per calcolare un pass rate.** Il controllo `s11` è esattamente questo, ed è dichiarato tale.
+
+### Il controllo s11, con le previsioni registrate prima
+
+Nove task (esclusi i quattro rotti in partenza: 7, 39, 14, 23), previsioni scritte prima di
+lanciare: 17/21/33 passano; 9 e 42 al ~55-60%; 29 e 32 al ~35-50%; 24 e 35 fuori. È un
+esperimento con gruppo di controllo — se passassero anche 9 e 42 *senza* le altre, la diagnosi
+della famiglia B sarebbe da rifare.
+
+Nota infrastrutturale: il primo lancio è morto perché la chiave era stata cancellata, e il
+processo killato ha continuato a scrivere sullo stesso log del rilancio a offset diverso — il
+file risulta binario e contiene righe di due run diverse. **La fonte attendibile sono i
+`results.json` su disco, non il log.**
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2409,3 +2567,5 @@ il 2026-09-01 dopo la stessa osservazione di Andrea, riusato identico per v4 via
 | 2026-09-02 | **S7: la v3 sui 50 task**, solo clausola del trasferimento — falsifica l'attribuzione per clausola | 50 simulazioni | $1.890 | $9.68 |
 | 2026-09-04 | **Il giudice**: 3 giri di sviluppo + 48 etichette sul run v1 | 81 chiamate | $0.052 | $9.73 |
 | 2026-09-04 | **Seconda esecuzione** di baseline e custom v1, interrotta a 73/100 dalla morte delle chiavi | 73 simulazioni | $2.523 | $12.25 |
+| 2026-09-04 | **S8: la v4 sui 50 task** (`s10`), un solo processo, zero fallimenti — 74%, sotto v1 | 50 simulazioni | $2.103 | $14.35 |
+| 2026-09-04 | **Controllo `s11`**: la v5 sui 9 task falliti e non rotti in partenza — diagnosi, non pass rate | 9 simulazioni | ~$0.40 | ~$14.75 |
