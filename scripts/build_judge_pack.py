@@ -3,24 +3,26 @@ Costruisce il materiale per l'etichettatura umana del giudice.
 
 Produce due file:
 - `docs/giudice/da-etichettare.md` — le tracce ridotte, con id anonimi, da dare
-  all'annotatore umano. Nessuna indicazione della versione dell'agente, del
-  numero di task o dell'esito atteso: solo il dialogo, le azioni attese, quelle
-  eseguite, e il dettaglio del reward.
+  all'annotatore umano.
 - `docs/giudice/mappa-privata.json` — la corrispondenza id anonimo -> traccia
-  reale. **Non va aperto prima di aver etichettato**, e non va commesso finche'
-  l'etichettatura non e' chiusa.
+  reale. **Non va aperto prima di aver etichettato.**
 
-Perche' gli id sono anonimi
----------------------------
-Durante la diagnosi ho discusso in chat la causa di quattordici task. Su quelli
-l'annotatore conosce gia' la mia risposta, quindi la sua etichetta non sarebbe
-indipendente e l'accordo misurato sarebbe gonfiato. Il pacco separa percio' due
-insiemi:
+Due scelte di disegno, entrambe pensate per non gonfiare il risultato
+-------------------------------------------------------------------
+**Gli id sono anonimi e le voci mescolate.** Durante la diagnosi ho dichiarato in
+chat la causa di quattordici task: su quelli l'annotatore conoscerebbe gia' la
+mia risposta, la sua etichetta non sarebbe indipendente e l'accordo misurato
+sarebbe gonfiato. Nel set di misura entrano percio' solo tracce di cui non ho mai
+detto niente. Il resto resta disponibile come set di sviluppo, dove si itera sul
+prompt del giudice usando le mie etichette: li' l'indipendenza non serve, perche'
+non e' una misura.
 
-- **misura**: solo tracce di cui non ho mai dichiarato la causa. E' l'unico
-  insieme su cui il kappa significa qualcosa.
-- **sviluppo**: il resto, dove si itera sul prompt del giudice usando le mie
-  etichette. Li' l'indipendenza non serve, perche' non e' una misura.
+**La vista e' ridotta, ed e' la stessa che ricevera' il giudice.** Se l'umano
+leggesse il dialogo intero e il giudice un estratto, il disaccordo misurato non
+sarebbe fra due giudizi ma fra due livelli di informazione, e il kappa non
+direbbe piu' niente. La riduzione contiene solo fatti — mai una sintesi
+interpretata — perche' riassumere il dialogo a parole mie inietterebbe la mia
+diagnosi dentro l'input, che e' esattamente cio' che stiamo tenendo fuori.
 
 Uso:
     PYTHONIOENCODING=utf-8 PYTHONUTF8=1 tau2-bench/.venv/Scripts/python.exe \
@@ -39,57 +41,73 @@ sys.path.insert(0, str(ROOT / "tau2-bench" / "src"))
 
 from action_metrics import _agent_tool_calls, get_domain_tool_types  # noqa: E402
 
-from tau2.data_model.tasks import Action  # noqa: E402
 from tau2.runner.helpers import get_tasks  # noqa: E402
 
 # Fallimenti la cui causa non e' mai stata dichiarata in chat: (prefisso, task).
-MISURA_KO = [("s7", "8"), ("s7", "42"), ("s8", "22"), ("s8", "34"), ("s8", "37"), ("s8", "42")]
-# Successi, per dare al giudice la possibilita' di sbagliare in eccesso.
-MISURA_OK = [("s6", "2"), ("s6", "5"), ("s6", "13"), ("s6", "27"), ("s6", "43"), ("s6", "47")]
+MISURA_KO = [("s7", "8"), ("s8", "22"), ("s8", "34"), ("s8", "37")]
+# Successi: un classificatore a cui mostri solo fallimenti sembra bravissimo
+# finche' non gli dai un caso sano e lui ci trova un problema comunque.
+MISURA_OK = [("s6", "5"), ("s6", "27")]
 
 SEED = 20260903  # ordine mescolato ma riproducibile
 
+NL = "\n"
+
 
 def compact(sim: dict, task, tool_types: dict) -> str:
+    """La vista ridotta di una traccia — la stessa che ricevera' il giudice."""
+    msgs = sim.get("messages") or []
     out = []
-    out.append("**Dialogo**\n")
-    for m in sim.get("messages") or []:
-        role = m.get("role")
-        content = (m.get("content") or "").strip().replace("\n", " ")
-        if role == "tool":
-            out.append(f"- *(risposta dello strumento)* {content[:120]}…")
-            continue
-        etichetta = {"assistant": "AGENTE", "user": "CLIENTE"}.get(role, role)
-        if content:
-            out.append(f"- **{etichetta}**: {content[:700]}")
-        for tc in m.get("tool_calls") or []:
-            args = json.dumps(tc.get("arguments"), ensure_ascii=False)
-            out.append(f"- **{etichetta} → CHIAMA** `{tc.get('name')}({args[:220]})`")
 
-    golden = task.evaluation_criteria.actions or []
-    out.append("\n**Azioni che il benchmark si aspetta** (solo quelle che scrivono nel database)\n")
-    scritture_attese = [a for a in golden if tool_types.get(a.name) == "write"]
-    if not scritture_attese:
-        out.append("- nessuna")
-    for a in scritture_attese:
-        out.append(f"- `{a.name}({json.dumps(a.arguments, ensure_ascii=False)[:260]})`")
-
-    out.append("\n**Azioni che l'agente ha eseguito** (idem)\n")
-    fatte = [c for c in _agent_tool_calls(sim.get("messages") or [])
-             if tool_types.get(c.get("name")) == "write"]
-    if not fatte:
-        out.append("- nessuna")
-    for c in fatte:
-        args = json.dumps(c.get("arguments"), ensure_ascii=False)
-        out.append(f"- `{c.get('name')}({args[:260]})`")
-
-    ri = sim.get("reward_info") or {}
-    bd = ri.get("reward_breakdown") or {}
-    out.append(
-        f"\n**Esito della misura**: database `{bd.get('DB')}` · "
-        f"comunicazione `{bd.get('COMMUNICATE')}`\n"
+    prima = next(
+        (m.get("content") for m in msgs
+         if m.get("role") == "user" and (m.get("content") or "").strip()),
+        "",
     )
-    return "\n".join(out)
+    out.append("**Cosa chiede il cliente**")
+    out.append("")
+    out.append("> " + (prima or "").strip().replace("\n", " "))
+    out.append("")
+
+    golden = [a for a in (task.evaluation_criteria.actions or [])
+              if tool_types.get(a.name) == "write"]
+    out.append("**Scritture attese dal benchmark**")
+    out.append("")
+    out.extend(
+        [f"- `{a.name}({json.dumps(a.arguments, ensure_ascii=False)[:230]})`" for a in golden]
+        or ["- nessuna"]
+    )
+
+    fatte = [c for c in _agent_tool_calls(msgs) if tool_types.get(c.get("name")) == "write"]
+    out.append("")
+    out.append("**Scritture eseguite dall'agente**")
+    out.append("")
+    out.extend(
+        [f"- `{c.get('name')}({json.dumps(c.get('arguments'), ensure_ascii=False)[:230]})`"
+         for c in fatte]
+        or ["- nessuna"]
+    )
+
+    trasferito = any(c.get("name") == "transfer_to_human_agents" for c in _agent_tool_calls(msgs))
+    out.append("")
+    out.append(f"**Ha trasferito a un operatore umano**: {'si' if trasferito else 'no'}  ")
+    out.append(f"**Turni totali**: {len(msgs)}")
+    out.append("")
+
+    out.append("**Come e' finita** (ultimi due turni, testuali)")
+    out.append("")
+    ultimi = [m for m in msgs
+              if m.get("role") in ("assistant", "user") and (m.get("content") or "").strip()][-2:]
+    for m in ultimi:
+        chi = "AGENTE" if m.get("role") == "assistant" else "CLIENTE"
+        testo = (m.get("content") or "").strip().replace("\n", " ")
+        out.append(f"- **{chi}**: {testo[:600]}")
+
+    bd = (sim.get("reward_info") or {}).get("reward_breakdown") or {}
+    out.append("")
+    out.append(f"**Esito**: database `{bd.get('DB')}` · comunicazione `{bd.get('COMMUNICATE')}`")
+    out.append("")
+    return NL.join(out)
 
 
 def main() -> None:
@@ -105,13 +123,17 @@ def main() -> None:
         "",
         "Leggi `famiglie.md` **prima** di cominciare, e tienilo aperto accanto.",
         "",
-        "Per ogni voce scrivi **una sola etichetta** (`F0`–`F9`) nella riga *Etichetta*, e una riga",
-        "di motivazione. La motivazione serve piu' dell'etichetta: quando piu' avanti il giudice",
-        "dissentira', e' l'unico modo per capire se ha torto lui o se la definizione della famiglia",
-        "e' ambigua.",
+        "Per ogni voce scrivi **una sola etichetta** (`F0`–`F9`) e una riga di motivazione.",
+        "La motivazione serve piu' dell'etichetta: quando il giudice dissentira', e' l'unico",
+        "modo per capire se ha torto lui o se la definizione della famiglia e' ambigua — e nel",
+        "secondo caso si corregge la definizione, non il tuo giudizio.",
         "",
-        "Le voci sono **mescolate e anonime**: non sai a quale task corrispondono, ne' quale",
-        "versione dell'agente le ha prodotte, ne' quante sono riuscite. E' voluto.",
+        "Le voci sono **mescolate e anonime**: non sai a quale task corrispondano, ne' quale",
+        "versione dell'agente le abbia prodotte, ne' quante siano riuscite. E' voluto.",
+        "",
+        "Quello che leggi qui e' **esattamente** cio' che ricevera' il giudice: stessa vista,",
+        "stessi fatti, nessuna sintesi interpretata. Cosi' il disaccordo misura il giudizio e",
+        "non l'accesso all'informazione.",
         "",
         "> Se una traccia non ti convince, `F9`. Un'etichetta forzata sporca la misura piu' di",
         "> un'astensione.",
@@ -130,14 +152,14 @@ def main() -> None:
         testo.append(compact(sim, tasks[task_id], tool_types))
         testo.append("**Etichetta**: `___`")
         testo.append("")
-        testo.append("**Perché**: ")
+        testo.append("**Perche'**: ")
         testo.append("")
         testo.append("---")
         testo.append("")
 
     out_dir = ROOT / "docs" / "giudice"
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "da-etichettare.md").write_text("\n".join(testo), encoding="utf-8")
+    (out_dir / "da-etichettare.md").write_text(NL.join(testo), encoding="utf-8")
     (out_dir / "mappa-privata.json").write_text(
         json.dumps(mappa, indent=2, ensure_ascii=False), encoding="utf-8"
     )
