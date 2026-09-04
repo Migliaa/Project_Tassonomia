@@ -2544,6 +2544,24 @@ lanciare: 17/21/33 passano; 9 e 42 al ~55-60%; 29 e 32 al ~35-50%; 24 e 35 fuori
 esperimento con gruppo di controllo — se passassero anche 9 e 42 *senza* le altre, la diagnosi
 della famiglia B sarebbe da rifare.
 
+**Esito: 5 recuperi su 9** (9, 17, 21, 24, 33). L'ipotesi principale regge su tutti e tre i task
+della famiglia A. Due previsioni sbagliate, una per direzione: il 24 passa contro una stima del
+20%, il 42 fallisce contro una del 55%.
+
+Due letture di traccia prima di dichiarare qualcosa, e danno esiti diversi:
+
+- **Task 24 — meccanismo confermato, non fortuna.** La v4 faceva *una* ricerca e prenotava il primo
+  candidato valido (EWR→LAX). La v5 ne fa **sedici** — 2 origini × 5 destinazioni West Coast per
+  l'andata, più i ritorni — enumera i candidati con i totali e sceglie il minimo: $106 JFK→SEA
+  (HAT069 + HAT276), esattamente il ground truth. EWR→LAX compare terzo a $163. Il blocco sulla
+  ricerca fa precisamente ciò per cui è scritto, e si vede nella traccia.
+- **Task 9 — esito giusto, catena causale non dimostrata.** Zero scritture, quindi corretto. Ma la
+  motivazione scritta dall'agente poggia sulle condizioni di policy delle altre prenotazioni, e
+  quella che dichiara idonea semplicemente non la cancella. **Il successo non è attribuibile
+  all'esempio di rifiuto**: il comportamento è quello voluto, il meccanismo no.
+
+Il 42, che era il gruppo di controllo, resta fallito come previsto.
+
 Nota infrastrutturale: il primo lancio è morto perché la chiave era stata cancellata, e il
 processo killato ha continuato a scrivere sullo stesso log del rilancio a offset diverso — il
 file risulta binario e contiene righe di due run diverse. **La fonte attendibile sono i
