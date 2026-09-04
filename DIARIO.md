@@ -2048,6 +2048,65 @@ Speso finora **$9.68 su €20**.
 
 ---
 
+## 2026-09-04 — La ripetizione ribalta il risultato
+
+Seconda esecuzione indipendente di baseline e custom v1 sugli stessi task. Si e' fermata a **73
+simulazioni su 100** perche' le quattro chiavi API nuove sono morte insieme a meta' lavoro (vedi
+sotto). Restano pero' **36 task presenti in tutte e quattro le esecuzioni**, ed e' un confronto
+appaiato valido.
+
+| | baseline | custom v1 | divario |
+|---|---|---|---|
+| 1a esecuzione | 25/36 | 27/36 | **+2** |
+| 2a esecuzione | 28/36 | 27/36 | **-1** |
+
+**Il divario cambia segno.** Combinando le due esecuzioni il pass rate medio e' **0.736 contro
+0.750**, cioe' **+1.4 punti percentuali**, non +10.
+
+### Il dato che spiega tutto: il benchmark non e' deterministico
+
+Fra due esecuzioni identiche, **a `temperature: 0.0`**, cambiano esito:
+
+- **5 task su 36** per il baseline
+- **8 task su 36** per il nostro agente
+
+Non e' il nostro agente a essere instabile: lo e' l'apparato. Temperatura zero non significa
+determinismo — restano la non-determinatezza dell'API e il simulatore-utente, che a ogni giro puo'
+prendere una strada diversa e, soprattutto, decidere in un momento diverso di chiudere la
+conversazione.
+
+**Conseguenza, e vale piu' di qualunque numero di questo progetto: una differenza di 2-5 task su 50
+non e' distinguibile dalla varianza fra esecuzioni.** E' la stessa conclusione a cui erano arrivate
+le varianti v2 e v3 per un'altra strada - tre prompt che davano 39, 38, 35 spostando 5-10 task per
+volta - e ora ha una **seconda prova indipendente**, ottenuta senza toccare il prompt.
+
+### Cautela sul campione, dichiarata
+
+I 14 task mancanti (18-24 e 43-49) sono proprio quelli su cui il divario della prima esecuzione era
+concentrato: su questi 36 la prima esecuzione dava +2, non +5. Il sottoinsieme **non e'
+rappresentativo**, quindi il numero definitivo non e' stabilito in nessuna delle due direzioni.
+Quello che e' stabilito - e non dipende dai 14 mancanti - e' l'instabilita' per task.
+
+### Perche' e' stata la spesa migliore del progetto
+
+$2.52 hanno impedito di pubblicare un **+10 punti che non regge**. Senza ripetizione il report
+avrebbe dichiarato "da 68% a 78%, stesso modello" con accanto un `p=0.125` che sembrava solo
+prudenza formale. Era invece il segnale corretto, e l'abbiamo verificato invece di sperare.
+
+### Le chiavi: 401, non quota
+
+Le quattro chiavi nuove hanno smesso di funzionare tutte insieme con
+`401 ACCOUNT_STATE_INVALID: "The bound service account is deleted or disabled"`. Non e' esaurimento
+quota - e' la disattivazione degli account Google dietro le chiavi. Verificato: morte anche a
+posteriori, mentre la chiave originale funziona.
+
+Da ricordare per chiunque replichi: **la firma "tutti i blocchi falliscono in coda alla propria
+lista" somiglia moltissimo all'esaurimento quota, e non lo era.** Solo leggere il testo
+dell'eccezione lo ha chiarito. Costo dell'ipotesi sbagliata, se non l'avessimo letta: aspettare un
+giorno per un reset che non sarebbe mai arrivato.
+
+---
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2064,3 +2123,5 @@ Speso finora **$9.68 su €20**.
 | 2026-09-02 | **S6: i 100 task** (50 baseline `llm_agent` + 50 `custom_agent`), cinque chiavi in parallelo, zero fallimenti | 100 simulazioni | $3.680 | $5.79 |
 | 2026-09-02 | **S7: la v2 sui 50 task** (piu' 5 ripetuti dopo la caduta di rete) | 55 simulazioni | $1.997 | $7.79 |
 | 2026-09-02 | **S7: la v3 sui 50 task**, solo clausola del trasferimento — falsifica l'attribuzione per clausola | 50 simulazioni | $1.890 | $9.68 |
+| 2026-09-04 | **Il giudice**: 3 giri di sviluppo + 48 etichette sul run v1 | 81 chiamate | $0.052 | $9.73 |
+| 2026-09-04 | **Seconda esecuzione** di baseline e custom v1, interrotta a 73/100 dalla morte delle chiavi | 73 simulazioni | $2.523 | $12.25 |
