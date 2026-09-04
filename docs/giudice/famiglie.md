@@ -71,6 +71,20 @@ descrizione del task contraddice le proprie azioni attese. Nessun agente può pa
 L'utente simulato termina la conversazione per una ragione propria — `###OUT-OF-SCOPE###`,
 `###TRANSFER###` — interrompendo un percorso che stava procedendo.
 
+### `F10` · Esecuzione non dovuta
+L'agente esegue una scrittura che il ground truth **non prevede affatto**: il task chiedeva di
+rifiutare, o di non toccare quella prenotazione, e l'agente ha agito lo stesso.
+*Da distinguere da `F3`*: li' l'azione era dovuta e un parametro era sbagliato; qui l'azione non
+andava fatta.
+
+> Questa famiglia **e' stata aggiunta durante il pilota di etichettatura**, non prima. Le dieci
+> famiglie iniziali nascevano dai fallimenti diagnosticati a mano, dove il caso non era mai
+> comparso; alla prima traccia mai vista si e' presentato subito. La metrica `unexpected_writes`
+> misurava gia' esattamente questo, ma non esisteva l'etichetta corrispondente — un buco fra le
+> due viste dello stesso fenomeno. E' il motivo per cui un pilota si fa **prima** di misurare:
+> allargare lo spazio delle etichette dopo aver visto i verdetti del giudice sarebbe stato
+> adattare la domanda alla risposta.
+
 ### `F9` · Non determinabile
 La traccia non contiene abbastanza per decidere, o il meccanismo non rientra in nessuna delle
 famiglie sopra. **Usarla senza esitazione**: un'etichetta forzata sporca la misura più di

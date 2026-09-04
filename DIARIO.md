@@ -1,6 +1,156 @@
 # Diario di `tassonomia`
 
-> Si scrive mentre si lavora, non dopo. Il report di S6 è questo diario ripulito.
+> Si scrive mentre si lavora, non dopo. Questo file ha due parti: in cima **cosa va nel report**,
+> distillato; sotto **il backstage**, cioè il percorso completo giorno per giorno, che serve a
+> difendere ogni numero ma che un lettore umano non deve attraversare.
+
+---
+
+# Per il report
+
+Il report va letto da persone, quindi: **poche frasi, molte immagini**. Ogni voce qui sotto è un
+risultato con accanto l'immagine che lo mostra. Se una voce non ha un'immagine possibile,
+probabilmente non merita il report.
+
+## 1. Il risultato — stesso modello, solo il prompt
+
+| | baseline | il nostro agente |
+|---|---|---|
+| task superati | 34/50 (68%) | **39/50 (78%)** |
+
+Stesso motore (`gemini-3.5-flash-lite`) per agente e per simulatore-utente, stessi 50 task, stesso
+ambiente. **L'unica variabile è il prompt.**
+
+🖼️ *I due Run affiancati sul dataset Langfuse, con la colonna reward.*
+
+## 2. Le regole generalizzano — è questo il risultato, non il 78%
+
+Le regole sono state scritte leggendo **dieci** task. Il guadagno si misura sui **quaranta mai
+guardati**:
+
+| | baseline | il nostro agente |
+|---|---|---|
+| i 10 task di sviluppo | 4/10 | 6/10 |
+| i **40 task mai visti** | 30/40 | **33/40** |
+
+Con overfitting la seconda riga sarebbe piatta. **Non lo è.**
+
+🖼️ *Le due righe come grafico a barre appaiate.*
+
+## 3. La significatività è misurata, non sventolata
+
+Test esatto di McNemar sulle coppie discordanti: **p = 0.125**, sopra la soglia di 0.05. Una sola
+esecuzione per task. *(Aggiornare con l'esito della seconda esecuzione.)*
+
+Va scritto **accanto al numero, non in nota**. È la prima domanda che farà un lettore competente, e
+averla anticipata vale più del numero stesso.
+
+## 4. Il reward binario nasconde il lavoro
+
+Il benchmark dà 1 o 0. Le metriche per-azione che abbiamo costruito mostrano cosa succede sotto:
+
+| | baseline | il nostro agente |
+|---|---|---|
+| scritture su prenotazioni che il task non tocca mai | 0.02 | **0.00** |
+
+La clausola che impone di verificare la policy prima di ogni scrittura **funziona su scala**, e il
+reward da solo non lo direbbe.
+
+🖼️ *Le colonne degli score sul dataset, affiancate.*
+
+## 5. Due task hanno un ground truth incoerente
+
+I task **7** e **39** non sono superabili da nessun agente. Il 39 chiede di cancellare una
+prenotazione indistinguibile da un'altra che il benchmark stesso vieta di cancellare, e la sua
+descrizione contraddice il proprio elenco di azioni attese.
+
+🖼️ *Le due descrizioni affiancate, con la contraddizione evidenziata.*
+
+## 6. Due task falliscono per l'ordine di una lista
+
+Sui task **14** e **23** le carte usate sono le stesse, gli importi sono gli stessi, il totale è lo
+stesso. Cambia solo **l'ordine di due gift card** dentro `payment_methods`. Il cliente non aveva
+chiesto nessun ordine.
+
+Il confronto fra database è un **hash del dizionario serializzato** (`toolkit.py:244`), e le liste
+hanno un ordine. Due prenotazioni finanziariamente identiche prendono **1.0 e 0.0**.
+
+🖼️ *Le due liste di pagamento affiancate, con le righe invertite evidenziate.* **È l'immagine più
+efficace del report.**
+
+## 7. Una regola corretta può peggiorare il punteggio
+
+La policy del dominio **impone** la conferma esplicita prima di ogni scrittura (`policy.md:7`). Ma
+il simulatore-utente, quando riceve una domanda chiusa, risponde "sì" **e chiude la conversazione
+nello stesso messaggio**: l'agente non ha più un turno, e l'azione confermata non viene mai
+eseguita.
+
+Succede in **8 turni di conferma su 69**, e colpisce **entrambi** gli agenti — il baseline più del
+nostro. Non è correggibile senza violare la policy.
+
+🖼️ *Lo scambio di due battute, con `###STOP###` evidenziato.*
+
+## 8. Il giudice: il metodo, non il punteggio
+
+Il protocollo, nell'ordine in cui va eseguito:
+
+1. **Spazio delle etichette fissato prima** di scrivere il prompt del giudice.
+2. **Etichette di riferimento congelate prima** di vederlo funzionare: se dissente si corregge il
+   giudice, mai il proprio giudizio.
+3. **Stessa vista** per l'annotatore e per il giudice — altrimenti il disaccordo misura l'accesso
+   all'informazione, non il giudizio.
+4. **Kappa di Cohen**, non accuratezza: con classi sbilanciate un classificatore degenere ottiene
+   una percentuale alta ed è inutile.
+5. **Matrice di confusione**: *dove* sbaglia sistematicamente vale più del totale.
+
+Due cose vanno dichiarate, non nascoste:
+
+- Le etichette di riferimento **non sono umane**: le ha prodotte un modello di frontiera. Quello che
+  misuriamo è quindi *"un modello piccolo riproduce la diagnosi di uno grande?"* — domanda
+  industriale vera, ma non validazione umana.
+- Il campione è di **sei voci**: il kappa ha un'incertezza ampia e non va confrontato con quelli
+  della letteratura.
+
+**Il pilota ha già prodotto un risultato**: mancava una famiglia. L'agente che esegue una scrittura
+che il task **non prevede affatto** non rientrava in nessuna delle dieci categorie iniziali, perché
+il caso non era mai comparso nei fallimenti diagnosticati a mano. La metrica `unexpected_writes`
+misurava già quel fenomeno, ma non esisteva l'etichetta corrispondente. È il motivo per cui il
+pilota si fa **prima** di misurare.
+
+🖼️ *La matrice di confusione.*
+
+## 9. L'infrastruttura, che è metà del lavoro
+
+- **Cinque chiavi API in parallelo**, una per processo, che non passano mai dalla riga di comando:
+  il worker riceve il *nome* della variabile e legge il valore dal `.env`.
+- **Limitatore di frequenza** scritto da noi: un singolo task supera da solo il limite di 15
+  richieste al minuto (ne abbiamo misurate 45).
+- **Salvataggio per singolo task**: un processo che muore perde un task, non venti, e alla ripresa
+  salta quelli già fatti.
+- **Un difetto latente trovato per caso**: durante una caduta di rete il ritentativo automatico non
+  ha salvato nessun task, e non per la rete — il benchmark, trovando un file di risultati
+  esistente, chiede conferma *a schermo*, e i worker girano senza terminale. Il retry era rotto da
+  sempre e non si era mai visto perché non era mai servito.
+
+🖼️ *Lo schema dei cinque processi con le cinque chiavi.*
+
+## Escluso dal report per scelta
+
+Le versioni **v2** e **v3** dell'agente (38/50 e 35/50) restano nel backstage e su Langfuse, ma
+fuori dal report: raccontano tentativi che non hanno migliorato il risultato, e aggiungerebbero
+rumore.
+
+*Cosa si perde, per averlo agli atti*: quelle tre varianti misurano il **pavimento di rumore** di
+questo apparato — ogni modifica al prompt sposta 5-10 task su 50 in entrambe le direzioni, a
+temperatura 0. È la risposta al *"come fai a sapere che il tuo +5 non è rumore?"*. Senza, quella
+domanda ha come unica risposta `p = 0.125`.
+
+---
+
+# Il backstage
+
+Da qui in avanti il percorso completo, in ordine cronologico: le decisioni, i vicoli ciechi, le
+verifiche e gli errori. Serve a difendere ogni numero della prima parte. Non è materiale da report.
 
 ## 2026-08-26 — S1, ambiente
 
