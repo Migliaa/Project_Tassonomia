@@ -183,7 +183,36 @@ RUNS = [
         "insieme. Con un'esecuzione per task le singole modifiche non sono "
         "separabili dal rumore.",
     ),
+    (
+        "s10",
+        "custom_agent",
+        "custom_agent v4 - ristrutturazione, non un'altra clausola",
+        "Non una sostituzione di clausola come v2/v3: una ristrutturazione, "
+        "motivata dalla scoperta che v1 impila ~21 vincoli nostri sopra i ~40 "
+        "della policy del dominio, ben oltre la soglia (15-20) a cui i modelli "
+        "senza reasoning nativo iniziano a violare regole in silenzio "
+        "(Instruction Stacking Collapse, arXiv:2608.02639). Regole fuse invece "
+        "che ripetute fino a 3 volte, precedenze esplicite quando due regole "
+        "confliggono, ordine dei blocchi per primacy/recency, un modulo di "
+        "verifica a 5 righe dentro il messaggio di conferma gia' imposto dalla "
+        "policy invece di ragionamento libero, e due checkpoint leggeri (non "
+        "regole a se') per far riattraversare al modello la regola pertinente "
+        "prima e dopo il ragionamento su un'azione. Bozza in "
+        "docs/v4-bozza-prompt.md. Stesso motore, stessi 50 task, stesso n=1 "
+        "di questo primo giro: confronta con il Run 'baseline - llm_agent' "
+        "sopra, non con v1/v2/v3.",
+    ),
 ]
+
+# Etichetta di sprint per i metadata del Run, per prefisso. "s6" copre sia il
+# baseline sia v1 (girati insieme nello stesso batch di 100).
+SPRINT_PER_PREFISSO = {
+    "s6": "S6",
+    "s7": "S7",
+    "s8": "S7",
+    "s9": "S6-ripetizione",
+    "s10": "S8-v4",
+}
 
 
 def main() -> None:
@@ -235,7 +264,7 @@ def main() -> None:
             ],
             max_concurrency=1,
             metadata={
-                "sprint": "S6" if prefix == "s6" else "S7",
+                "sprint": SPRINT_PER_PREFISSO.get(prefix, prefix),
                 "agent": agent,
                 "modello": "gemini/gemini-3.5-flash-lite",
                 "esecuzioni_per_task": 1,

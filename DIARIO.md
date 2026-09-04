@@ -224,8 +224,25 @@ problema — non in generale, ma **su questo benchmark specifico**:
 
 ### 13. La v4
 
-*(Da riempire: prompt, motivazione tecnica per tecnica, e risultato — solo dopo averlo misurato
-con lo stesso rigore delle voci precedenti, non prima.)*
+Non è un'altra clausola come v2/v3: v1 impila ~21 vincoli nostri sopra i ~40 della policy del
+dominio (che non possiamo modificare), ben oltre la soglia (15-20) a cui i modelli senza reasoning
+nativo iniziano a violare regole **in silenzio**, senza errore — misurato su un parente diretto
+del nostro modello (Instruction Stacking Collapse, arXiv:2608.02639). v4 fonde le regole invece di
+ripeterle fino a tre volte, ordina i blocchi per sfruttare i bias di posizione, e sostituisce il
+"ragionamento libero prima di agire" con un modulo a righe fisse dentro il messaggio di conferma
+che la policy impone già. Bozza completa in `docs/v4-bozza-prompt.md`.
+
+**Criterio di decisione, fissato prima di girare i task** (come per v1/v2/v3): il pass rate da
+solo non basta, perché v4 costerà di più per simulazione. Due misure pre-registrate: **costo per
+successo** (costo totale / task riusciti, confrontabile fra baseline/v1/v4) e **costo incrementale
+per punto guadagnato** (quanto costa in più comprare un punto di pass rate in più, sullo stesso
+modello dell'ICER usato in economia sanitaria per trattamenti più efficaci ma più cari). Se v4 non
+supera v1 sul pass rate, si riporta comunque quanto è costato non guadagnare nulla.
+
+*(Il resto — prompt finale, risultato, e le due misure di costo sopra — si riempie solo dopo
+averlo misurato con lo stesso rigore delle voci precedenti, non prima.)*
+
+🖼️ *Il dataset Langfuse con baseline e v4 affiancati, primo giro di 50 task ciascuno.*
 
 ---
 
@@ -2276,6 +2293,84 @@ meglio" con "va in timeout".
 
 Documenti prodotti: `docs/ricerca-valutazione-agenti.md`, `docs/premortem-bug-hash-ordine.md`,
 `docs/tecniche-da-submission-esterne.md`.
+
+---
+
+## 2026-09-04 (3) — La bozza v4, il modello più capace scartato (per ora), e i prezzi veri
+
+### La bozza v4, scritta da un secondo agente con ricerca supplementare
+
+Le due guide di Anthropic sull'architettura degli agenti (Building Effective Agents, Writing
+effective tools) **trasferiscono poco**: quasi tutto riguarda architetture multi-chiamata fuori
+scope, e il consiglio più forte di entrambe - ottimizzare le descrizioni dei tool - e' proprio
+quello che non possiamo applicare, perche' i tool sono parte del benchmark. La scoperta utile e'
+venuta da altrove: un paper (arXiv:2608.02639, Instruction Stacking Collapse) misura su Gemini 2.5
+Flash - il parente pubblicato piu' vicino al nostro modello - che l'aderenza alle istruzioni
+crolla dal 96% con una istruzione al 43% con venti, con fallimenti **silenziosi**. v1 impila ~21
+vincoli nostri sopra i ~40 di `policy.md`: molto oltre quella soglia. E' una spiegazione piu'
+verificabile di quella che avevamo per v2/v3 - non un'attribuzione sbagliata da parte nostra, ma
+un regime in cui sostituire una clausola non sposta il comportamento in modo prevedibile.
+
+La v4 (bozza in `docs/v4-bozza-prompt.md`) fonde le regole invece di ripeterle, ordina i blocchi
+per posizione (primacy/recency, "Lost in the middle"), e sostituisce il "pensa prima di agire"
+libero - che un altro paper (arXiv:2409.12183) dice aiutare poco fuori da matematica/logica - con
+un modulo a 5 righe fisse dentro il messaggio di conferma gia' imposto dalla policy. Rischio piu'
+alto dichiarato dall'agente stesso, senza che gli fosse chiesto: la checklist puo' diventare
+**teatro** - il modello riempie sempre lo slot "Allowed because", e se se lo inventa produce
+tracce piu' rigorose in apparenza con esiti uguali o peggiori.
+
+### Un modello piu' capace? I prezzi veri correggono l'intuizione, in entrambe le direzioni
+
+Cercati i prezzi reali (non stimati) di GPT-5.6 e GLM-5.3-Flash, le due alternative proposte.
+Sorpresa: **non sono piu' costosi** del nostro Gemini 3.5 Flash Lite - GPT-5.6 Luna ($0.20/$1.20
+per milione di token) e GLM-5.3 Flash ($0.075-0.15/$0.25-0.50) sono i livelli budget delle
+rispettive famiglie, comparabili o piu' economici dei nostri $0.30/$2.50. Il budget non era
+l'ostacolo che sembrava.
+
+Ma la stessa ricerca che ha prodotto la v4 dice l'opposto di quello che l'intuizione suggeriva
+sull'effetto: la tecnica centrale (prompt compilation) da' +11 punti su un modello debole
+(GPT-5-mini), **+3.3 su un modello della nostra fascia**, ~0 su un modello forte (Sonnet).
+L'effetto si restringe con la capacita' del modello, non si allarga. Un modello piu' recente e
+probabilmente piu' capace di Gemini 3.5 Flash Lite renderebbe questa specifica tecnica **meno**
+efficace secondo la fonte da cui e' presa, non piu'. Trovata pero' una versione piu' solida
+dell'intuizione originale: un modello che soffre meno il collasso da densita' fallisce in modo
+meno casuale, il che potrebbe rendere piu' pulita l'attribuzione causa-effetto (il problema che
+ha affossato v2/v3) anche senza rendere piu' facile il miglioramento in se'. Deciso: non sostituire
+il binario Gemini-vs-Gemini, che e' il cuore della tesi del progetto ("stesso modello, solo il
+prompt"); un secondo esperimento su un modello diverso resta un'aggiunta possibile, non un
+sostituto.
+
+### Due checkpoint di rilettura, proposti da Andrea - con una correzione tecnica
+
+Proposta: far "rileggere" all'agente le regole pertinenti in punti scelti del ragionamento,
+prima e dopo, per aiutarlo a restare concentrato o ad accorgersi di un ragionamento approssimativo.
+Verificato nel codice (`llm_agent.py:127`) che la policy intera viene gia' reinviata al modello a
+ogni turno - non c'e' nulla da "rileggere" in senso letterale, e il costo aggiuntivo non e' in
+lettura ma in output (le righe che il modello scrive in piu'). Il meccanismo per cui l'idea
+dovrebbe comunque funzionare e' reale: costringere il modello a riattraversare la regola pertinente
+nella generazione, subito prima di deciderla, sfrutta lo stesso effetto di posizione gia' citato
+per il riordino dei blocchi. Aggiunti come due righe morbide dentro i passi 1 e 3 della procedura
+esistente - non nuove regole numerate, per non peggiorare la densita' di istruzioni che la v4
+cerca di ridurre. Dettagli e limiti dichiarati in `docs/v4-bozza-prompt.md`, sezione 6.
+
+### Il criterio di costo, fissato prima di girare i 50 task
+
+Aggiunta una misura che il progetto non aveva ancora: **costo per successo** (costo totale del
+giro / task riusciti) e **costo incrementale per punto guadagnato**, sullo stesso principio
+dell'ICER usato in economia sanitaria per giudicare un trattamento piu' efficace ma piu' caro.
+Se v4 costa di piu' per simulazione - atteso, per via del modulo di conferma e dei checkpoint -
+queste due misure dicono se il costo in piu' vale il risultato, invece di guardare il solo pass
+rate. Fissato prima di vedere il numero, come per ogni criterio di decisione di questo progetto.
+
+### Infrastruttura Langfuse pronta per il primo giro v4
+
+Aggiunto `s10` a `scripts/s6_publish.py`: il primo giro di 50 task v4 (quando esistera') si
+pubblica nello stesso dataset del baseline S6, pronto per il confronto affiancato sulla pagina
+Experiments - la stessa infrastruttura gia' usata per v1/v2/v3, senza bisogno di altro codice.
+Generalizzata anche l'etichetta di sprint nei metadata dei Run (prima un ternario `s6`/altro,
+ora un dizionario per prefisso).
+
+Deciso: **niente pilota di 5-10 task**. Si gira tutto il primo giro da 50 direttamente.
 
 ---
 
