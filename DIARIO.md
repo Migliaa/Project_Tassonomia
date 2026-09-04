@@ -12,40 +12,93 @@ Il report va letto da persone, quindi: **poche frasi, molte immagini**. Ogni voc
 risultato con accanto l'immagine che lo mostra. Se una voce non ha un'immagine possibile,
 probabilmente non merita il report.
 
-## 1. Il risultato — stesso modello, solo il prompt
+Il report ha due parti, e la seconda esiste solo grazie alla prima: **Parte 1** è cosa abbiamo
+misurato costruendo v1, v2, v3 e ripetendo l'esperimento — il metodo regge, il risultato no.
+**Parte 2** è cosa costruiamo adesso (v4), informati da come lo stesso problema lo affrontano
+aziende vere sullo stesso benchmark.
 
-| | baseline | il nostro agente |
+---
+
+## Parte 1 — cosa abbiamo misurato
+
+### 1. Il risultato iniziale — stesso modello, solo il prompt
+
+| | baseline | il nostro agente (v1) |
 |---|---|---|
 | task superati | 34/50 (68%) | **39/50 (78%)** |
 
 Stesso motore (`gemini-3.5-flash-lite`) per agente e per simulatore-utente, stessi 50 task, stesso
-ambiente. **L'unica variabile è il prompt.**
+ambiente. **L'unica variabile è il prompt.** Questo è il numero con cui il progetto è partito —
+tenerlo nel report **insieme** a come si è evoluto (voci 3 e 4) è il punto, non nasconderlo.
 
 🖼️ *I due Run affiancati sul dataset Langfuse, con la colonna reward.*
 
-## 2. Le regole generalizzano — è questo il risultato, non il 78%
+### 2. Le regole generalizzano sul set di sviluppo
 
 Le regole sono state scritte leggendo **dieci** task. Il guadagno si misura sui **quaranta mai
 guardati**:
 
-| | baseline | il nostro agente |
+| | baseline | il nostro agente (v1) |
 |---|---|---|
 | i 10 task di sviluppo | 4/10 | 6/10 |
 | i **40 task mai visti** | 30/40 | **33/40** |
 
-Con overfitting la seconda riga sarebbe piatta. **Non lo è.**
+Con overfitting la seconda riga sarebbe piatta. **Non lo è** — ma "non generalizza al caso" è una
+domanda diversa da "l'effetto è reale", ed è la voce 4 a rispondere alla seconda.
 
 🖼️ *Le due righe come grafico a barre appaiate.*
 
-## 3. La significatività è misurata, non sventolata
+### 3. v2 e v3: stesso metodo, applicato di nuovo, amplifica il degrado
 
-Test esatto di McNemar sulle coppie discordanti: **p = 0.125**, sopra la soglia di 0.05. Una sola
-esecuzione per task. *(Aggiornare con l'esito della seconda esecuzione.)*
+Il metodo che aveva prodotto v1 — diagnosi in famiglie, una regola per causa, verifica sui task mai
+visti — è stato riapplicato altre due volte. Il risultato non è stato "ancora meglio":
+
+| | baseline | v1 | v2 | v3 |
+|---|---|---|---|---|
+| task superati | 34/50 | 39/50 | 38/50 | 35/50 |
+
+**Ogni giro in più ha eroso il guadagno del giro precedente**, non lo ha esteso. Sul task 24 e 32
+la v3 è tornata a trasferire l'utente nonostante contenesse esplicitamente la clausola che lo
+vietava — la prova che l'attribuzione "questa clausola causa questo guadagno" non regge nemmeno
+quando la si scrive apposta per reggere.
+
+**Non abbiamo continuato a iterare.** Il metodo era corretto — ogni singola regola, presa da sola,
+era motivata da un task reale e verificata sui 40 mai visti — ma il segnale su cui stavamo
+correggendo era già dentro il rumore dell'apparato (voce 4), e insistere avrebbe significato
+inseguire varianza, non capacità. Ci siamo fermati per approfondire lo studio invece di lanciare
+una v4 alla cieca: è la Parte 2 di questo report.
+
+🖼️ *Le quattro barre (baseline, v1, v2, v3) affiancate, dai quattro Run su Langfuse.*
+
+### 4. La ripetizione ribalta il risultato
+
+Motivo per cui ci siamo fermati, misurato e non supposto: **ripetendo v1 contro il baseline una
+seconda volta**, con gli stessi 50 task e la stessa configurazione, il divario **cambia segno** sui
+36 task comuni alle due esecuzioni:
+
+| | baseline | custom v1 | divario |
+|---|---|---|---|
+| 1ª esecuzione | 25/36 | 27/36 | **+2** |
+| 2ª esecuzione | 28/36 | 27/36 | **−1** |
+
+A `temperature: 0.0`, fra due esecuzioni identiche cambiano esito **5 task su 36** per il baseline
+e **8 su 36** per il nostro agente. Non è instabilità del nostro prompt: è il pavimento di rumore
+dell'intero apparato — simulatore-utente e API non sono deterministici nemmeno a temperatura zero.
+**Una differenza di 2-5 task su 50 non è distinguibile dalla varianza fra esecuzioni.** È la stessa
+conclusione a cui la voce 3 era già arrivata da un'altra strada.
+
+🖼️ *Le due esecuzioni affiancate su Langfuse, stesso dataset, Run diversi.*
+
+### 5. La significatività, misurata due volte
+
+Test esatto di McNemar sulle coppie discordanti: **p = 0.125** sulla prima esecuzione da sola;
+**p = 0.424** mettendo insieme le due esecuzioni (86 coppie task-esecuzione, rapporto vittorie
+9:5). Entrambi sopra la soglia di 0.05.
 
 Va scritto **accanto al numero, non in nota**. È la prima domanda che farà un lettore competente, e
-averla anticipata vale più del numero stesso.
+averla anticipata — e misurata due volte, non una — vale più del numero stesso.
 
-## 4. Il reward binario nasconde il lavoro
+### 6. Il reward binario nasconde il lavoro
 
 Il benchmark dà 1 o 0. Le metriche per-azione che abbiamo costruito mostrano cosa succede sotto:
 
@@ -58,7 +111,7 @@ reward da solo non lo direbbe.
 
 🖼️ *Le colonne degli score sul dataset, affiancate.*
 
-## 5. Due task hanno un ground truth incoerente
+### 7. Due task hanno un ground truth incoerente
 
 I task **7** e **39** non sono superabili da nessun agente. Il 39 chiede di cancellare una
 prenotazione indistinguibile da un'altra che il benchmark stesso vieta di cancellare, e la sua
@@ -66,19 +119,26 @@ descrizione contraddice il proprio elenco di azioni attese.
 
 🖼️ *Le due descrizioni affiancate, con la contraddizione evidenziata.*
 
-## 6. Due task falliscono per l'ordine di una lista
+### 8. Un bug vero nel benchmark, trovato e segnalato
 
 Sui task **14** e **23** le carte usate sono le stesse, gli importi sono gli stessi, il totale è lo
-stesso. Cambia solo **l'ordine di due gift card** dentro `payment_methods`. Il cliente non aveva
-chiesto nessun ordine.
+stesso. Cambia solo **l'ordine di due gift card** dentro `payment_history`. Il cliente non aveva
+chiesto nessun ordine, e nessuna riga di policy lo specifica.
 
 Il confronto fra database è un **hash del dizionario serializzato** (`toolkit.py:244`), e le liste
-hanno un ordine. Due prenotazioni finanziariamente identiche prendono **1.0 e 0.0**.
+hanno un ordine. Due prenotazioni finanziariamente identiche prendono **1.0 e 0.0**. Verificato con
+un `DeepDiff(ignore_order=True)` fra i due stati finali: la differenza scompare del tutto.
+
+Prima di pubblicarlo, un secondo agente (in un ruolo di avvocato del diavolo, con l'istruzione
+esplicita di dimostrare che *non* fosse un bug) ha provato a smontare la diagnosi su cinque fronti
+— compreso l'argomento più forte possibile, che il campo è un libro mastro dove l'ordine avrebbe
+senso — e non c'è riuscito. Segnalato a Sierra come issue pubblica su GitHub, con riferimento a una
+issue aperta e senza risposta sullo stesso difetto in un altro dominio.
 
 🖼️ *Le due liste di pagamento affiancate, con le righe invertite evidenziate.* **È l'immagine più
-efficace del report.**
+efficace del report.** 🖼️ *Screenshot della issue pubblicata.*
 
-## 7. Una regola corretta può peggiorare il punteggio
+### 9. Una regola corretta può peggiorare il punteggio
 
 La policy del dominio **impone** la conferma esplicita prima di ogni scrittura (`policy.md:7`). Ma
 il simulatore-utente, quando riceve una domanda chiusa, risponde "sì" **e chiude la conversazione
@@ -90,7 +150,7 @@ nostro. Non è correggibile senza violare la policy.
 
 🖼️ *Lo scambio di due battute, con `###STOP###` evidenziato.*
 
-## 8. Il giudice: il metodo, non il punteggio
+### 10. Il giudice: il metodo, non il punteggio
 
 Il protocollo, nell'ordine in cui va eseguito:
 
@@ -119,7 +179,7 @@ pilota si fa **prima** di misurare.
 
 🖼️ *La matrice di confusione.*
 
-## 9. L'infrastruttura, che è metà del lavoro
+### 11. L'infrastruttura, che è metà del lavoro
 
 - **Cinque chiavi API in parallelo**, una per processo, che non passano mai dalla riga di comando:
   il worker riceve il *nome* della variabile e legge il valore dal `.env`.
@@ -134,16 +194,38 @@ pilota si fa **prima** di misurare.
 
 🖼️ *Lo schema dei cinque processi con le cinque chiavi.*
 
-## Escluso dal report per scelta
+---
 
-Le versioni **v2** e **v3** dell'agente (38/50 e 35/50) restano nel backstage e su Langfuse, ma
-fuori dal report: raccontano tentativi che non hanno migliorato il risultato, e aggiungerebbero
-rumore.
+## Parte 2 — da "abbiamo misurato" a "costruiamo la v4"
 
-*Cosa si perde, per averlo agli atti*: quelle tre varianti misurano il **pavimento di rumore** di
-questo apparato — ogni modifica al prompt sposta 5-10 task su 50 in entrambe le direzioni, a
-temperatura 0. È la risposta al *"come fai a sapere che il tuo +5 non è rumore?"*. Senza, quella
-domanda ha come unica risposta `p = 0.125`.
+### 12. Ci siamo confrontati con chi ha già affrontato lo stesso benchmark
+
+Prima di scrivere una v4 alla cieca, abbiamo cercato come altri hanno affrontato lo stesso
+problema — non in generale, ma **su questo benchmark specifico**:
+
+- Il paper originale di τ-bench spiega perché la metrica ufficiale è **pass^k** (tutte le k prove
+  riescono) e non il pass rate a singola esecuzione: un agente cliente-facing deve essere
+  affidabile su ripetizioni, non solo capace di trovare la soluzione una volta. Sullo stesso
+  dominio airline un modello frontier (GPT-5, valutato da Sierra) passa da pass^1 = 62.5% a
+  pass^4 = 48% — lo stesso fenomeno di degrado misurato da noi con la ripetizione (voce 4), ora
+  confermato dai creatori del benchmark su un modello molto più capace del nostro.
+- Sierra pubblica un **leaderboard pubblico** (taubench.com) con le submission reali di decine di
+  organizzazioni (Anthropic, Google, NVIDIA, e altre), ciascuna con una nota di metodologia. Da lì
+  abbiamo estratto tecniche di prompting realmente applicabili con un solo modello, senza
+  training né infrastruttura aggiuntiva: ragionamento esplicito scritto prima di ogni azione che
+  modifica lo stato, una checklist di precondizioni prima delle azioni irreversibili, e — una
+  verifica, non una tecnica — le tre cause di fallimento che Sierra stessa indica come le più
+  comuni (aderenza alla policy, pianificazione su orizzonte lungo, selezione dell'informazione
+  giusta), usate per controllare se le nostre famiglie di fallimento (S4) le coprono tutte.
+- Scartate esplicitamente perché fuori scopo per un singolo system prompt: routing fra più modelli
+  (NVIDIA ToolOrchestra, che addestra un orchestratore con RL) e fine-tuning.
+
+🖼️ *Il leaderboard di taubench.com, con le organizzazioni partecipanti.*
+
+### 13. La v4
+
+*(Da riempire: prompt, motivazione tecnica per tecnica, e risultato — solo dopo averlo misurato
+con lo stesso rigore delle voci precedenti, non prima.)*
 
 ---
 
@@ -2104,6 +2186,96 @@ Da ricordare per chiunque replichi: **la firma "tutti i blocchi falliscono in co
 lista" somiglia moltissimo all'esaurimento quota, e non lo era.** Solo leggere il testo
 dell'eccezione lo ha chiarito. Costo dell'ipotesi sbagliata, se non l'avessimo letta: aspettare un
 giorno per un reset che non sarebbe mai arrivato.
+
+---
+
+## 2026-09-04 (2) — Dal reward binario alle metriche per-azione, e la domanda "vale la pena rifare tutto?"
+
+### La rianalisi per-azione: stessa direzione, ancora dentro il rumore
+
+Messe insieme le due esecuzioni indipendenti, `write_action_score` (frazione delle scritture
+attese eseguite correttamente) dà +0.071 e +0.056 nelle due esecuzioni — **stessa direzione in
+entrambe**, con due metodi di conteggio diversi (media per-task e tasso micro pesato per azione).
+Bootstrap a blocchi (10.000 ricampionamenti, blocco = task, per rispettare la clusterizzazione
+delle azioni dentro lo stesso task): divario +9.0 punti, IC 95% **[-5.6, +23.5]** — attraversa lo
+zero. Anche alzando la risoluzione di un ordine di grandezza (da 50 bit a 78 azioni scritte
+osservate) il segnale resta compatibile col rumore, ma consistentemente dalla stessa parte.
+
+**pass^2** (la metrica ufficiale del benchmark: successo in *entrambe* le esecuzioni, non almeno
+una) dà un risultato scomodo: baseline 0.667, custom v1 0.639 — **il baseline è leggermente più
+affidabile**, non il nostro agente. Riportato perché e' quello che dicono i dati, non perché
+conferma la tesi.
+
+### Il paper del benchmark giustifica quello che avevamo osservato
+
+Il paper originale di τ-bench (Sierra, arXiv:2406.12045) motiva esplicitamente la metrica pass^k
+con la stessa osservazione fatta empiricamente da noi: un agente cliente-facing deve essere
+affidabile su ripetizioni, non solo capace di risolvere una volta. Numero citato dal paper: GPT-4o
+passa da pass^1=61.2% a pass^8<25% sul dominio retail. Non e' un'analogia, e' la prova dagli
+autori del benchmark che una singola esecuzione a 50 task non misura la capacita' reale.
+
+Trovato nello stesso passaggio (nel codice del repo, non in letteratura terza): un secondo script
+di Sierra, `auto_error_identification.py`, classifica i fallimenti con un giudice LLM in una
+tassonomia a due livelli (chi ha causato l'errore, che tipo) — strutturalmente la stessa cosa
+fatta a mano in S4. E una issue reale (#12) sul reward per-substring del benchmark, un precedente
+diretto per la fragilita' dello scoring binario che il nostro giudice cerca di risolvere.
+
+### La domanda vera: rifare tutto da zero, o continuare?
+
+Con tutto quanto sopra ancora dentro il rumore, la domanda successiva e' stata se ripartire da un
+altro progetto per riuscire a dimostrare un miglioramento reale. Risposta, con i numeri:
+
+- **Sierra stessa pubblica lo standard**: `docs/leaderboard-submission.md`, nel repo clonato,
+  richiede **4+ trial per dominio** e copertura completa del task set per una submission
+  affidabile statisticamente. Il dominio airline ha **esattamente 50 task** — li abbiamo gia'
+  tutti. Il gap rispetto allo standard del settore non e' concettuale, e' aritmetico: 2 trial
+  fatti, 4 richiesti.
+- **Ma il rapporto vittorie:sconfitte si restringe aggiungendo dati**, non si allarga: 6:1 (86%)
+  sulla sola prima esecuzione, **9:5 (64%)** mettendo insieme le due. E' il segno classico di una
+  stima iniziale gonfiata che torna verso il rumore. Proiettando lo stesso 64% su un volume pari a
+  4 trial, `p` scenderebbe a 0.044 — sopra la soglia per un soffio, *se* il rapporto vero regge e
+  non continua a scendere.
+- Deciso: **non fare altri 2×100 su v1** solo per inseguire un p-value che probabilmente non
+  arriva. Investire lo stesso budget in una **v4** progettata meglio, non in piu' ripetizioni
+  della stessa v1.
+
+### Il bug del task 14/23: passato al vaglio di un avvocato del diavolo prima di pubblicarlo
+
+Prima di aprire una issue pubblica su un repository di terzi a nome di Andrea, un secondo agente
+(Opus, istruito esplicitamente a *falsificare* la diagnosi, non confermarla) ha provato a
+smontarla su cinque fronti — incluso l'argomento piu' forte possibile: il campo si chiama
+`payment_history`, non `payment_methods`, ed e' concettualmente un libro mastro dove l'ordine
+avrebbe senso. Non ce l'ha fatta: le voci sono scritte in un'unica transazione atomica, senza
+timestamp ne' numero di sequenza, quindi non c'e' cronologia da preservare. Ha trovato inoltre
+un precedente diretto: issue **#325**, aperta e senza risposta, stesso sintomo su un altro
+dominio (retail) senza causa radice individuata — il nostro contributo la completa, non la
+duplica. Correzioni fatte alla bozza prima dell'invio: un path sbagliato, un'affermazione
+("COMMUNICATE conferma la prenotazione corretta") sostituita con una prova piu' solida
+(`DeepDiff(ignore_order=True) == {}`), e il fix proposto ristretto per non rompere il dominio
+retail (dove `payment_history[0]` e' indicizzato posizionalmente per il rimborso).
+
+### Il leaderboard pubblico di Sierra: dove si vede chi altro l'ha fatto
+
+`taubench.com` esiste, e' vivo, e le submission reali di oltre 60 organizzazioni (Anthropic,
+Google, NVIDIA, e altre) sono **gia' clonate in locale** in
+`tau2-bench/web/leaderboard/public/submissions/` — non serve andare sul sito. Ogni submission ha
+un campo `methodology.notes` con cosa hanno fatto, e spesso link a paper/repo. Trovato un
+esempio diretto della categoria "custom submission" (= modifica al prompt/scaffold, la nostra
+stessa categoria): NVIDIA, `toolorchestra_nvidia_2025-12-02`, paper pubblico (arXiv:2511.21689) +
+repo GitHub. Trovato anche il dato piu' utile per il report: GPT-5 valutato da Sierra stessa su
+airline con 4 trial, pass^1=62.5 -> pass^4=48 — lo stesso degrado misurato da noi, confermato dai
+creatori del benchmark su un modello molto piu' capace del nostro.
+
+Ricerca sulle tecniche di prompting applicabili (non infrastruttura, non training): nessuna
+submission "custom" del leaderboard e' un caso pulito di solo-prompt su airline/retail (per lo
+piu' voce o richiedono training). Le tecniche piu' utili sono arrivate dalle note delle
+submission **ufficiali** di Anthropic (non marcate "custom" ma testualmente esplicite su cosa
+hanno cambiato nel prompt): scrivere un ragionamento esplicito prima di ogni azione che modifica
+stato, e alzare il tetto di step del harness in parallelo (30->100) per non confondere "ragiona
+meglio" con "va in timeout".
+
+Documenti prodotti: `docs/ricerca-valutazione-agenti.md`, `docs/premortem-bug-hash-ordine.md`,
+`docs/tecniche-da-submission-esterne.md`.
 
 ---
 
