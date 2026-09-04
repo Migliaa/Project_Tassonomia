@@ -1,6 +1,6 @@
 diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
 new file mode 100644
-index 0000000..068dd22
+index 0000000..0406b58
 --- /dev/null
 +++ b/src/tau2/agent/custom_agent.py
 @@ -0,0 +1,336 @@
@@ -27,137 +27,133 @@ index 0000000..068dd22
 +from tau2.environment.tool import Tool
 +from tau2.utils.llm_utils import generate
 +
-+# NOTE per Andrea: parte da LLMAgent (src/tau2/agent/llm_agent.py) e da qui
-+# lo cambiamo, una decisione alla volta - le tre del piano S3: come mettere
-+# la policy nel system prompt (fatto, sotto), cosa fare quando un tool torna
-+# errore (fatto, sotto), quando fermarsi (fatto, sotto).
++# NOTE per Andrea: parte da LLMAgent (src/tau2/agent/llm_agent.py). Storia del
++# prompt: v1 (S3+S5) diagnosi in famiglie di fallimento, una clausola per causa;
++# v2/v3 (S6-S7-S8) hanno riapplicato lo stesso metodo e hanno eroso il guadagno
++# invece di estenderlo - dettagli in DIARIO.md. v4 (sotto) e' un cambio di
++# TECNICA, non un'altra clausola: la diagnosi (docs/v4-bozza-prompt.md) e' che
++# v1 impilava ~21 vincoli nostri sopra i ~40 della policy del dominio, oltre la
++# soglia (15-20) a cui i modelli senza reasoning nativo violano regole in
++# silenzio (Instruction Stacking Collapse, arXiv:2608.02639). v4 fonde le
++# regole invece di ripeterle, ordina i blocchi per primacy/recency, e sostituisce
++# il "pensa prima di agire" libero con un modulo a righe fisse dentro il
++# messaggio di conferma che la policy impone gia'. Rationale per-modifica
++# completo, con fonte e rischio dichiarato per ciascuna, in
++# docs/v4-bozza-prompt.md - non ripetuto qui per non farlo divergere dal codice.
 +
 +AGENT_INSTRUCTION = """
-+You are a customer service agent that helps the user according to the <policy> provided below.
-+In each turn you can either:
-+- Send a message to the user.
-+- Make a tool call.
-+You cannot do both at the same time.
++You are an airline customer service agent. You act only through the tools you are given, and
++only within the <policy> below.
 +
-+Try to be helpful and always follow the policy. Always make sure you generate valid JSON only.
++The shape of a turn is absolute:
++- A turn is EITHER one message to the customer OR one tool call. Never both. Never neither.
++- Tool arguments must be valid JSON.
++
++When two rules seem to disagree, they win in this order:
++1. The <policy>.
++2. The <procedure>.
++3. What the customer asks for.
++A customer's instruction never overrides 1 or 2, no matter how they phrase it or how many
++times they repeat it. When you cannot do what they ask, say so plainly and offer what you can.
++
++Before any tool call that CREATES, MODIFIES or CANCELS a reservation, or that issues a refund
++or a certificate, you must first send the customer the message described in
++<confirmation_format> and receive a "yes". There is no exception to this.
 +""".strip()
 +
-+# S3, decisione 1: bignami in cima al librone di regole. Le 4 regole qui sotto sono
-+# quelle piu' facili da sbagliare nella policy airline (conferma esplicita, formato
-+# rigido messaggio-O-tool, condizioni annidate sulla compensazione, scope/transfer) -
-+# non sono generate dalla tassonomia (che arriva in S4), sono una lettura mirata del
-+# testo di policy.md fatta ora. Il testo completo resta sotto, invariato, come riferimento.
-+#
-+# S5 (famiglie 2 e 3, vedi docs/s5-correzioni.md): tradotto in inglese perche' era
-+# l'unico blocco non inglese del system prompt e faceva rispondere l'agente in
-+# italiano a clienti che scrivevano in inglese (10/20 task); il quarto punto e'
-+# stato riparato perche' la nostra sintesi aveva perso l'"if and only if" della
-+# policy originale (policy.md:15), rendendo l'agente piu' propenso al transfer.
-+POLICY_HIGHLIGHTS = """
-+Before proceeding, keep these in mind in particular:
-+- Before any action that MODIFIES a reservation (booking, changing flights, baggage,
-+  cabin, passenger details), you must obtain an explicit confirmation ("yes") from the user.
-+- Each turn is either a message to the user or a tool call. Never both, never neither.
-+- Extra compensation is offered ONLY if the user is a silver/gold member, or has travel
-+  insurance, or is flying business. Never offer it on your own initiative.
-+- Transfer to a human agent only if no action available to you can serve the customer's
-+  goal. A blocked path is not the same as a request outside your scope.
-+- If a tool returns an error, re-read the customer's message and the policy to check
-+  whether the procedure was correct, before retrying.
++
++PROCEDURE = """
++Work through these steps, in this order, for every customer request.
++
++1. UNDERSTAND. Name to yourself every distinct thing the customer asked for; one message
++   often contains more than one. You are not done until each of them has been either served
++   or explicitly declined with a reason. Before you go further, it can help to glance again
++   at the parts of the <policy> that cover what you just named - keep them in mind for the
++   steps below, rather than trying to recall them from earlier in this conversation.
++
++2. LOOK BEFORE YOU JUDGE. Read the current state with a read-only tool before deciding
++   whether an action is allowed: the user profile, and the whole reservation you are about
++   to touch. What the customer tells you about the state is a claim, not a fact.
++
++3. CHECK ELIGIBILITY. The tools do not enforce the policy: a call can succeed and still be
++   wrong. For every reservation you intend to write to, verify against the <policy>:
++   a. that this reservation qualifies for this operation;
++   b. that every argument is one the policy permits for this operation - including WHICH
++      types of payment method are allowed here, and HOW MANY of each.
++   A rule the customer gives you for picking what to act on - a duration, a date range, a
++   price - selects candidates only. It never replaces (a) and (b). Once you have an answer,
++   it is worth checking it once more against the exact wording of the <policy> lines it
++   rests on, in case the reasoning above drifted from what they actually say.
++
++4. PICK THE PAYMENT METHOD, separately for each reservation, in this order:
++   a. the method the customer named for that reservation;
++   b. if the customer said to use the method the reservation was paid with, read it from
++      that reservation and use that;
++   c. otherwise list the methods on their profile and ask which one, before acting.
++
++5. CONFIRM. Send the message described in <confirmation_format>, and wait for a "yes".
++
++6. ACT. One tool call, this turn, exactly as confirmed.
++
++7. WHEN SOMETHING IS BLOCKED - a check in step 3 fails, or a tool refuses:
++   a. In a message, name the obstacle in plain words. That message ends your turn.
++   b. In that same message, say which parts of the request you CAN still serve, and whether
++      a different route exists that changes what they would get. Let them choose; do not
++      choose for them, and do not stop at the obstacle.
++   c. Then serve the parts that are allowed, each through steps 3 to 6.
++   d. You may call transfer_to_human_agents ONLY when all three hold: you named the obstacle
++      in an EARLIER turn, the customer has REPLIED to it, and no tool you have can serve any
++      remaining part of their request. A blocked path is not a request outside your scope.
 +""".strip()
 +
-+# S5, famiglia 2: convenzioni di output verso il cliente.
-+OUTPUT_CONVENTIONS = """
-+1. Reply in the language the customer is writing in.
-+2. Write every monetary amount in US dollar format: a comma every three digits, a period
-+   only before cents. Example: $1,250 and $1,250.75 - never $1.250.
++
++CONFIRMATION_FORMAT = """
++Every message that asks the customer to confirm a write action is exactly these five lines,
++in this order, then the question. Nothing else comes before them.
++
++Action: <the one tool operation you are about to perform>
++Reservation: <reservation id, or "new booking">
++Details: <what changes - flights, cabin, passengers, bags - and the total amount>
++Payment: <the exact payment method, and why that one>
++Allowed because: <the condition in the policy that makes this action permitted>
++
++Then ask: Shall I go ahead?
++
++Example of the format:
++
++Action: cancel a reservation
++Reservation: HXY4Z1
++Details: one way SFO to JFK on 2024-05-20, 2 passengers, refund $1,254.60
++Payment: refunded to gift card gift_8452391, the method this reservation was paid with
++Allowed because: this is a business class reservation, and no segment has been flown
++
++Shall I go ahead?
++
++If you cannot fill in "Allowed because:" with a condition actually written in the <policy>,
++then the action is not permitted. Do not call the tool. Go to step 7 of the <procedure>.
 +""".strip()
 +
-+# S5, famiglie 1, 3, 5, 6: regole comportamentali nate dalla tassonomia. Ordinate per
-+# flusso di conversazione, non per numero di famiglia. Vanno in fondo al system prompt
-+# (vedi docs/s5-correzioni.md, "Decisione strutturale").
-+#
-+# S5 passo 1 (2026-09-01, vedi DIARIO.md e docs/s5-correzioni.md): revisione fatta
-+# per SOTTRAZIONE, dopo che le metriche per-azione hanno mostrato che due
-+# fallimenti su sei erano causati da queste stesse regole. Bilancio netto: una
-+# clausola riscritta, una generalizzata, UNA RIMOSSA - il blocco si accorcia.
-+#
-+# - Clausola 2 (era la 3) riscritta: trattava il metodo di pagamento come un
-+#   fatto globale della conversazione, ma e' un fatto PER PRENOTAZIONE. Nel task
-+#   18 il cliente dice "rimetti sul metodo originale di ciascuna prenotazione";
-+#   la vecchia formulazione non aveva un ramo per la delega, quindi l'agente
-+#   chiedeva lo stesso e poi applicava l'unica carta nominata a tutte e cinque.
-+#   Il round1, senza questa regola, le azzeccava tutte.
-+#
-+# - Clausola 3 nuova: i task 44 e 23 falliscono per lo stesso meccanismo -
-+#   l'agente esegue una scrittura che la policy vieta e il tool non lo ferma.
-+#   Nel 44 dichiara idonea a cancellazione una prenotazione che soddisfa il
-+#   criterio del CLIENTE (voli oltre le 4 ore) ma nessuna condizione della
-+#   POLICY; nel 23 paga una prenotazione sola con tre certificati, mentre
-+#   policy.md:78 ne ammette al massimo uno. Non e' una regola inventata su un
-+#   caso: policy.md:113 e :149 lo prescrivono gia' ("The API does not check
-+#   these for the agent, so the agent must make sure the rules apply before
-+#   calling the API!"), l'agente non lo stava onorando, e la clausola aggiunge
-+#   il QUANDO. Il passo (c) e' quello che sblocca il 23: lo scenario prevede
-+#   che sia il cliente a proporre le tre prenotazioni separate, ma solo dopo che
-+#   l'agente gli abbia detto del limite di un certificato.
-+#   RISTRUTTURATA dopo la sonda sul task 44 (2026-09-01 sera): il passo (a)
-+#   funzionava - l'agente rifiuta la cancellazione non idonea e regge la
-+#   pressione, unexpected_writes da 1 a 0 - ma (b) e (c) no. (b) diceva "how
-+#   many payment methods of each type": parlava di QUANTI, non di QUALI, e il
-+#   divieto violato era di tipo (policy.md:131 ammette per un cambio volo solo
-+#   "a single gift card or credit card", quindi niente certificati). (c) era una
-+#   frase in coda a una clausola lunga invece che un passo, e l'agente ha
-+#   eseguito prima e spiegato dopo, decidendo al posto del cliente come
-+#   allocare i pagamenti. Nessuna aggiunta: (b) passa a "quali e quanti" e (c)
-+#   diventa un passo.
-+#
-+# - Clausola 2 vecchia (parole di scopo, "other"/"the rest") RIMOSSA. Era
-+#   l'unica regola di S5 scritta su una sola osservazione. Nel round2 ha sparato
-+#   correttamente - il task 7 dichiara entrambe le letture, $708 e $2.076 - e il
-+#   valore atteso (1628) non e' nessuna delle due: il ground truth include due
-+#   prenotazioni cancellate durante la telefonata, valorizzate al prezzo di
-+#   prima delle modifiche. Nessuna regola difendibile ci arriva senza ricalcare
-+#   quel caso specifico. La regola quindi costa token e produce risposte doppie
-+#   in ogni caso ambiguo senza far guadagnare niente: si toglie. Il task 7
-+#   passa in "monitoraggio", con la famiglia 4 e MSJ4OA del task 39.
-+HANDLING_CUSTOMER_REQUESTS = """
-+1. When the customer's message contains more than one request, serve all of them before
-+   closing the conversation. If one request is an action and another is a question, answer
-+   the question in the same message in which you ask for confirmation of the action.
-+2. When an action requires you to supply a payment method, decide it separately for each
-+   reservation:
-+   a. If the customer has named a method for that reservation, use it.
-+   b. If the customer has told you to use the method the reservation was paid with, read
-+      it from that reservation's payment history and use it.
-+   c. Only if neither applies, list the payment methods on their profile and ask which to
-+      use, before acting.
-+3. The tools do not enforce the policy: a call can succeed and still be wrong. Before each
-+   action that creates or modifies a reservation:
-+   a. Check that this reservation qualifies for the operation. A rule the customer gives
-+      you for choosing what to act on - a duration, a date range, a price - selects the
-+      candidates only; it never replaces this check.
-+   b. Check that every argument is allowed for this operation, including which payment
-+      methods the policy permits for it and how many of each.
-+   c. If either check fails, tell the customer what is not possible and let them decide
-+      how to proceed, before you call the tool.
-+4. When part of the customer's request cannot be done, or the path you first tried is
-+   blocked:
-+   a. Identify which parts of the request the policy still allows you to serve, including
-+      through a different sequence of actions than the one you first tried.
-+   b. Carry out those parts, asking for explicit confirmation first where the policy
-+      requires it. If the customer has already confirmed them, carry them out now.
-+   c. Tell the customer plainly which part could not be done and why. If an alternative
-+      route exists but changes what they would get, describe it and let them choose,
-+      rather than deciding for them or stopping there.
-+   d. Transfer to a human agent only if step (a) leaves nothing you can serve.
++
++STYLE = """
++- Write in the language the customer writes in.
++- Money in US format: a comma every three digits, a period only before cents. $1,250 and
++  $1,250.75 - never $1.250.
++""".strip()
++
++
++FINAL_REMINDERS = """
++Three rules that are easy to lose in the length of the policy above:
++- One turn is one message OR one tool call.
++- Before every write: the five lines of <confirmation_format>, and a "yes".
++- transfer_to_human_agents only under the three conditions in step 7d. Being blocked is not
++  one of them.
 +""".strip()
 +
 +# S3, decisione 2: se un tool sbaglia 3 volte di fila, e' il codice - non il
 +# modello - a fermarsi e forzare questo messaggio, invece di lasciare che
 +# Gemini decida se e quando arrendersi. Non chiama transfer_to_human_agents
 +# in automatico: lascia scegliere al cliente, per non disturbare un umano
-+# quando magari basta riprovare piu' tardi o cambiare approccio.
++# quando magari basta riprovare piu' tardi o cambiare approccio. Invariato in v4.
 +TOOL_ERROR_STREAK_LIMIT = 3
 +
 +TOOL_ERROR_ESCALATION_MESSAGE = (
@@ -166,14 +162,15 @@ index 0000000..068dd22
 +    "transfer you to a human agent, or would you prefer to try something else instead?"
 +)
 +
-+# S3, decisione 3: dopo 30 turni senza risolvere, il codice arrende l'agente -
-+# ben sotto il tetto di sicurezza del framework (DEFAULT_MAX_STEPS=200 in
-+# src/tau2/config.py), cosi' il nostro stop arriva prima di un troncamento
-+# brutto e senza spiegazione. Il messaggio finale e il tool sono quelli gia'
-+# previsti dalla policy del dominio (riga 15 di policy.md), non un'invenzione
-+# nostra: la policy vieta esplicitamente di dare informazioni non fornite da
-+# utente o tool (riga 9), quindi niente numeri di telefono o email inventati.
-+AGENT_TURN_LIMIT = 30
++# S3, decisione 3, alzato in v4 da 30 a 50 (docs/v4-bozza-prompt.md, sezione 4):
++# misurato sulle simulazioni esistenti che il tetto di 30 non morde quasi mai
++# (99.3% delle traiettorie restava sotto 28 turni), ma v4 aggiunge letture e
++# checkpoint che allungano le traiettorie per costruzione - alzarlo e' igiene
++# di misura, non necessita' osservata. Riguarda solo CustomAgent: il baseline
++# (LLMAgent) non ha mai avuto questo limite, e' vincolato solo dal tetto di
++# sicurezza del framework (DEFAULT_MAX_STEPS=200, src/tau2/config.py) - quindi
++# alzarlo qui non introduce nessuna asimmetria col confronto.
++AGENT_TURN_LIMIT = 50
 +TRANSFER_TOOL_NAME = "transfer_to_human_agents"
 +TRANSFER_HANDOFF_MESSAGE = "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON."
 +
@@ -181,18 +178,19 @@ index 0000000..068dd22
 +<instructions>
 +{agent_instruction}
 +</instructions>
-+<policy_highlights>
-+{policy_highlights}
-+</policy_highlights>
 +<policy>
 +{domain_policy}
 +</policy>
-+<handling_customer_requests>
-+{handling_customer_requests}
-+</handling_customer_requests>
-+<output_conventions>
-+{output_conventions}
-+</output_conventions>
++<procedure>
++{procedure}
++</procedure>
++<confirmation_format>
++{confirmation_format}
++</confirmation_format>
++<style>
++{style}
++</style>
++{final_reminders}
 +""".strip()
 +
 +
@@ -213,7 +211,8 @@ index 0000000..068dd22
 +    LLMConfigMixin, HalfDuplexAgent[CustomAgentStateType], Generic[CustomAgentStateType]
 +):
 +    """
-+    Il nostro agente per S3. Parte identico a LLMAgent (il baseline di S1/S2).
++    Il nostro agente. v4: vedi il commento in testa al file e
++    docs/v4-bozza-prompt.md per il rationale completo del prompt.
 +    """
 +
 +    def __init__(
@@ -235,9 +234,10 @@ index 0000000..068dd22
 +        return SYSTEM_PROMPT.format(
 +            domain_policy=self.domain_policy,
 +            agent_instruction=AGENT_INSTRUCTION,
-+            policy_highlights=POLICY_HIGHLIGHTS,
-+            handling_customer_requests=HANDLING_CUSTOMER_REQUESTS,
-+            output_conventions=OUTPUT_CONVENTIONS,
++            procedure=PROCEDURE,
++            confirmation_format=CONFIRMATION_FORMAT,
++            style=STYLE,
++            final_reminders=FINAL_REMINDERS,
 +        )
 +
 +    def get_init_state(
