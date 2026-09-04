@@ -1,0 +1,69 @@
+{
+  "s6/7": {
+    "riferimento": "F7",
+    "family": "F4",
+    "evidence": "update_reservation_flights(...) and cancel_reservation(...) were both performed but the scores show database 1.0 and communication 0.0, indicating the writes match (F4 Unrecognised equivalence or similar formatting difference, but database is 1.0 so wait - database is 1.0 means database matched!). Let's check F0: both scores are 1.0, but communication is 0.0 here.",
+    "confidence": "low"
+  },
+  "s6/11": {
+    "riferimento": "F1",
+    "family": "F1",
+    "evidence": "Yes, please just get this done quickly! Confirm the downgrade and make sure that $5,244.00 refund is processed back to my original payment method right away.   ###STOP###",
+    "confidence": "high"
+  },
+  "s6/14": {
+    "riferimento": "F4",
+    "family": "F3",
+    "evidence": "\n{\"family\": \"F3\", \"evidence\": \"payment_methods\": [{\"amount\": 500, \"payment_id\": \"certificate_3765853\"}, {\"amount\": 129, \"payment_id\": \"gift_card_6136092\"}, {\"payment_id\": \"gift_card_8020792\", \"amount\": 198}, {\"amount\": 1786, \"payment_id\": \"credit_card_2198526\"}]}\", \"confidence\": \"high\"}\n",
+    "confidence": "low",
+    "json_rotto": true
+  },
+  "s6/23": {
+    "riferimento": "F4",
+    "family": "F4",
+    "evidence": "All three reservations have been successfully created!",
+    "confidence": "high"
+  },
+  "s6/24": {
+    "riferimento": "F2",
+    "family": "F2",
+    "evidence": "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+    "confidence": "high"
+  },
+  "s6/25": {
+    "riferimento": "F1",
+    "family": "F1",
+    "evidence": "Yes, please go ahead and confirm the booking with those details and payment methods.   ###STOP###",
+    "confidence": "high"
+  },
+  "s6/29": {
+    "riferimento": "F8",
+    "family": "F8",
+    "evidence": "###OUT-OF-SCOPE###",
+    "confidence": "high"
+  },
+  "s6/32": {
+    "riferimento": "F2",
+    "family": "F2",
+    "evidence": "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+    "confidence": "high"
+  },
+  "s6/33": {
+    "riferimento": "F3",
+    "family": "F3",
+    "evidence": "update_reservation_flights({\"cabin\": \"economy\", \"payment_id\": \"gift_card_1646646\", \"flights\": [{\"date\": \"2024-05-19\", \"flight_number\": \"HAT072\"}, {\"date\": \"2024-05-23\", \"flight_number\": \"HAT278\"}], \"reservation_id\": \"HXDUBJ\"})",
+    "confidence": "high"
+  },
+  "s6/35": {
+    "riferimento": "F5",
+    "family": "F5",
+    "evidence": "book_reservation({\"cabin\": \"economy\", \"passengers\": [{\"dob\": \"1981-05-26\", \"last_name\": \"Ahmed\", \"first_name\": \"Aarav\"}], \"insurance\": \"no\", \"origin\": \"JFK\", \"total_baggages\": 0, \"flights\": [{\"date\": \"2024-05-24\", \"flight_number\": \"HAT023\"}], \"payment_methods\": [{\"payment_id\": \"credit_card_9074831\", \"amount\": 163}], \"destination\": \"SFO\", \"flight_type\": \"one_way\", \"user_id\": \"aarav_ahmed_6699\", \"nonfree_baggages\": 0})",
+    "confidence": "high"
+  },
+  "s6/39": {
+    "riferimento": "F7",
+    "family": "F6",
+    "evidence": "Je suis désolé, mais même sans remboursement, notre politique aérienne est stricte et ne nous permet pas d'annuler ces réservations",
+    "confidence": "high"
+  }
+}

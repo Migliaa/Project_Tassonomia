@@ -29,6 +29,7 @@ Score pubblicati per ogni item: `reward`, `db_check`, `write_action_score`,
 vedi il commento sotto.
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -98,6 +99,37 @@ def failure_family_evaluator(*, input, output, expected_output, metadata, **kwar
     )
     return Evaluation(
         name="failure_family", value=family, data_type="CATEGORICAL", comment=why
+    )
+
+
+# Etichette prodotte dal giudice per il run corrente. Popolata in `main()` prima
+# di ogni Run, sullo stesso schema di `base.REUSE_EXISTING`: gli evaluator di
+# Langfuse ricevono un item per volta e non sanno a quale run appartengono.
+GIUDIZI: dict = {}
+
+
+def judge_evaluator(*, input, output, expected_output, metadata, **kwargs):
+    """Pubblica l'etichetta del giudice accanto a quella di riferimento.
+
+    Perche' sta su Langfuse e non solo in un file: e' li' che si vede, riga per
+    riga e sullo stesso item, cosa ha detto il classificatore automatico e cosa
+    dice il reward. Una tabella in un report la si legge fidandosi; una colonna
+    accanto agli altri score la si puo' ispezionare.
+    """
+    if not isinstance(output, dict):
+        return []
+    g = GIUDIZI.get(output.get("task_id"))
+    if not g:
+        return []
+    prova = str(g.get("evidence") or "")[:300]
+    nota = f"confidenza {g.get('confidence')} · prova citata: {prova}"
+    if g.get("json_rotto"):
+        nota += " · [output JSON non valido, etichetta recuperata dal testo]"
+    return Evaluation(
+        name="failure_family_judge",
+        value=g.get("family", "?"),
+        data_type="CATEGORICAL",
+        comment=nota,
     )
 
 
@@ -176,6 +208,14 @@ def main() -> None:
         if missing:
             print(f"[{run_name}] ATTENZIONE: mancano i results.json di {missing}")
 
+        global GIUDIZI
+        percorso = ROOT / "docs" / "giudice" / "esito-tutto.json"
+        GIUDIZI = {}
+        if percorso.exists() and prefix == "s6" and agent == "custom_agent":
+            grezzo = json.loads(percorso.read_text(encoding="utf-8"))
+            GIUDIZI = {k.split("/")[1]: v for k, v in grezzo.items()}
+            print(f"[{run_name}] etichette del giudice caricate: {len(GIUDIZI)}")
+
         # Serve tutto dalla cache locale: my_task non fa nessuna chiamata LLM.
         base.REUSE_EXISTING = mapping
 
@@ -191,6 +231,7 @@ def main() -> None:
                 base.unexpected_writes_evaluator,
                 base.wrong_argument_writes_evaluator,
                 failure_family_evaluator,
+                judge_evaluator,
             ],
             max_concurrency=1,
             metadata={

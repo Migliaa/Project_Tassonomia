@@ -74,7 +74,7 @@ def compact(sim: dict, task, tool_types: dict) -> str:
     out.append("**Scritture attese dal benchmark**")
     out.append("")
     out.extend(
-        [f"- `{a.name}({json.dumps(a.arguments, ensure_ascii=False)[:230]})`" for a in golden]
+        [f"- `{a.name}({json.dumps(a.arguments, ensure_ascii=False)[:900]})`" for a in golden]
         or ["- nessuna"]
     )
 
@@ -83,7 +83,7 @@ def compact(sim: dict, task, tool_types: dict) -> str:
     out.append("**Scritture eseguite dall'agente**")
     out.append("")
     out.extend(
-        [f"- `{c.get('name')}({json.dumps(c.get('arguments'), ensure_ascii=False)[:230]})`"
+        [f"- `{c.get('name')}({json.dumps(c.get('arguments'), ensure_ascii=False)[:900]})`"
          for c in fatte]
         or ["- nessuna"]
     )

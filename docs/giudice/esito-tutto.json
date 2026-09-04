@@ -1,0 +1,290 @@
+{
+  "s6/0": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/1": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/10": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/11": {
+    "riferimento": "F1",
+    "family": "F1",
+    "evidence": "Yes, please just get this done quickly! Confirm the downgrade and make sure that $5,244.00 refund is processed back to my original payment method right away.   ###STOP###",
+    "confidence": "high"
+  },
+  "s6/12": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Your reservation YAX4DR has been successfully updated with 2 checked bags",
+    "confidence": "high"
+  },
+  "s6/13": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/14": {
+    "riferimento": "F4",
+    "family": "F3",
+    "evidence": "payment_methods\": [{\"amount\": 500, \"payment_id\": \"certificate_3765853\"}, {\"amount\": 129, \"payment_id\": \"gift_card_6136092\"}, {\"payment_id\": \"gift_card_8020792\", \"amount\": 198}, {\"amount\": 1786, \"payment_id\": \"credit_card_2198526\"}]",
+    "confidence": "high"
+  },
+  "s6/15": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/16": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Your reservation (ID: M05KNL) has been successfully updated!",
+    "confidence": "high"
+  },
+  "s6/17": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Your reservation (`FQ8APE`) has been successfully updated... Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/18": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "I have successfully downgraded all five of your business class reservations to economy class...",
+    "confidence": "high"
+  },
+  "s6/19": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/2": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/20": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Your one-way flight from New York (JFK) to Seattle (SEA) has been successfully booked!",
+    "confidence": "high"
+  },
+  "s6/21": {
+    "riferimento": "(nessuna)",
+    "family": "F3",
+    "evidence": "update_reservation_flights({\"flights\": [{\"date\": \"2024-05-27\", \"flight_number\": \"HAT078\"}, {\"date\": \"2024-05-27\", \"flight_number\": \"HAT118\"}, {\"date\": \"2024-05-27\", \"flight_number\": \"HAT290\"}, {\"date\": \"2024-05-27\", \"flight_number\": \"HAT175\"}], \"reservation_id\": \"OBUT9V\", \"payment_id\": \"gift_card_7480005\", \"cabin\": \"economy\"})",
+    "confidence": "high"
+  },
+  "s6/22": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/23": {
+    "riferimento": "F4",
+    "family": "F4",
+    "evidence": "All three reservations have been successfully created!",
+    "confidence": "high"
+  },
+  "s6/24": {
+    "riferimento": "F2",
+    "family": "F2",
+    "evidence": "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+    "confidence": "high"
+  },
+  "s6/25": {
+    "riferimento": "F1",
+    "family": "F1",
+    "evidence": "Yes, please go ahead and confirm the booking with those details and payment methods.   ###STOP###",
+    "confidence": "high"
+  },
+  "s6/26": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/28": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/29": {
+    "riferimento": "F8",
+    "family": "F8",
+    "evidence": "###OUT-OF-SCOPE###",
+    "confidence": "high"
+  },
+  "s6/3": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/30": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "I have successfully updated your reservation (`1N99U6`).",
+    "confidence": "high"
+  },
+  "s6/31": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/32": {
+    "riferimento": "F2",
+    "family": "F2",
+    "evidence": "YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+    "confidence": "high"
+  },
+  "s6/33": {
+    "riferimento": "F3",
+    "family": "F3",
+    "evidence": "update_reservation_flights({\"cabin\": \"economy\", \"payment_id\": \"gift_card_1646646\", \"flights\": [{\"date\": \"2024-05-19\", \"flight_number\": \"HAT072\"}, {\"date\": \"2024-05-23\", \"flight_number\": \"HAT278\"}], \"reservation_id\": \"HXDUBJ\"})",
+    "confidence": "high"
+  },
+  "s6/34": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/35": {
+    "riferimento": "F5",
+    "family": "F5",
+    "evidence": "book_reservation({\"cabin\": \"economy\", \"passengers\": [{\"dob\": \"1981-05-26\", \"last_name\": \"Ahmed\", \"first_name\": \"Aarav\"}], \"insurance\": \"no\", \"origin\": \"JFK\", \"total_baggages\": 0, \"flights\": [{\"date\": \"2024-05-24\", \"flight_number\": \"HAT023\"}], \"payment_methods\": [{\"payment_id\": \"credit_card_9074831\", \"amount\": 163}], \"destination\": \"SFO\", \"flight_type\": \"one_way\", \"user_id\": \"aarav_ahmed_6699\", \"nonfree_baggages\": 0})",
+    "confidence": "high"
+  },
+  "s6/36": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/37": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/38": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/39": {
+    "riferimento": "F7",
+    "family": "F6",
+    "evidence": "Je suis désolé, mais même sans remboursement, notre politique aérienne est stricte et ne nous permet pas d'annuler ces réservations",
+    "confidence": "high"
+  },
+  "s6/4": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/40": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/41": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/42": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Both scores are 1.0.",
+    "confidence": "high"
+  },
+  "s6/43": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/44": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/45": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/46": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/47": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/48": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/49": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/6": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database `1.0` · comunicazione `1.0`",
+    "confidence": "high"
+  },
+  "s6/7": {
+    "riferimento": "F7",
+    "family": "F4",
+    "evidence": "update_reservation_flights(...) and cancel_reservation(...) were performed in a different order",
+    "confidence": "high"
+  },
+  "s6/8": {
+    "riferimento": "(nessuna)",
+    "family": "F0",
+    "evidence": "Esito: database 1.0 · comunicazione 1.0",
+    "confidence": "high"
+  },
+  "s6/9": {
+    "riferimento": "(nessuna)",
+    "family": "F1",
+    "evidence": "For IFOYYZ, the reason for cancellation is simply a change of plans. And yes, please go ahead and transfer me regarding NQNU5R since those dates have already passed. As for M20IZO, since there are no nonstop flights available, I suppose I will just leave it as it is for now.  You are the most lenient customer service agent I have ever spoken to. ###TRANSFER###",
+    "confidence": "high"
+  }
+}
