@@ -202,6 +202,22 @@ RUNS = [
         "di questo primo giro: confronta con il Run 'baseline - llm_agent' "
         "sopra, non con v1/v2/v3.",
     ),
+    (
+        "s13",
+        "custom_agent",
+        "custom_agent v5 - conferma unica e disciplina di ricerca",
+        "La v4 ristrutturata su tre diagnosi lette una traccia alla volta. "
+        "(1) Una conferma sola per richiesta, poi tutte le azioni di fila: il "
+        "modulo a 5 righe della v4 sembrava una ricevuta, e il cliente chiudeva "
+        "la conversazione dopo aver detto si', lasciando l'azione mai eseguita "
+        "(COMMUNICATE 1.0, DB 0.0). (2) Disciplina di ricerca: quando il cliente "
+        "descrive invece di nominare - 'il piu' economico', 'un posto qualsiasi "
+        "della West Coast' - enumerare i candidati e scegliere per confronto "
+        "invece di fermarsi al primo valido. (3) Lo slot 'Allowed because' "
+        "riscritto come verifica che puo' fallire, con un esempio di rifiuto. "
+        "Stesso motore, stessi 50 task, n=1: il termine di paragone e' il Run "
+        "'baseline - llm_agent'.",
+    ),
 ]
 
 # Etichetta di sprint per i metadata del Run, per prefisso. "s6" copre sia il
@@ -212,6 +228,7 @@ SPRINT_PER_PREFISSO = {
     "s8": "S7",
     "s9": "S6-ripetizione",
     "s10": "S8-v4",
+    "s13": "S8-v5",
 }
 
 

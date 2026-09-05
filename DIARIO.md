@@ -2695,6 +2695,80 @@ verificata da un secondo agente in ruolo di avvocato del diavolo, quattro correz
 È contenuto pubblico e permanente su un repo di terzi a nome di Andrea: la manda lui, o serve un
 `gh auth login` fatto da lui più un via libera esplicito.
 
+## 2026-09-05 (2) — La v6: la conferma unica concentrava il rischio invece di ridurlo
+
+Il trial 1 della v5 ha rivelato un difetto di progetto che la sonda `s11` non poteva vedere,
+perché girava solo su task già falliti. **La v5 ha più fallimenti da chiusura anticipata della
+v4, non meno**: 4 contro 3 (baseline: 2). La conferma unica non ha risolto il problema, l'ha
+spostato — recupera 17 e 21, ma crea 20 e 44, dove la v4 eseguiva tutte le scritture e la v5
+non ne esegue **nessuna**.
+
+Il meccanismo, una volta visto, è ovvio: confermare azione per azione distribuisce il rischio, e
+se il cliente riaggancia a metà il grosso è già fatto. **Una conferma sola concentra tutto in un
+istante**: se quel "sì" non arriva, non è stato fatto niente. Avevamo ottimizzato il numero di
+finestre di rischio senza accorgerci di averne aumentato la posta.
+
+Correzione a una nostra stima: il backport valeva "+1 sulla v5" solo perché l'avevamo misurato
+sul set di fallimenti della **v4**. Sul set reale della v5 (20, 33, 44) ne varrebbe fino a 3.
+La stima era giusta sul campione sbagliato.
+
+### Le due modifiche della v6
+
+1. **Un diritto non è un'istruzione.** Copre entrambe le regressioni contro il baseline: la
+   compensazione non richiesta del task 2 e il bagaglio non richiesto del task 8. È un principio
+   generale, non una toppa sui due casi. Rimosso anche l'esempio sul bagaglio gratuito che li
+   innescava.
+2. **Il messaggio di conferma si apre con «non ho ancora fatto nessuna di queste modifiche».**
+   Attacca il meccanismo (il cliente crede che il lavoro sia fatto) senza toccare il benchmark.
+
+### Sonda `s14`: 4 recuperi su 5, e la firma sparisce da tutti
+
+| task | v5 | v6 | |
+|---|---|---|---|
+| 2 | 0.0 | **1.0** | nessuna compensazione emessa |
+| 8 | 0.0 | **1.0** | nessun bagaglio inventato |
+| 20 | 0.0 | **1.0** | prenotazione eseguita |
+| 44 | 0.0 | **1.0** | tutte e tre le modifiche eseguite |
+| 33 | 0.0 | 0.0 | ma **esegue entrambe** le azioni attese |
+
+**Nessuno dei cinque finisce più con una domanda in sospeso**, il 33 compreso: fallisce ora per
+argomenti, non per abbandono. Una riga di prompt ha fatto, senza modificare lo strumento di
+misura, più di quanto avrebbe fatto il backport che avevamo scartato.
+
+Cautela dichiarata: i 5 task erano scelti perché fallivano, e le due modifiche toccano *tutti* i
+task. Proiettare 38+4=42/50 sarebbe l'errore esatto commesso con la v5, dove i 5 recuperi della
+sonda si riassorbirono. Il numero vero lo dà solo un trial completo.
+
+### Vincoli reali della sottomissione, verificati sulle PR di Sierra
+
+- **62 PR di sottomissione: 50 accettate, 12 chiuse.** Ma dieci delle dodici corrispondono a
+  submission oggi presenti sulla leaderboard (Pine, Distyl, ToolOrchestra, Sonnet 4.5, Gemini
+  Flash Live, gpt-realtime): erano duplicati o PR rifatte, non rifiuti. **Ripresentare una PR non
+  brucia nulla** — ToolOrchestra e Distyl l'hanno fatto entrambe.
+- **Il criterio d'accettazione, dalle parole del maintainer** (PR #368): *«acceptance — including
+  for custom submissions — requires that we can verify what was evaluated»*. I tre motivi che
+  bloccavano quella PR erano: nessun link all'implementazione, prompt segreti non auditabili,
+  percorso di servizio non dichiarato. **Nessuno riguarda chi sei.** Su tutti e tre siamo messi
+  meglio di quella submission aziendale: repo pubblico, prompt in chiaro, API standard.
+- **Le submission a 1 trial vengono accettate**: quella di Anthropic per Claude Opus 4 ha
+  `pass_1: 59.6` e `pass_2/3/4: null`, con nota «incomplete evaluation (Pass^1 only)».
+- **Il baseline non serve a Sierra**: si sottomette il proprio agente, non un termine di paragone.
+  I trial multipli riguardano solo noi.
+- **Scartato** (di nuovo, su richiesta): dichiarare 4 trial mescolando v5 e v6 perché «cambia una
+  riga sola». L'argomento si autodistrugge: se quella riga cambia il comportamento — ed è la cosa
+  che vorremmo mostrare — allora i trial non sono dello stesso sistema. Il confronto v5/v6 su una
+  riga va nelle note metodologiche, dove è un contributo interessante, non nel conteggio.
+
+### Langfuse, verificato via API
+
+Sei Run nello stesso dataset (baseline, v1, v2, v3, v4, v5), 50 item ciascuno sugli stessi task.
+Ogni item porta `transcript` (dialogo turno per turno), `reward`, `db_check`,
+`reward_breakdown`, `action_metrics`, `communicate_checks`, `termination_reason`, più gli score
+agganciati riga per riga. Due note per gli screenshot: l'SDK accoda un timestamp ISO lungo al
+nome del Run (prolisso in una schermata di confronto, si può ripulire ripubblicando a costo
+zero), e `failure_family`/`write_action_score` compaiono solo dove hanno senso, quindi su un
+task riuscito quelle colonne appaiono vuote.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2717,3 +2791,4 @@ verificata da un secondo agente in ruolo di avvocato del diavolo, quattro correz
 | 2026-09-04 | **Controllo `s11`**: la v5 sui 9 task falliti e non rotti in partenza — diagnosi, non pass rate | 9 simulazioni | ~$0.40 | ~$14.75 |
 | 2026-09-05 | **`s12`**: v5 senza backport sui task 17, 21, 33 — isola le due correzioni | 3 simulazioni | ~$0.13 | ~$14.88 |
 | 2026-09-05 | **Trial 1 della v5** (`s13`), 50 task — 38/50, sopra la soglia di arresto | 50 simulazioni | $2.028 | ~$16.91 |
+| 2026-09-05 | **Sonda `s14`**: v6 sui 5 task da recuperare — 4 su 5, diagnosi non pass rate | 5 simulazioni | ~$0.21 | ~$17.12 |

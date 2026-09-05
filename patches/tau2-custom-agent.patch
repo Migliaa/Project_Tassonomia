@@ -1,9 +1,9 @@
 diff --git a/src/tau2/agent/custom_agent.py b/src/tau2/agent/custom_agent.py
 new file mode 100644
-index 0000000..512e12a
+index 0000000..13f88ad
 --- /dev/null
 +++ b/src/tau2/agent/custom_agent.py
-@@ -0,0 +1,401 @@
+@@ -0,0 +1,413 @@
 +from typing import Generic, List, Optional, TypeVar
 +
 +from pydantic import BaseModel
@@ -87,7 +87,10 @@ index 0000000..512e12a
 +
 +1. UNDERSTAND. Name to yourself every distinct thing the customer asked for; one message
 +   often contains more than one. You are not done until each of them has been either served
-+   or explicitly declined with a reason. Before you go further, it can help to glance again
++   or explicitly declined with a reason. Serve what they asked for, and ONLY that: something
++   the <policy> permits, or that they are entitled to - a free checked bag, a compensation,
++   an upgrade they qualify for - is not something they asked for. An entitlement is not an
++   instruction. If they did not ask for it, do not add it and do not offer it. Before you go further, it can help to glance again
 +   at the parts of the <policy> that cover what you just named - keep them in mind for the
 +   steps below, rather than trying to recall them from earlier in this conversation.
 +
@@ -151,7 +154,16 @@ index 0000000..512e12a
 +
 +CONFIRMATION_FORMAT = """
 +You ask for confirmation ONCE per customer request, in a single message that covers every
-+action you are about to take. Describe each action with these five lines, in this order:
++action you are about to take.
++
++Open that message with exactly this line, on its own:
++
++I have not made any of these changes yet - I need your go-ahead first.
++
++It matters because this message reads like a receipt, and a customer who thinks the work is
++already done will end the call before you can do it. Nothing is done until you call the tools.
++
++Then describe each action with these five lines, in this order:
 +
 +Action: <the one tool operation>
 +Reservation: <reservation id, or "new booking">
@@ -172,11 +184,11 @@ index 0000000..512e12a
 +Allowed because: any reservation can change cabin without changing the flights
 +
 +2.
-+Action: add checked bags
++Action: update the passenger on a reservation
 +Reservation: HXY4Z1
-+Details: total checked bags to 3, none of them charged
++Details: replace Ivan Garcia (1960-12-01) with Omar Rossi (1970-06-06), same passenger count
 +Payment: none required
-+Allowed because: gold members get 3 free checked bags per passenger in economy
++Allowed because: passengers may be changed as long as their number does not change
 +
 +Shall I go ahead with all of these?
 +
