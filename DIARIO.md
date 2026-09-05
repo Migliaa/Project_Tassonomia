@@ -2816,6 +2816,39 @@ baseline 0,80 e v5 0,90, mentre sui 50 veri sono 0,68 e 0,76 — un lettore ne t
 conclusione sbagliata. Se serve un'immagine, va presa dalla tabella Experiments, dove le medie
 sono per-run.
 
+## 2026-09-05 (4) — Il pass^2 chiude il cerchio, e ridimensiona tutto
+
+Trial 2 completato con la chiave nuova. I numeri finali sui 50 task:
+
+| | 50 task |
+|---|---|
+| baseline | 68,0% |
+| v6 trial 1 | 82,0% — McNemar p=0,039 |
+| v6 trial 2 | 74,0% — McNemar p=0,508 |
+| **pass^1 medio** | **78,0%** |
+| **pass^2** | **68,0%** |
+| almeno una volta su due | 88,0% |
+
+**Il pass^2 della v6 coincide con il pass^1 del baseline.** Chiedendo all'agente di riuscire *due
+volte su due*, vale quanto l'agente di default che riesce *una volta*. Dieci task su cinquanta
+cambiano esito fra due esecuzioni identiche (9, 11, 12, 14, 16, 20, 21, 29, 34, 40).
+
+**La significatività dipende dall'estrazione**: trial 1 p=0,039, trial 2 p=0,508 — stesso agente,
+stessi task. È letteralmente la cautela registrata il giorno prima di vedere il dato, e vale come
+verifica del metodo: la previsione era che il p del trial 1 fosse fragile, e lo era.
+
+### Cosa resta vero, detto senza sconti
+
+- Il miglioramento sul **pass^1** è reale e coerente: sei versioni, tutte sopra il baseline, mai
+  una sotto. Da 68% a 78% medio.
+- Il miglioramento sull'**affidabilità** non c'è. È la distinzione che il pass^k esiste per fare,
+  e che con n=1 avremmo continuato a non vedere: i quattro trial dello standard Sierra non sono
+  burocrazia, sono ciò che separa un 82% vero da un 82% fortunato.
+- Il risultato più difendibile del progetto non è un pass rate ma una **catena diagnostica**:
+  fallimenti letti a mano, tre famiglie separate, previsioni registrate prima di girare, e due
+  correzioni finali («un diritto non è un'istruzione», «non ho ancora fatto nulla») che hanno
+  colpito esattamente i task previsti.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2841,3 +2874,4 @@ sono per-run.
 | 2026-09-05 | **Sonda `s14`**: v6 sui 5 task da recuperare — 4 su 5, diagnosi non pass rate | 5 simulazioni | ~$0.21 | ~$17.12 |
 | 2026-09-05 | **v6 trial 1** (`s15`), 50 task — 41/50 (82%), McNemar p=0,039 | 50 simulazioni | $2.080 | ~$19.20 |
 | 2026-09-05 | **v6 trial 2** (`s16`), interrotto a 34/50 dalla quota giornaliera | 34 simulazioni | $1.498 | ~$20.70 |
+| 2026-09-05 | **v6 trial 2, completamento** dei 16 task mancanti con chiave nuova — pass^2 = 68,0% | 16 simulazioni | ~$0.59 | ~$21.29 |
