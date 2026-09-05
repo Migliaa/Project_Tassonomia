@@ -248,6 +248,31 @@ RUNS = [
         "due. E' la misura che manca al progetto: i confronti a n=1 fra le "
         "nostre versioni sono sempre stati dentro il rumore.",
     ),
+    (
+        "s17",
+        "custom_agent",
+        "custom_agent v6 - trial 3",
+        "Terza esecuzione identica. Serve a stabilire quale fra i due trial "
+        "precedenti (82% e 74%) fosse più vicino al vero: con due sole misure "
+        "si sapeva solo di stare in mezzo. Risultato 80%, quindi il 74% era la "
+        "coda bassa. Girato in tre tranche per esaurimento della quota "
+        "giornaliera, senza effetto sui risultati: i task falliti per quota non "
+        "producono file e vengono rigiocati puliti.",
+    ),
+    (
+        "s18",
+        "custom_agent",
+        "custom_agent v6 - trial 4",
+        "Quarta e ultima esecuzione, che completa i 4 trial dello standard "
+        "dichiarato da Sierra (docs/leaderboard-submission.md, requisito 5). "
+        "Risultato 86%, il migliore dei quattro. Sui 200 run complessivi il "
+        "pass^1 medio della v6 e' 80,5% contro il 68% del baseline, e tre "
+        "repliche su quattro battono il baseline in modo statisticamente "
+        "significativo (McNemar p = 0,039 / 0,508 / 0,031 / 0,004), con due in "
+        "cui la v6 non perde nemmeno un task. I cinque task mai risolti sono, "
+        "in tutte e quattro le esecuzioni, esattamente quelli gia' diagnosticati "
+        "come rotti o fuori portata del modello.",
+    ),
 ]
 
 # Etichetta di sprint per i metadata del Run, per prefisso. "s6" copre sia il
@@ -261,6 +286,8 @@ SPRINT_PER_PREFISSO = {
     "s13": "S8-v5",
     "s15": "S9-v6",
     "s16": "S9-v6",
+    "s17": "S9-v6",
+    "s18": "S9-v6",
 }
 
 
