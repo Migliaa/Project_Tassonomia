@@ -2849,6 +2849,61 @@ verifica del metodo: la previsione era che il p del trial 1 fosse fragile, e lo 
   correzioni finali («un diritto non è un'istruzione», «non ho ancora fatto nulla») che hanno
   colpito esattamente i task previsti.
 
+## 2026-09-05 (5) — Perche' lo stesso agente oscilla di 8 punti: non e' un nostro difetto
+
+Andrea ha chiesto di verificare se l'82% del trial 1 contro il 74% del trial 2 nascondesse un
+errore dell'harness. **Non lo nasconde**, e le verifiche vanno registrate perche' escludono
+altrettante spiegazioni sbagliate.
+
+**Escluso: errori di esecuzione.** Tutte e 100 le simulazioni dei due trial terminano
+regolarmente (`user_stop`), nessun troncamento, nessun errore di infrastruttura, nessun
+trasferimento anomalo.
+
+**Escluso: la chiave e l'interruzione per quota.** Il trial 2 e' girato in due tronconi, con
+chiavi diverse e una caduta per quota in mezzo — sembrava il sospetto migliore. Ma sui 16 task
+della chiave nuova i due trial fanno **75% e 75%**, identici; tutta la divergenza sta nei 34 task
+girati con la stessa chiave. Ipotesi mia, smentita dai dati.
+
+**Escluso: instabilita' anomala.** E' la norma per questo benchmark, e lo avevamo gia' misurato:
+
+| stesso agente, due esecuzioni | task che cambiano esito |
+|---|---|
+| v6 (s15 vs s16) | 10/50 = 20% |
+| v1 (s6 vs s9), misurato il 2026-09-04 | 8/36 = 22% |
+| baseline (s6 vs s9) | 5/37 = 14% |
+
+**E il dato che chiude la questione: la temperatura e' 0.0**, per l'agente *e* per il simulatore
+utente (`src/tau2/config.py:19-20`). Campionamento deterministico, stesso prompt, stessi task, e
+il 20% dei risultati cambia comunque. E' la non-determinatezza dei servizi LLM a temperatura zero
+(batching sui GPU, somme in virgola mobile non associative): basta un token diverso per far
+divergere una conversazione di venti turni.
+
+### La scoperta: una parte della varianza la produce il bug del benchmark
+
+Fra i dieci task instabili c'e' il **14**, che avevamo classificato come irrisolvibile. Nei due
+trial esegue **le stesse due azioni** (`cancel_reservation` + `book_reservation`) e ottiene DB=1.0
+nel primo, DB=0.0 nel secondo. E' il bug dell'ordinamento nell'hash: **non fallisce sempre,
+fallisce quando l'agente capita di produrre la lista in un ordine diverso.**
+
+Due conseguenze:
+
+1. **La segnalazione da inviare si rafforza**: il bug non produce solo falsi negativi, **inietta
+   varianza** — rende l'esito di un task una moneta, e contribuisce al 20% osservato. Da
+   aggiungere a `scratch_issue_taubench.md` prima di mandarla.
+2. **Una nostra affermazione va corretta.** I task "mai risolti da nessuna versione" erano 7; il
+   **14** e il **33** sono ora stati risolti almeno una volta. Restano **cinque** (7, 23, 32, 35,
+   39) e il **tetto empirico sale da 86% a 90%**. Va aggiornato anche nel PDF, dove l'86% compare
+   in copertina.
+
+### Terzo trial, parziale: quali 10 task
+
+La quota consente 10 task. Scelti i **dieci instabili** (9, 11, 12, 14, 16, 20, 21, 29, 34, 40)
+invece dei primi dieci in ordine: sono quelli dove il pass^k si decide davvero, mentre un task
+che ha gia' vinto o perso due volte su due e' molto meno informativo. L'ordine di esecuzione non
+tocca la validita' del trial, che resta completo quando i 50 saranno girati tutti con lo stesso
+agente. **Vincolo: da questi 10 non si calcola nessun pass rate** — sono un sottoinsieme scelto
+perche' anomalo.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
