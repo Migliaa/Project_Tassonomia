@@ -218,6 +218,36 @@ RUNS = [
         "Stesso motore, stessi 50 task, n=1: il termine di paragone e' il Run "
         "'baseline - llm_agent'.",
     ),
+    # v6: due trial dello STESSO agente. Servono a due cose diverse - il primo
+    # dice se le due righe aggiunte valgono qualcosa, il secondo misura quanta
+    # parte delle differenze fra le nostre versioni era varianza (con lo stesso
+    # agente girato due volte avevamo gia' visto cambiare esito a 8 task su 36).
+    (
+        "s15",
+        "custom_agent",
+        "custom_agent v6 - trial 1",
+        "La v5 piu' due righe, entrambe nate da fallimenti letti nel trial 1 "
+        "della v5. (1) 'Un diritto non e' un'istruzione': l'agente emetteva un "
+        "certificato mai chiesto (task 2) e aggiungeva bagagli a un cliente che "
+        "diceva di non averne (task 8), giustificandoli con il diritto ad "
+        "averli. Rimosso anche l'esempio sul bagaglio gratuito nel prompt, che "
+        "innescava il secondo. (2) Il messaggio di conferma si apre dichiarando "
+        "che nulla e' stato ancora fatto: la conferma unica della v5 "
+        "concentrava tutto il rischio in un istante, e se il cliente chiudeva "
+        "li' non veniva eseguita nessuna azione invece che solo l'ultima. "
+        "Stesso motore e stessi 50 task: confronta con 'baseline - llm_agent'.",
+    ),
+    (
+        "s16",
+        "custom_agent",
+        "custom_agent v6 - trial 2",
+        "Seconda esecuzione della v6, identica alla prima in tutto: stesso "
+        "prompt, stesso motore, stessi task. Non serve a migliorare il "
+        "punteggio ma a misurarne la varianza - insieme al trial 1 da' il "
+        "pass^2, cioe' la probabilita' che lo stesso task riesca DUE volte su "
+        "due. E' la misura che manca al progetto: i confronti a n=1 fra le "
+        "nostre versioni sono sempre stati dentro il rumore.",
+    ),
 ]
 
 # Etichetta di sprint per i metadata del Run, per prefisso. "s6" copre sia il
@@ -229,6 +259,8 @@ SPRINT_PER_PREFISSO = {
     "s9": "S6-ripetizione",
     "s10": "S8-v4",
     "s13": "S8-v5",
+    "s15": "S9-v6",
+    "s16": "S9-v6",
 }
 
 
@@ -267,6 +299,11 @@ def main() -> None:
 
         result = lf.run_experiment(
             name=run_name,
+            # Senza `run_name` l'SDK accoda al nome un timestamp ISO completo
+            # ("... - 2026-09-05T00:05:20.746417Z"): nella pagina di confronto fra
+            # Run i nomi diventano illeggibili, ed e' proprio la schermata che
+            # serve al report. Passandolo esplicitamente il nome resta quello.
+            run_name=run_name,
             description=description,
             data=items,
             task=base.my_task,
