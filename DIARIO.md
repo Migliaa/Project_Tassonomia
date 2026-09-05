@@ -2941,6 +2941,47 @@ Bilancio: dei dieci task instabili, **uno solo** (il 14) è imputabile al bug de
 nove sono varianza del modello a temperatura zero. Il bug contribuisce alla varianza, ma non la
 spiega.
 
+## 2026-09-05 (7) — Tre esecuzioni complete: il 74% era il ribasso, non la norma
+
+Trial 3 completato (`s17`): **40/50 (80%)**. Con i tre trial pieni dello stesso agente sugli
+stessi 50 task, per la prima volta il progetto ha la misura che inseguiva da tre sprint.
+
+| | |
+|---|---|
+| trial 1 / 2 / 3 | 82% / 74% / 80% |
+| **pass^1 medio** | **78,7%** (baseline 68%) |
+| **pass^3** (riesce 3 volte su 3) | **66,0%** |
+
+**Il 74% del trial 2 era la coda bassa**, non il valore vero: due esecuzioni su tre stanno a
+80-82%. La stima onesta è 78,7%, dieci punti sopra il baseline — il che *rafforza* il risultato
+rispetto a quanto sembrava con due soli trial.
+
+### La distribuzione, che dice più della media
+
+| esiti su 3 | task | |
+|---|---|---|
+| 3/3 | 33 | solidi |
+| 2/3 | 7 | 11, 12, 16, 21, 34, 37, 40 |
+| 1/3 | 5 | 9, 14, 20, 29, 44 |
+| 0/3 | 5 | 7, 23, 32, 35, 39 |
+
+Due cose importanti. **I cinque «mai risolti» coincidono esattamente con quelli già diagnosticati**
+come rotti o fuori portata: la diagnosi regge alla terza replica, senza sorprese. E **dodici task
+su 45 non rotti sono monete** — l'agente li risolve o no a seconda dell'esecuzione.
+
+Il pass^3 (66%) resta sotto il pass^1 del baseline (68%). È la stessa conclusione dei due trial,
+ora su tre punti: **il guadagno è sul punteggio medio, non sull'affidabilità.** E non è un difetto
+della v6 in particolare — è la natura di questo benchmark con un modello senza ragionamento.
+
+### Nota operativa: quota giornaliera, non limite al minuto
+
+Il primo tentativo di completare il trial 3 si è schiantato dopo 4 task. Il log mostrava 336 hit
+di rate limit, ma la causa non era il limite al minuto (il nostro limitatore è intervenuto
+correttamente 11 volte): era **`GenerateRequestsPerDay`**, la quota giornaliera. Distinzione che
+conta, perché il primo si assorbe aspettando e il secondo no — da lì in poi ogni task falliva
+comunque, sprecando 90 secondi di attesa a testa. Fermato subito. Risolto con una chiave a
+fatturazione.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2967,3 +3008,4 @@ spiega.
 | 2026-09-05 | **v6 trial 1** (`s15`), 50 task — 41/50 (82%), McNemar p=0,039 | 50 simulazioni | $2.080 | ~$19.20 |
 | 2026-09-05 | **v6 trial 2** (`s16`), interrotto a 34/50 dalla quota giornaliera | 34 simulazioni | $1.498 | ~$20.70 |
 | 2026-09-05 | **v6 trial 2, completamento** dei 16 task mancanti con chiave nuova — pass^2 = 68,0% | 16 simulazioni | ~$0.59 | ~$21.29 |
+| 2026-09-05 | **v6 trial 3** (`s17`), 50 task in tre tranche (una persa per quota giornaliera) — 40/50 (80%) | 50 simulazioni | $2.068 | ~$23.36 |
