@@ -2982,6 +2982,64 @@ conta, perché il primo si assorbe aspettando e il secondo no — da lì in poi 
 comunque, sprecando 90 secondi di attesa a testa. Fermato subito. Risolto con una chiave a
 fatturazione.
 
+## 2026-09-05 (8) — Quattro trial: lo standard Sierra è completo, e la tesi regge
+
+Trial 4: **43/50 (86%)**, il migliore dei quattro. Il quadro definitivo della v6, su 200
+simulazioni:
+
+| | |
+|---|---|
+| trial 1 / 2 / 3 / 4 | 82% / 74% / 80% / 86% |
+| **pass^1 medio** | **80,5%** (baseline 68%) |
+| pass^4 | 64,0% |
+
+### La significatività, che due giorni fa era il punto debole
+
+| | vinti/persi | p |
+|---|---|---|
+| trial 1 | +8 / −1 | 0,039 |
+| trial 2 | +6 / −3 | 0,508 |
+| trial 3 | +6 / **−0** | 0,031 |
+| trial 4 | +9 / **−0** | **0,004** |
+
+**Tre repliche su quattro sono significative**, e in due la v6 non perde **nemmeno un task**
+contro il baseline. È un'altra cosa rispetto al singolo p=0,039 del trial 1, su cui avevo
+avvertito che con sei tentativi poteva essere fortuna: quattro repliche indipendenti, tutte nella
+stessa direzione, tre significative.
+
+### Distribuzione su quattro esecuzioni
+
+| esiti | task | |
+|---|---|---|
+| 4/4 | 32 | solidi |
+| 3/4 | 8 | 11, 12, 16, 21, 33, 34, 37, 40 |
+| 2/4 | 4 | 9, 20, 29, 44 |
+| 1/4 | 1 | 14 (il task del bug dell'hash) |
+| 0/4 | 5 | 7, 23, 32, 35, 39 — gli stessi già diagnosticati |
+
+I cinque mai risolti sono, per la quarta volta consecutiva, esattamente quelli diagnosticati come
+rotti o fuori portata. E il task 14 riesce **una volta su quattro**: coerente con un esito deciso
+dall'ordine casuale di una lista, non dalla competenza dell'agente.
+
+### Una correzione a me stesso, questa volta a nostro favore
+
+Ho ripetuto più volte che «il nostro pass^k sta sotto il pass^1 del baseline». **È un confronto
+scorretto**: mette a confronto due misure diverse. Anche il baseline cala se gli si chiede di
+riuscire più volte di fila — non l'avevamo mai misurato perché non avevamo repliche del baseline.
+Usando i 37 task dove **entrambi** hanno due esecuzioni:
+
+| | pass^1 | pass^2 |
+|---|---|---|
+| baseline | 74,3% | 67,6% |
+| v6 | 78,4% | 67,6% |
+
+Formulazione onesta: **la v6 è migliore sul punteggio singolo e alla pari sull'affidabilità.** Il
+calo del pass^k non è un difetto nostro, è una proprietà del benchmark che colpisce entrambi.
+Resta vero che non abbiamo comprato affidabilità; non è vero che l'abbiamo peggiorata.
+
+**Limite dichiarato**: il baseline ha due esecuzioni, non quattro. Un pass^4 del baseline non lo
+possiamo calcolare, e il confronto a k=4 resta aperto.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -3009,3 +3067,4 @@ fatturazione.
 | 2026-09-05 | **v6 trial 2** (`s16`), interrotto a 34/50 dalla quota giornaliera | 34 simulazioni | $1.498 | ~$20.70 |
 | 2026-09-05 | **v6 trial 2, completamento** dei 16 task mancanti con chiave nuova — pass^2 = 68,0% | 16 simulazioni | ~$0.59 | ~$21.29 |
 | 2026-09-05 | **v6 trial 3** (`s17`), 50 task in tre tranche (una persa per quota giornaliera) — 40/50 (80%) | 50 simulazioni | $2.068 | ~$23.36 |
+| 2026-09-05 | **v6 trial 4** (`s18`) — 43/50 (86%), completa i 4 trial dello standard Sierra | 50 simulazioni | $2.129 | ~$25.49 |
