@@ -2904,6 +2904,43 @@ tocca la validita' del trial, che resta completo quando i 50 saranno girati tutt
 agente. **Vincolo: da questi 10 non si calcola nessun pass rate** — sono un sottoinsieme scelto
 perche' anomalo.
 
+## 2026-09-05 (6) — Il terzo trial parziale, e la prova definitiva del bug dell'hash
+
+Dieci task instabili rigirati (`s17`). **Nessuno si assesta**: tutti e dieci restano fra 1/3 e
+2/3 anche alla terza esecuzione. Non esistono, fra questi, task «quasi sempre giusti»: sono
+genuinamente delle monete.
+
+### La prova che mancava alla segnalazione
+
+Il task 14, nelle tre esecuzioni, produce **la stessa identica chiamata** salvo un dettaglio.
+Confrontando gli argomenti completi e normalizzati, l'unica differenza fra l'esecuzione che passa
+e quella che fallisce è **l'ordine di due carte regalo dentro `payment_methods`**:
+
+| | `payment_methods` | DB |
+|---|---|---|
+| trial 1 (`s15`) | `[gift_card_8020792 ($198), gift_card_6136092 ($129)]` | **1.0** |
+| trial 2 (`s16`) | `[gift_card_6136092 ($129), gift_card_8020792 ($198)]` | **0.0** |
+
+Stesse carte, stessi importi, stesso totale, stessa prenotazione. Cambia solo l'ordine, e il
+verdetto si ribalta. **E' l'esempio minimo e riproducibile che alla bozza della issue mancava**:
+finora avevamo l'argomento teorico su `get_dict_hash` (`json.dumps(sort_keys=True)` ordina le
+chiavi dei dizionari ma non gli elementi delle liste) e una prova con DeepDiff costruita da noi.
+Ora abbiamo due esecuzioni reali del benchmark, con la stessa soluzione corretta, giudicate in
+modo opposto.
+
+### E una correzione a me stesso, nella stessa analisi
+
+Avevo attribuito **anche il task 20** allo stesso bug, sulla base del fatto che le due esecuzioni
+mostravano gli stessi *nomi* di azione. Confrontando gli **argomenti completi** l'attribuzione
+cade: il task 20 usa il volo HAT218 in un'esecuzione e HAT136 nell'altra, con un bagaglio a
+pagamento di differenza. E' variabilità genuina del modello, non un difetto del benchmark. La
+lezione è quella già imparata in S4 e riapplicata male qui: **il nome dell'azione non basta, si
+confrontano gli argomenti.**
+
+Bilancio: dei dieci task instabili, **uno solo** (il 14) è imputabile al bug dell'hash. Gli altri
+nove sono varianza del modello a temperatura zero. Il bug contribuisce alla varianza, ma non la
+spiega.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
