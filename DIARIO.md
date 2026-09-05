@@ -2769,6 +2769,53 @@ nome del Run (prolisso in una schermata di confronto, si può ripulire ripubblic
 zero), e `failure_family`/`write_action_score` compaiono solo dove hanno senso, quindi su un
 task riuscito quelle colonne appaiono vuote.
 
+## 2026-09-05 (3) — La v6 e il primo p sotto 0,05, con tutte le cautele del caso
+
+**v6 trial 1: 41/50 (82%)**, contro il 68% del baseline: +8 task vinti, 1 perso, **McNemar
+p = 0,039**. È il primo confronto significativo del progetto. Le due modifiche previste hanno
+fatto quello che dovevano: nessuno dei fallimenti è più della famiglia B (compensazioni o bagagli
+non richiesti), e i task 2, 8, 24 sono stabilmente recuperati.
+
+**Ma il trial 2 raffredda il risultato, ed è la parte più importante di questa voce.** Si è
+fermato a 34/50 per quota giornaliera (429), e sui 34 task comuni:
+
+| | 34 task comuni |
+|---|---|
+| v6 trial 1 | 85,3% |
+| v6 trial 2 | 73,5% |
+| baseline | 64,7% |
+
+**Lo stesso agente, stessi task, oscilla di 11,8 punti fra due esecuzioni**, con 8 task che
+cambiano esito (9, 11, 12, 14, 16, 20, 21, 29). L'82% è la faccia fortunata della moneta: la
+stima onesta è **~79%** di pass^1 medio, e il **pass^2 è 67,6%** — appena sopra il pass^1 del
+baseline. Un agente che riesce una volta su due non è un agente affidabile, ed è esattamente ciò
+che i 4 trial dello standard Sierra servono a rendere visibile.
+
+### Due cautele da riportare accanto al p, non in nota
+
+1. **Il p viene dal solo trial 1**, cioè dalla migliore delle due estrazioni. Sul trial 2 il
+   confronto sarebbe molto più debole.
+2. **È il sesto confronto contro lo stesso baseline** (v1...v6). Con sei tentativi la probabilità
+   di trovarne almeno uno sotto 0,05 per puro caso è alta: con una correzione per confronti
+   multipli servirebbe p < 0,008. **Va dichiarato**, altrimenti è il tipo di affermazione che
+   si smonta in una riga.
+
+Quello che resta solido è la **direzione**: sei esperimenti indipendenti, tutti sopra il baseline,
+mai una volta sotto (+10, +8, +2, +6, +8, +14 punti). Nessuno significativo da solo; la coerenza
+vale più di ciascuno.
+
+### Il report
+
+Prodotto `report-tassonomia.pdf` (6 pagine) generato da HTML e stampato con Chrome headless: il
+sorgente rigenera il PDF in venti secondi, quindi si aggiorna quando arrivano dati nuovi. Tutti i
+numeri sono calcolati dai `results.json`, nessuno trascritto a mano.
+
+Deliberatamente **non** contiene screenshot di Langfuse: nella vista Compare le medie in cima
+sono calcolate **sulla pagina visibile**, non sul run. Una schermata dei primi 10 item mostra
+baseline 0,80 e v5 0,90, mentre sui 50 veri sono 0,68 e 0,76 — un lettore ne trarrebbe la
+conclusione sbagliata. Se serve un'immagine, va presa dalla tabella Experiments, dove le medie
+sono per-run.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
@@ -2792,3 +2839,5 @@ task riuscito quelle colonne appaiono vuote.
 | 2026-09-05 | **`s12`**: v5 senza backport sui task 17, 21, 33 — isola le due correzioni | 3 simulazioni | ~$0.13 | ~$14.88 |
 | 2026-09-05 | **Trial 1 della v5** (`s13`), 50 task — 38/50, sopra la soglia di arresto | 50 simulazioni | $2.028 | ~$16.91 |
 | 2026-09-05 | **Sonda `s14`**: v6 sui 5 task da recuperare — 4 su 5, diagnosi non pass rate | 5 simulazioni | ~$0.21 | ~$17.12 |
+| 2026-09-05 | **v6 trial 1** (`s15`), 50 task — 41/50 (82%), McNemar p=0,039 | 50 simulazioni | $2.080 | ~$19.20 |
+| 2026-09-05 | **v6 trial 2** (`s16`), interrotto a 34/50 dalla quota giornaliera | 34 simulazioni | $1.498 | ~$20.70 |
