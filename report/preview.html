@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Preview report</title>
+<style>
+:root{--bg:#fbfbfc;--card:#fff;--ink:#1b1f24;--dim:#6b747d;--line:#e3e7eb;--accent:#6d5cf0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(251,251,252,.92);
+ backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 32px;
+ display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:700}
+header .meta{font-size:13px;color:var(--dim)}
+header .warn{font-size:13px;color:#a9741f;background:#fdf7ef;border:1px solid #f0e2cd;
+ padding:3px 10px;border-radius:20px}
+main{max-width:1180px;margin:0 auto;padding:28px 32px 80px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;
+ margin-bottom:22px;overflow:hidden}
+.step > .head{display:flex;align-items:center;gap:12px;padding:16px 22px;
+ border-bottom:1px solid var(--line);background:#fcfcfd}
+.num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;
+ display:grid;place-items:center;font-size:14px;font-weight:700;flex:0 0 auto}
+.head h2{font-size:17px;margin:0;font-weight:700;flex:1}
+.count{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media (max-width:900px){.body{grid-template-columns:1fr}}
+.txt{padding:22px;border-right:1px solid var(--line)}
+@media (max-width:900px){.txt{border-right:0;border-bottom:1px solid var(--line)}}
+.txt p{margin:0 0 12px}
+.txt p:last-child{margin-bottom:0}
+.fig{padding:22px;display:flex;flex-direction:column;justify-content:center;
+ align-items:center;background:#fdfdfe;gap:10px}
+.fig img{width:100%;height:auto}
+.fig .cap{font-size:12px;color:var(--dim);font-family:ui-monospace,monospace}
+.shot{width:100%;border:1.5px dashed #c9cfd6;border-radius:10px;padding:26px 20px;
+ text-align:center;background:#fff}
+.shot .t{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.shot .u{font-size:11px;color:var(--dim);font-family:ui-monospace,monospace;
+ word-break:break-all;line-height:1.45}
+.shot .d{font-size:12.5px;color:var(--dim);margin-top:10px}
+.bug{border-color:var(--accent)}
+.bug > .head{background:#f4f2ff}
+.bug .num{background:#2b323a}
+em{color:#3a424a}
+</style></head><body>
+
+<header>
+  <h1>Report &mdash; anteprima di controllo</h1>
+  <span class="meta">1.210 parole &middot; 6 step + approfondimento</span>
+  <span class="warn">Uso interno: non &egrave; il design finale</span>
+</header>
+
+<main>
+
+<section class="step">
+  <div class="head"><div class="num">1</div><h2>Il banco di prova</h2><span class="count">146 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>&tau;&sup2;-bench &egrave; un banco di prova costruito da Sierra per misurare gli agenti conversazionali. Un agente fa l'assistente di una compagnia aerea: parla con un cliente simulato da un altro modello, consulta e modifica un database di prenotazioni vero, e deve rispettare un regolamento aziendale di quaranta pagine.</p>
+      <p>Il punteggio &egrave; spietato: un task riesce <strong>solo</strong> se lo stato finale del database coincide esattamente con quello atteso <strong>e</strong> le informazioni richieste sono state comunicate al cliente. Non esistono mezzi voti.</p>
+      <p>La domanda del progetto era una sola, e volutamente stretta: <strong>a modello fisso, quanto si pu&ograve; guadagnare cambiando solo il prompt?</strong> Niente fine-tuning, niente secondo modello, niente strumenti aggiuntivi. Solo le istruzioni date all'agente.</p>
+      <p>Il modello scelto &egrave; piccolo e senza capacit&agrave; di ragionamento esplicito. &Egrave; una scelta deliberata: su un modello gi&agrave; forte i margini di miglioramento sono minimi, e un eventuale guadagno sarebbe indistinguibile dal rumore.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHJlY3QgeD0iMjAiIHk9IjgwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjcwIiByeD0iMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzhhOTI5YiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4NCjx0ZXh0IHg9Ijk1IiB5PSIxMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZpbGw9IiMyYjMyM2EiPkNsaWVudGU8L3RleHQ+DQo8dGV4dCB4PSI5NSIgeT0iMTMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE1IiBmaWxsPSIjMmIzMjNhIj5zaW11bGF0bzwvdGV4dD4NCjxyZWN0IHg9IjI2NSIgeT0iODAiIHdpZHRoPSIxNzAiIGhlaWdodD0iNzAiIHJ4PSIxMCIgZmlsbD0iIzZkNWNmMCIvPg0KPHRleHQgeD0iMzUwIiB5PSIxMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmZmZmYiIGZvbnQtd2VpZ2h0PSI3MDAiPkFnZW50ZTwvdGV4dD4NCjx0ZXh0IHg9IjM1MCIgeT0iMTMyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZTZlMmZmIj5pbCBub3N0cm8gcHJvbXB0PC90ZXh0Pg0KPHJlY3QgeD0iNTMwIiB5PSIzMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI2MCIgcng9IjEwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4YTkyOWIiIHN0cm9rZS13aWR0aD0iMS41Ii8+DQo8dGV4dCB4PSI2MDUiIHk9IjU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMmIzMjNhIj5TdHJ1bWVudGk8L3RleHQ+DQo8dGV4dCB4PSI2MDUiIHk9Ijc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOGE5MjliIj5wcmVub3RhLCBhbm51bGxhPC90ZXh0Pg0KPHJlY3QgeD0iNTMwIiB5PSIxNDAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIHJ4PSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGE5MjliIiBzdHJva2Utd2lkdGg9IjEuNSIvPg0KPHRleHQgeD0iNjA1IiB5PSIxNjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyYjMyM2EiPlJlZ29sYW1lbnRvPC90ZXh0Pg0KPHRleHQgeD0iNjA1IiB5PSIxODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPjQwIHBhZ2luZTwvdGV4dD4NCjxsaW5lIHgxPSIxNzIiIHkxPSIxMTUiIHgyPSIyNjIiIHkyPSIxMTUiIHN0cm9rZT0iIzhhOTI5YiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4NCjxsaW5lIHgxPSI0MzciIHkxPSIxMDUiIHgyPSI1MjciIHkyPSI3MCIgc3Ryb2tlPSIjOGE5MjliIiBzdHJva2Utd2lkdGg9IjEuNSIvPg0KPGxpbmUgeDE9IjQzNyIgeTE9IjEyOCIgeDI9IjUyNyIgeTI9IjE2NSIgc3Ryb2tlPSIjOGE5MjliIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+DQo8cmVjdCB4PSIyMzAiIHk9IjIwNSIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI0MiIgcng9IjgiIGZpbGw9IiNmNGYyZmYiIHN0cm9rZT0iIzZkNWNmMCIvPg0KPHRleHQgeD0iMzUwIiB5PSIyMzEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM2ZDVjZjAiIGZvbnQtd2VpZ2h0PSI3MDAiPlZlcmlmaWNhIGZpbmFsZSBzdWwgZGF0YWJhc2U8L3RleHQ+DQo8L3N2Zz4=" alt=""><span class="cap">fig1-banco-di-prova.svg</span></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="head"><div class="num">2</div><h2>La prima misura, e il muro</h2><span class="count">158 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>L'agente di default fornito dal benchmark risolve <strong>34 task su 50</strong>. &Egrave; il numero da battere.</p>
+      <p>Ma qui arriva il problema che ha definito tutto il progetto: il punteggio dice &laquo;fallito&raquo; e nient'altro. Sedici fallimenti, sedici scatole nere. Non si sa se l'agente abbia violato una regola, dimenticato un passaggio, o scelto l'opzione sbagliata fra due legittime.</p>
+      <p>La prima cosa costruita non &egrave; stata quindi un agente migliore, ma <strong>un modo di guardare</strong>: ogni esecuzione viene tracciata su Langfuse, e il punteggio viene scomposto nelle sue due componenti &mdash; <em>ha comunicato correttamente?</em> e <em>ha lasciato il database nello stato giusto?</em> &mdash; insieme a metriche per singola azione: quante azioni non richieste, quante con argomenti sbagliati.</p>
+      <p>&Egrave; una distinzione che sembra banale e non lo &egrave;. Un agente che comunica benissimo e non esegue nulla, e un agente che esegue azioni vietate senza dire niente, prendono lo stesso zero. Sono problemi opposti e richiedono correzioni opposte.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHRleHQgeD0iMCIgeT0iMjAiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPlFVRUxMTyBDSEUgVkVESTwvdGV4dD4NCjxyZWN0IHg9IjAiIHk9IjM0IiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI2Y2ZjdmOCIgc3Ryb2tlPSIjZTNlN2ViIi8+DQo8dGV4dCB4PSI5MCIgeT0iNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiMyYjMyM2EiIGZvbnQtd2VpZ2h0PSI3MDAiPkZBTExJVE88L3RleHQ+DQo8bGluZSB4MT0iMjAwIiB5MT0iNjAiIHgyPSIyNTAiIHkyPSI2MCIgc3Ryb2tlPSIjOGE5MjliIiBzdHJva2Utd2lkdGg9IjEuNSIvPg0KPHRleHQgeD0iMjcwIiB5PSIyMCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+UVVFTExPIENIRSBTRVJWRSBTQVBFUkU8L3RleHQ+DQo8cmVjdCB4PSIyNzAiIHk9IjM0IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI2VlZjhmMSIgc3Ryb2tlPSIjY2JlNmQ1Ii8+DQo8dGV4dCB4PSIyODYiIHk9IjU4IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmY3ZDRmIiBmb250LXdlaWdodD0iNzAwIj5IYSBjb211bmljYXRvIGJlbmU/PC90ZXh0Pg0KPHRleHQgeD0iMjg2IiB5PSI3NiIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzhhOTI5YiI+c2k8L3RleHQ+DQo8cmVjdCB4PSIyNzAiIHk9Ijk4IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI2ZkZjNmMyIgc3Ryb2tlPSIjZjBkNGQ0Ii8+DQo8dGV4dCB4PSIyODYiIHk9IjEyMiIgZm9udC1zaXplPSIxMyIgZmlsbD0iI2I0NDUzZiIgZm9udC13ZWlnaHQ9IjcwMCI+SGEgYWdpdG8gYmVuZT88L3RleHQ+DQo8dGV4dCB4PSIyODYiIHk9IjE0MCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzhhOTI5YiI+bm8sIGF6aW9uZSBtYWkgZXNlZ3VpdGE8L3RleHQ+DQo8cmVjdCB4PSI0OTAiIHk9IjM0IiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjExNiIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2UzZTdlYiIvPg0KPHRleHQgeD0iNTA2IiB5PSI1OCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzJiMzIzYSIgZm9udC13ZWlnaHQ9IjcwMCI+TWV0cmljaGUgcGVyIGF6aW9uZTwvdGV4dD4NCjx0ZXh0IHg9IjUwNiIgeT0iODIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPmF6aW9uaSBub24gcmljaGllc3RlPC90ZXh0Pg0KPHRleHQgeD0iNTA2IiB5PSIxMDIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPmFyZ29tZW50aSBzYmFnbGlhdGk8L3RleHQ+DQo8dGV4dCB4PSI1MDYiIHk9IjEyMiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+YXppb25pIGNvcnJldHRlIC8gYXR0ZXNlPC90ZXh0Pg0KPHRleHQgeD0iMCIgeT0iMTk1IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj5EdWUgYWdlbnRpIGNvbiBsbyBzdGVzc28gemVybyBwb3Nzb25vIGF2ZXJlIHByb2JsZW1pIG9wcG9zdGksPC90ZXh0Pg0KPHRleHQgeD0iMCIgeT0iMjE1IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj5lIHJpY2hpZWRlcmUgY29ycmV6aW9uaSBvcHBvc3RlLjwvdGV4dD4NCjwvc3ZnPg==" alt=""><span class="cap">fig2-punteggio-binario.svg</span></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="head"><div class="num">3</div><h2>Leggere i fallimenti uno per uno</h2><span class="count">211 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>Nessuna scorciatoia: ogni fallimento &egrave; stato letto turno per turno, come si legge la registrazione di una telefonata. Da l&igrave; sono emerse tre famiglie con cause distinte.</p>
+      <p><strong>Non agisce.</strong> L'agente descrive l'operazione cos&igrave; bene che il cliente crede sia gi&agrave; fatta, dice &laquo;s&igrave;&raquo; e chiude la conversazione &mdash; prima che l'azione parta. Comunicazione perfetta, database intatto.</p>
+      <p><strong>Agisce troppo.</strong> L'agente si scrive da solo una giustificazione e la usa come autorizzazione. In un caso reale scrive <em>&laquo;nessun volo &egrave; stato ancora effettuato&raquo;</em> due righe sotto delle date che sono nel passato, e cancella una prenotazione che il regolamento proteggeva.</p>
+      <p><strong>Sceglie male.</strong> Al cliente che chiede &laquo;il volo pi&ugrave; economico verso la costa ovest&raquo;, l'agente cerca una sola combinazione e prenota la prima valida. Valida, ma non la pi&ugrave; economica.</p>
+      <p>E leggendo &egrave; emerso qualcos'altro. Un task passava o falliva in modo apparentemente casuale, a parit&agrave; di soluzione. La causa non era l'agente: era <strong>un difetto nel modo in cui il benchmark confronta i risultati</strong>. Due carte regalo elencate in ordine diverso producono un verdetto diverso. &rarr; <em>approfondimento a pagina dedicata</em></p>
+    </div>
+    <div class="fig">
+      <div class="shot">
+        <div class="t">SCREENSHOT LANGFUSE &mdash; da catturare</div>
+        <div class="u">cloud.langfuse.com/project/cmtefvd6j05kqad0i158liz8k/traces/708da1f15bcd8f49c35167e1d3a1f83a</div>
+        <div class="d">La traccia di una conversazione: albero delle chiamate con costo e token, <strong>reward 1.00</strong>, etichette <strong>gemini-3.5-flash-lite</strong> e <strong>temperature: 0</strong>, e lo scambio User / Assistant.<br>Istruzioni complete in <code>screenshot.md</code>.</div>
+      </div>
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMTc1IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjIyMiIgaGVpZ2h0PSIxNjAiIHJ4PSIxMCIgZmlsbD0iI2ZkZjNmMyIgc3Ryb2tlPSIjZjBkNGQ0Ii8+DQo8dGV4dCB4PSIxOCIgeT0iMzQiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNiNDQ1M2YiPk5vbiBhZ2lzY2U8L3RleHQ+DQo8dGV4dCB4PSIxOCIgeT0iNjQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM1YjYzNmIiPklsIGNsaWVudGUgY3JlZGUgc2lhIGZhdHRvLDwvdGV4dD4NCjx0ZXh0IHg9IjE4IiB5PSI4NCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzViNjM2YiI+ZGljZSBzaSBlIHJpYWdnYW5jaWEuPC90ZXh0Pg0KPHRleHQgeD0iMTgiIHk9IjEzMiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+Y29tdW5pY2EgYmVuZSwgbm9uIGVzZWd1ZTwvdGV4dD4NCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIzOSwwKSI+DQo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMjIyIiBoZWlnaHQ9IjE2MCIgcng9IjEwIiBmaWxsPSIjZmRmN2VmIiBzdHJva2U9IiNmMGUyY2QiLz4NCjx0ZXh0IHg9IjE4IiB5PSIzNCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2E5NzQxZiI+QWdpc2NlIHRyb3BwbzwvdGV4dD4NCjx0ZXh0IHg9IjE4IiB5PSI2NCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzViNjM2YiI+U2kgc2NyaXZlIHVuYSBnaXVzdGlmaWNhemlvbmU8L3RleHQ+DQo8dGV4dCB4PSIxOCIgeT0iODQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM1YjYzNmIiPmZhbHNhIGUgbGEgdXNhIGNvbWUgcGVybWVzc28uPC90ZXh0Pg0KPHRleHQgeD0iMTgiIHk9IjEzMiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+ZXNlZ3VlIGNpbyBjaGUgZSB2aWV0YXRvPC90ZXh0Pg0KPC9nPg0KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDc4LDApIj4NCjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIyMjIiIGhlaWdodD0iMTYwIiByeD0iMTAiIGZpbGw9IiNmMmY0ZmQiIHN0cm9rZT0iI2Q4ZGNmMiIvPg0KPHRleHQgeD0iMTgiIHk9IjM0IiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjNGE1NWI4Ij5TY2VnbGllIG1hbGU8L3RleHQ+DQo8dGV4dCB4PSIxOCIgeT0iNjQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM1YjYzNmIiPkNlcmNhIGlsIHBpdSBlY29ub21pY28gZTwvdGV4dD4NCjx0ZXh0IHg9IjE4IiB5PSI4NCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzViNjM2YiI+c2kgZmVybWEgYWwgcHJpbW8gdmFsaWRvLjwvdGV4dD4NCjx0ZXh0IHg9IjE4IiB5PSIxMzIiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPnZhbGlkbywgbWEgbm9uIGlsIG1pZ2xpb3JlPC90ZXh0Pg0KPC9nPg0KPC9zdmc+" alt=""><span class="cap">fig3-famiglie.svg</span>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="head"><div class="num">4</div><h2>L'errore che &egrave; costato di pi&ugrave;</h2><span class="count">151 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>L'istinto, dopo una diagnosi, &egrave; aggiungere una regola per ogni problema trovato. &Egrave; esattamente quello che ho fatto, per tre versioni consecutive. E il punteggio &egrave; <strong>sceso</strong>.</p>
+      <p>La spiegazione &egrave; arrivata dalla letteratura, non dall'intuito: superata una certa densit&agrave; di istruzioni &mdash; attorno alla ventina &mdash; i modelli piccoli iniziano a violarle <strong>in silenzio</strong>, senza alcun errore visibile. Il regolamento del dominio ne conteneva gi&agrave; una quarantina. Ogni clausola aggiunta per risolvere un problema ne slatentizzava un altro altrove.</p>
+      <p>Un secondo esperimento ha chiuso la questione: riscrivendo <strong>una sola</strong> clausola, i fallimenti cambiavano su task che con quella clausola non c'entravano nulla. Il comportamento non era attribuibile alla regola, ma alla perturbazione del prompt nel suo insieme.</p>
+      <p>Conclusione scomoda ma utile: <strong>su un modello piccolo, aggiungere istruzioni ha rendimenti negativi.</strong> Bisognava cambiare metodo, non aggiungere righe.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjc1IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPGxpbmUgeDE9IjQxNiIgeTE9IjEwIiB4Mj0iNDE2IiB5Mj0iMjU2IiBzdHJva2U9IiM4YTkyOWIiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWRhc2hhcnJheT0iMyAzIi8+DQo8dGV4dCB4PSI0MTYiIHk9IjI3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+NjglIC0gYWdlbnRlIGRpIGRlZmF1bHQ8L3RleHQ+DQo8dGV4dCB4PSIwIiB5PSIzMyIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzJiMzIzYSI+ZGVmYXVsdDwvdGV4dD48cmVjdCB4PSI2MiIgeT0iMTgiIHdpZHRoPSIzNTQiIGhlaWdodD0iMjEiIHJ4PSIzIiBmaWxsPSIjYjljMWNhIi8+PHRleHQgeD0iNDI2IiB5PSIzNCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzJiMzIzYSI+NjglPC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjY3IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj52MTwvdGV4dD48cmVjdCB4PSI2MiIgeT0iNTIiIHdpZHRoPSI0MDYiIGhlaWdodD0iMjEiIHJ4PSIzIiBmaWxsPSIjYTk4YWYwIi8+PHRleHQgeD0iNDc4IiB5PSI2OCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzJiMzIzYSI+NzglPC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjEwMSIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzJiMzIzYSI+djI8L3RleHQ+PHJlY3QgeD0iNjIiIHk9Ijg2IiB3aWR0aD0iMzk1IiBoZWlnaHQ9IjIxIiByeD0iMyIgZmlsbD0iI2E5OGFmMCIvPjx0ZXh0IHg9IjQ2NyIgeT0iMTAyIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj43NiU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMTM1IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj52MzwvdGV4dD48cmVjdCB4PSI2MiIgeT0iMTIwIiB3aWR0aD0iMzY0IiBoZWlnaHQ9IjIxIiByeD0iMyIgZmlsbD0iI2Q5Y2RmNyIvPjx0ZXh0IHg9IjQzNiIgeT0iMTM2IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj43MCU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMTY5IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj52NDwvdGV4dD48cmVjdCB4PSI2MiIgeT0iMTU0IiB3aWR0aD0iMzg1IiBoZWlnaHQ9IjIxIiByeD0iMyIgZmlsbD0iI2E5OGFmMCIvPjx0ZXh0IHg9IjQ1NyIgeT0iMTcwIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj43NCU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMjAzIiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj52NTwvdGV4dD48cmVjdCB4PSI2MiIgeT0iMTg4IiB3aWR0aD0iMzk1IiBoZWlnaHQ9IjIxIiByeD0iMyIgZmlsbD0iI2E5OGFmMCIvPjx0ZXh0IHg9IjQ2NyIgeT0iMjA0IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj43NiU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMjM3IiBmb250LXNpemU9IjEzIiBmaWxsPSIjMmIzMjNhIj52NjwvdGV4dD48cmVjdCB4PSI2MiIgeT0iMjIyIiB3aWR0aD0iNDE5IiBoZWlnaHQ9IjIxIiByeD0iMyIgZmlsbD0iIzZkNWNmMCIvPjx0ZXh0IHg9IjQ5MSIgeT0iMjM4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj44MC41JTwvdGV4dD4NCjx0ZXh0IHg9IjQ3MCIgeT0iMTIyIiBmb250LXNpemU9IjEzIiBmaWxsPSIjYjQ0NTNmIj52MiBlIHYzOiByZWdvbGUgYWdnaXVudGUsPC90ZXh0Pg0KPHRleHQgeD0iNDcwIiB5PSIxNDIiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNiNDQ1M2YiPnB1bnRlZ2dpbyBzY2VzbzwvdGV4dD4NCjwvc3ZnPg==" alt=""><span class="cap">fig4-versioni.svg</span></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="head"><div class="num">5</div><h2>Sottrarre invece che aggiungere</h2><span class="count">174 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>Il cambio di metodo &egrave; stato questo: <strong>smettere di scrivere regole e cominciare a rimuovere le cause.</strong></p>
+      <p>Un esempio concreto. Il modulo di conferma conteneva un esempio d'uso in cui l'agente aggiungeva bagagli gratuiti a cui il cliente aveva diritto. Quell'esempio insegnava un comportamento sbagliato: in un task reale l'agente ha aggiunto due bagagli a un cliente che aveva detto di non averne, giustificandoli con il diritto ad averli. <strong>La correzione &egrave; stata togliere l'esempio</strong>, e sostituire dieci righe di casistica con un principio solo: <em>un diritto non &egrave; un'istruzione</em>.</p>
+      <p>Stessa logica per la famiglia &laquo;non agisce&raquo;. Invece di aggiungere regole sul quando confermare, una riga sola apre ogni messaggio di conferma: <em>&laquo;non ho ancora fatto nessuna di queste modifiche&raquo;</em>. Toglie al cliente la ragione per riagganciare.</p>
+      <p>Due righe al posto di due blocchi. E ogni modifica &egrave; stata <strong>registrata come previsione prima di girare l'esperimento</strong>: quali task specifici dovevano cambiare esito, e quali no. &Egrave; ci&ograve; che distingue una correzione da un aggiustamento fortunato.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjUwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHRleHQgeD0iMCIgeT0iMTgiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPlBSSU1BIC0gdW4gZXNlbXBpbyBkZW50cm8gaWwgcHJvbXB0PC90ZXh0Pg0KPHJlY3QgeD0iMCIgeT0iMzAiIHdpZHRoPSIzMzAiIGhlaWdodD0iMTAwIiByeD0iOCIgZmlsbD0iI2ZkZjNmMyIgc3Ryb2tlPSIjZjBkNGQ0Ii8+DQo8dGV4dCB4PSIxNiIgeT0iNTYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM1YjYzNmIiIGZvbnQtZmFtaWx5PSJ1aS1tb25vc3BhY2UsbW9ub3NwYWNlIj5BemlvbmU6IGFnZ2l1bmdpIGJhZ2FnbGk8L3RleHQ+DQo8dGV4dCB4PSIxNiIgeT0iNzgiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM1YjYzNmIiIGZvbnQtZmFtaWx5PSJ1aS1tb25vc3BhY2UsbW9ub3NwYWNlIj5QZXJtZXNzbyBwZXJjaGU6IGkgc29jaSBnb2xkIGhhbm5vPC90ZXh0Pg0KPHRleHQgeD0iMTYiIHk9Ijk2IiBmb250LXNpemU9IjEyIiBmaWxsPSIjNWI2MzZiIiBmb250LWZhbWlseT0idWktbW9ub3NwYWNlLG1vbm9zcGFjZSI+ZGlyaXR0byBhIDMgYmFnYWdsaSBncmF0dWl0aTwvdGV4dD4NCjx0ZXh0IHg9IjE2IiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNiNDQ1M2YiPmwnYWdlbnRlIGFnZ2l1bmdlIGJhZ2FnbGkgbm9uIHJpY2hpZXN0aTwvdGV4dD4NCjx0ZXh0IHg9IjM3MCIgeT0iMTgiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPkRPUE8gLSBsJ2VzZW1waW8gcmltb3NzbywgdW4gcHJpbmNpcGlvPC90ZXh0Pg0KPHJlY3QgeD0iMzcwIiB5PSIzMCIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxMDAiIHJ4PSI4IiBmaWxsPSIjZWVmOGYxIiBzdHJva2U9IiNjYmU2ZDUiLz4NCjx0ZXh0IHg9IjM4NiIgeT0iNjYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyZjdkNGYiIGZvbnQtd2VpZ2h0PSI3MDAiPlVuIGRpcml0dG8gbm9uIGU8L3RleHQ+DQo8dGV4dCB4PSIzODYiIHk9IjkwIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMmY3ZDRmIiBmb250LXdlaWdodD0iNzAwIj51bidpc3RydXppb25lLjwvdGV4dD4NCjx0ZXh0IHg9IjM4NiIgeT0iMTIwIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMmY3ZDRmIj5zZXJ2ZSBzb2xvIGNpbyBjaGUgZSBzdGF0byBjaGllc3RvPC90ZXh0Pg0KPHRleHQgeD0iMCIgeT0iMTc4IiBmb250LXNpemU9IjE0IiBmaWxsPSIjMmIzMjNhIj5EaWVjaSByaWdoZSBkaSBjYXNpc3RpY2Egc29zdGl0dWl0ZSBkYSB1bmEgZnJhc2UuPC90ZXh0Pg0KPHRleHQgeD0iMCIgeT0iMjA2IiBmb250LXNpemU9IjE0IiBmaWxsPSIjMmIzMjNhIj5PZ25pIG1vZGlmaWNhIHJlZ2lzdHJhdGEgY29tZSBwcmV2aXNpb25lIHByaW1hIGRpIGdpcmFyZSBsJ2VzcGVyaW1lbnRvOjwvdGV4dD4NCjx0ZXh0IHg9IjAiIHk9IjIzMCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzJiMzIzYSI+cXVhbGkgdGFzayBkb3ZldmFubyBjYW1iaWFyZSBlc2l0bywgZSBxdWFsaSBuby48L3RleHQ+DQo8L3N2Zz4=" alt=""><span class="cap">fig5-prima-dopo.svg</span></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="head"><div class="num">6</div><h2>Il risultato, e cosa non dice</h2><span class="count">184 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>Quattro esecuzioni complete, 200 simulazioni, come richiede lo standard dichiarato da Sierra per la propria classifica pubblica.</p>
+      <p><strong>80,5% contro il 68% dell'agente di default.</strong> Tre repliche su quattro battono il baseline in modo statisticamente significativo, e in due di esse il nuovo agente non perde <strong>nemmeno un task</strong>. Cinque task non li risolve nessuna versione: sono, in tutte e quattro le esecuzioni, esattamente quelli diagnosticati come difettosi nel benchmark o fuori dalla portata del modello.</p>
+      <p>Ma i quattro trial servivano soprattutto a misurare un'altra cosa. Presi singolarmente, i quattro punteggi vanno da 74% a 86%: <strong>lo stesso agente, sugli stessi task, con temperatura a zero.</strong> Con una sola esecuzione avrei pubblicato l'86% in buona fede, e sarebbe caduto alla prima verifica.</p>
+      <p>E sull'affidabilit&agrave; &mdash; riuscire pi&ugrave; volte di fila sullo stesso task &mdash; il nuovo agente &egrave; <strong>alla pari</strong> con quello di default, non migliore. Il guadagno &egrave; sul punteggio medio, non sulla costanza.</p>
+      <p>Dirlo &egrave; meno soddisfacente che fermarsi all'86%. &Egrave; anche l'unica versione che regge a un controllo.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjkyIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHRleHQgeD0iMCIgeT0iMjAiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPlFVQVRUUk8gRVNFQ1VaSU9OSSBERUxMTyBTVEVTU08gQUdFTlRFIC0gMjAwIFNJTVVMQVpJT05JPC90ZXh0Pg0KPGxpbmUgeDE9IjI5MSIgeTE9IjMwIiB4Mj0iMjkxIiB5Mj0iMTg2IiBzdHJva2U9IiM4YTkyOWIiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWRhc2hhcnJheT0iMyAzIi8+DQo8dGV4dCB4PSIyOTEiIHk9IjIwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzhhOTI5YiI+NjglIC0gZGVmYXVsdDwvdGV4dD4NCjx0ZXh0IHg9IjAiIHk9IjUyIiBmb250LXNpemU9IjEzLjUiIGZpbGw9IiMyYjMyM2EiPnRyaWFsIDE8L3RleHQ+PHJlY3QgeD0iODAiIHk9IjM4IiB3aWR0aD0iMjU0IiBoZWlnaHQ9IjE5IiByeD0iMyIgZmlsbD0iIzZkNWNmMCIvPjx0ZXh0IHg9IjM0NCIgeT0iNTIiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzJiMzIzYSI+ODIlPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iNTIiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM4YTkyOWIiPis4IC8gLTE8L3RleHQ+PHRleHQgeD0iNTAwIiB5PSI1MiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzZkNWNmMCI+cCA9IDAsMDM5PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9Ijg2IiBmb250LXNpemU9IjEzLjUiIGZpbGw9IiMyYjMyM2EiPnRyaWFsIDI8L3RleHQ+PHJlY3QgeD0iODAiIHk9IjcyIiB3aWR0aD0iMjI5IiBoZWlnaHQ9IjE5IiByeD0iMyIgZmlsbD0iI2M5Y2ZkNiIvPjx0ZXh0IHg9IjMxOSIgeT0iODYiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzJiMzIzYSI+NzQlPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iODYiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM4YTkyOWIiPis2IC8gLTM8L3RleHQ+PHRleHQgeD0iNTAwIiB5PSI4NiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjQwMCIgZmlsbD0iIzhhOTI5YiI+cCA9IDAsNTA4PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjEyMCIgZm9udC1zaXplPSIxMy41IiBmaWxsPSIjMmIzMjNhIj50cmlhbCAzPC90ZXh0PjxyZWN0IHg9IjgwIiB5PSIxMDYiIHdpZHRoPSIyNDgiIGhlaWdodD0iMTkiIHJ4PSIzIiBmaWxsPSIjNmQ1Y2YwIi8+PHRleHQgeD0iMzM4IiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzJiMzIzYSI+ODAlPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iMTIwIiBmb250LXNpemU9IjEzIiBmaWxsPSIjOGE5MjliIj4rNiAvIC0wPC90ZXh0Pjx0ZXh0IHg9IjUwMCIgeT0iMTIwIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjNmQ1Y2YwIj5wID0gMCwwMzE8L3RleHQ+PHRleHQgeD0iMCIgeT0iMTU0IiBmb250LXNpemU9IjEzLjUiIGZpbGw9IiMyYjMyM2EiPnRyaWFsIDQ8L3RleHQ+PHJlY3QgeD0iODAiIHk9IjE0MCIgd2lkdGg9IjI2NyIgaGVpZ2h0PSIxOSIgcng9IjMiIGZpbGw9IiM2ZDVjZjAiLz48dGV4dCB4PSIzNTciIHk9IjE1NCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMmIzMjNhIj44NiU8L3RleHQ+PHRleHQgeD0iNDAwIiB5PSIxNTQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM4YTkyOWIiPis5IC8gLTA8L3RleHQ+PHRleHQgeD0iNTAwIiB5PSIxNTQiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiM2ZDVjZjAiPnAgPSAwLDAwNDwvdGV4dD4NCjxsaW5lIHgxPSIwIiB5MT0iMjI2IiB4Mj0iNzAwIiB5Mj0iMjI2IiBzdHJva2U9IiNlM2U3ZWIiLz4NCjx0ZXh0IHg9IjAiIHk9IjI1NCIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzZkNWNmMCI+ODAsNSUgZGkgbWVkaWE8L3RleHQ+DQo8dGV4dCB4PSIxNjAiIHk9IjI1NCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzJiMzIzYSI+Y29udHJvIDY4JSAtIHRyZSByZXBsaWNoZSBzdSBxdWF0dHJvIHNpZ25pZmljYXRpdmU8L3RleHQ+DQo8dGV4dCB4PSIwIiB5PSIyODAiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM4YTkyOWIiPk1hIGRhIDc0JSBhIDg2JSBmcmEgZXNlY3V6aW9uaSBpZGVudGljaGU6IGNvbiB1bmEgc29sYSBtaXN1cmEgYXZyZWkgcHViYmxpY2F0byBsJzg2JS48L3RleHQ+DQo8L3N2Zz4=" alt=""><span class="cap">fig6-risultato.svg</span></div>
+  </div>
+</section>
+
+<section class="step bug">
+  <div class="head"><div class="num">+</div><h2>Pagina di approfondimento &middot; Il bug</h2><span class="count">178 parole</span></div>
+  <div class="body">
+    <div class="txt">
+      <p>&tau;&sup2;-bench verifica il risultato confrontando due impronte digitali del database: quella prodotta dall'agente e quella attesa. Se coincidono, il task &egrave; superato.</p>
+      <p>L'impronta si calcola serializzando il database in testo e ordinandone le chiavi (<code>json.dumps(..., sort_keys=True)</code>). Ma quell'ordinamento riguarda <strong>le chiavi dei dizionari, non gli elementi delle liste</strong>. E la cronologia dei pagamenti di una prenotazione &egrave; una lista.</p>
+      <p>La conseguenza: due prenotazioni identiche &mdash; stesse carte, stessi importi, stesso totale &mdash; ma con i pagamenti elencati in ordine diverso, producono impronte diverse. Il benchmark le giudica differenti.</p>
+      <p>Verificato su due esecuzioni reali dello stesso agente. Unica differenza in tutta la chiamata: l'ordine di due carte regalo. Una esecuzione superata, l'altra bocciata.</p>
+      <p>L'effetto va oltre il singolo falso negativo. Poich&eacute; l'ordine che un modello produce non &egrave; stabile, <strong>il difetto inietta casualit&agrave; nella metrica di affidabilit&agrave;</strong>: un task effettivamente risolto diventa una monetina. Un benchmark che misura proprio quanto un agente &egrave; costante viene reso, in quel punto, meno costante di quanto misuri.</p>
+      <p>Segnalazione preparata per gli autori.</p>
+    </div>
+    <div class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MDAgMjUwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLHNhbnMtc2VyaWYiPg0KPHJlY3QgeD0iMCIgeT0iMjAiIHdpZHRoPSIzMDAiIGhlaWdodD0iMTA0IiByeD0iOCIgZmlsbD0iI2Y2ZjdmOCIgc3Ryb2tlPSIjZTNlN2ViIi8+DQo8dGV4dCB4PSIxNiIgeT0iNDQiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM4YTkyOWIiPkVTRUNVWklPTkUgQTwvdGV4dD4NCjx0ZXh0IHg9IjE2IiB5PSI3MCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzJiMzIzYSIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiPmNhcnRhIDgwMjA3OTIgLSAkMTk4PC90ZXh0Pg0KPHRleHQgeD0iMTYiIHk9IjkyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMmIzMjNhIiBmb250LWZhbWlseT0idWktbW9ub3NwYWNlLG1vbm9zcGFjZSI+Y2FydGEgNjEzNjA5MiAtICQxMjk8L3RleHQ+DQo8dGV4dCB4PSIxNiIgeT0iMTE0IiBmb250LXNpemU9IjEyIiBmaWxsPSIjMmY3ZDRmIiBmb250LXdlaWdodD0iNzAwIj5zdXBlcmF0bzwvdGV4dD4NCjxyZWN0IHg9IjMzMCIgeT0iMjAiIHdpZHRoPSIzMDAiIGhlaWdodD0iMTA0IiByeD0iOCIgZmlsbD0iI2Y2ZjdmOCIgc3Ryb2tlPSIjZTNlN2ViIi8+DQo8dGV4dCB4PSIzNDYiIHk9IjQ0IiBmb250LXNpemU9IjEyIiBmaWxsPSIjOGE5MjliIj5FU0VDVVpJT05FIEI8L3RleHQ+DQo8dGV4dCB4PSIzNDYiIHk9IjcwIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMmIzMjNhIiBmb250LWZhbWlseT0idWktbW9ub3NwYWNlLG1vbm9zcGFjZSI+Y2FydGEgNjEzNjA5MiAtICQxMjk8L3RleHQ+DQo8dGV4dCB4PSIzNDYiIHk9IjkyIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMmIzMjNhIiBmb250LWZhbWlseT0idWktbW9ub3NwYWNlLG1vbm9zcGFjZSI+Y2FydGEgODAyMDc5MiAtICQxOTg8L3RleHQ+DQo8dGV4dCB4PSIzNDYiIHk9IjExNCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2I0NDUzZiIgZm9udC13ZWlnaHQ9IjcwMCI+Ym9jY2lhdG88L3RleHQ+DQo8dGV4dCB4PSIwIiB5PSIxNjIiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyYjMyM2EiPlN0ZXNzZSBjYXJ0ZS4gU3Rlc3NpIGltcG9ydGkuIFN0ZXNzbyB0b3RhbGUuIENhbWJpYSBzb2xvIGwnb3JkaW5lLjwvdGV4dD4NCjxyZWN0IHg9IjAiIHk9IjE4MiIgd2lkdGg9IjY2MCIgaGVpZ2h0PSI1OCIgcng9IjgiIGZpbGw9IiNmNGYyZmYiIHN0cm9rZT0iIzZkNWNmMCIvPg0KPHRleHQgeD0iMTYiIHk9IjIwNiIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzZkNWNmMCIgZm9udC13ZWlnaHQ9IjcwMCI+TCdpbXByb250YSBkZWwgZGF0YWJhc2Ugb3JkaW5hIGxlIGNoaWF2aSBkZWkgZGl6aW9uYXJpLCBub24gZ2xpIGVsZW1lbnRpIGRlbGxlIGxpc3RlLjwvdGV4dD4NCjx0ZXh0IHg9IjE2IiB5PSIyMjgiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiMyYjMyM2EiPlVuIHRhc2sgcmlzb2x0byBkaXZlbnRhIHVuYSBtb25ldGluYSwgZGVudHJvIHVuIGJlbmNobWFyayBjaGUgbWlzdXJhIGxhIGNvc3RhbnphLjwvdGV4dD4NCjwvc3ZnPg==" alt=""><span class="cap">fig-bug.svg</span></div>
+  </div>
+</section>
+
+</main>
+</body></html>
