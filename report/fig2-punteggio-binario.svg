@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 230" font-family="system-ui,sans-serif">
+<text x="0" y="20" font-size="12" fill="#8a929b">QUELLO CHE VEDI</text>
+<rect x="0" y="34" width="180" height="52" rx="8" fill="#f6f7f8" stroke="#e3e7eb"/>
+<text x="90" y="66" text-anchor="middle" font-size="20" fill="#2b323a" font-weight="700">FALLITO</text>
+<line x1="200" y1="60" x2="250" y2="60" stroke="#8a929b" stroke-width="1.5"/>
+<text x="270" y="20" font-size="12" fill="#8a929b">QUELLO CHE SERVE SAPERE</text>
+<rect x="270" y="34" width="200" height="52" rx="8" fill="#eef8f1" stroke="#cbe6d5"/>
+<text x="286" y="58" font-size="13" fill="#2f7d4f" font-weight="700">Ha comunicato bene?</text>
+<text x="286" y="76" font-size="13" fill="#8a929b">si</text>
+<rect x="270" y="98" width="200" height="52" rx="8" fill="#fdf3f3" stroke="#f0d4d4"/>
+<text x="286" y="122" font-size="13" fill="#b4453f" font-weight="700">Ha agito bene?</text>
+<text x="286" y="140" font-size="13" fill="#8a929b">no, azione mai eseguita</text>
+<rect x="490" y="34" width="210" height="116" rx="8" fill="#ffffff" stroke="#e3e7eb"/>
+<text x="506" y="58" font-size="13" fill="#2b323a" font-weight="700">Metriche per azione</text>
+<text x="506" y="82" font-size="12" fill="#8a929b">azioni non richieste</text>
+<text x="506" y="102" font-size="12" fill="#8a929b">argomenti sbagliati</text>
+<text x="506" y="122" font-size="12" fill="#8a929b">azioni corrette / attese</text>
+<text x="0" y="195" font-size="13" fill="#2b323a">Due agenti con lo stesso zero possono avere problemi opposti,</text>
+<text x="0" y="215" font-size="13" fill="#2b323a">e richiedere correzioni opposte.</text>
+</svg>

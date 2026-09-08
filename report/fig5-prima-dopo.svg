@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 250" font-family="system-ui,sans-serif">
+<text x="0" y="18" font-size="12" fill="#8a929b">PRIMA - un esempio dentro il prompt</text>
+<rect x="0" y="30" width="330" height="100" rx="8" fill="#fdf3f3" stroke="#f0d4d4"/>
+<text x="16" y="56" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">Azione: aggiungi bagagli</text>
+<text x="16" y="78" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">Permesso perche: i soci gold hanno</text>
+<text x="16" y="96" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">diritto a 3 bagagli gratuiti</text>
+<text x="16" y="120" font-size="12" fill="#b4453f">l'agente aggiunge bagagli non richiesti</text>
+<text x="370" y="18" font-size="12" fill="#8a929b">DOPO - l'esempio rimosso, un principio</text>
+<rect x="370" y="30" width="330" height="100" rx="8" fill="#eef8f1" stroke="#cbe6d5"/>
+<text x="386" y="66" font-size="16" fill="#2f7d4f" font-weight="700">Un diritto non e</text>
+<text x="386" y="90" font-size="16" fill="#2f7d4f" font-weight="700">un'istruzione.</text>
+<text x="386" y="120" font-size="12" fill="#2f7d4f">serve solo cio che e stato chiesto</text>
+<text x="0" y="178" font-size="14" fill="#2b323a">Dieci righe di casistica sostituite da una frase.</text>
+<text x="0" y="206" font-size="14" fill="#2b323a">Ogni modifica registrata come previsione prima di girare l'esperimento:</text>
+<text x="0" y="230" font-size="14" fill="#2b323a">quali task dovevano cambiare esito, e quali no.</text>
+</svg>

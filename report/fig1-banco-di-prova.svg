@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 260" font-family="system-ui,sans-serif">
+<rect x="20" y="80" width="150" height="70" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="95" y="110" text-anchor="middle" font-size="15" fill="#2b323a">Cliente</text>
+<text x="95" y="130" text-anchor="middle" font-size="15" fill="#2b323a">simulato</text>
+<rect x="265" y="80" width="170" height="70" rx="10" fill="#6d5cf0"/>
+<text x="350" y="112" text-anchor="middle" font-size="16" fill="#ffffff" font-weight="700">Agente</text>
+<text x="350" y="132" text-anchor="middle" font-size="12" fill="#e6e2ff">il nostro prompt</text>
+<rect x="530" y="30" width="150" height="60" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="605" y="58" text-anchor="middle" font-size="14" fill="#2b323a">Strumenti</text>
+<text x="605" y="76" text-anchor="middle" font-size="12" fill="#8a929b">prenota, annulla</text>
+<rect x="530" y="140" width="150" height="60" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="605" y="168" text-anchor="middle" font-size="14" fill="#2b323a">Regolamento</text>
+<text x="605" y="186" text-anchor="middle" font-size="12" fill="#8a929b">40 pagine</text>
+<line x1="172" y1="115" x2="262" y2="115" stroke="#8a929b" stroke-width="1.5"/>
+<line x1="437" y1="105" x2="527" y2="70" stroke="#8a929b" stroke-width="1.5"/>
+<line x1="437" y1="128" x2="527" y2="165" stroke="#8a929b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<rect x="230" y="205" width="240" height="42" rx="8" fill="#f4f2ff" stroke="#6d5cf0"/>
+<text x="350" y="231" text-anchor="middle" font-size="13" fill="#6d5cf0" font-weight="700">Verifica finale sul database</text>
+</svg>
