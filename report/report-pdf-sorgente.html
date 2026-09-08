@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Tassonomia dei fallimenti</title>
+<style>
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html,body { margin:0; padding:0; }
+body {
+  font-family: "Segoe UI", -apple-system, system-ui, sans-serif;
+  color:#1b1f24; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+.page {
+  width:210mm; height:297mm; padding:18mm 20mm 14mm; page-break-after:always;
+  position:relative; display:flex; flex-direction:column;
+}
+.page:last-child { page-break-after:auto; }
+.kicker { font-size:8.5pt; letter-spacing:.16em; text-transform:uppercase; color:#8a5cf6; font-weight:700; }
+h1 { font-size:30pt; line-height:1.06; margin:6mm 0 4mm; font-weight:800; letter-spacing:-.02em; }
+h2 { font-size:19pt; line-height:1.15; margin:3mm 0 4mm; font-weight:750; letter-spacing:-.01em; }
+p  { font-size:10.5pt; line-height:1.55; margin:0 0 3mm; max-width:150mm; color:#333a42; }
+.lead { font-size:12pt; color:#1b1f24; }
+.foot { position:absolute; left:20mm; right:20mm; bottom:9mm;
+        display:flex; justify-content:space-between; font-size:7.5pt; color:#9aa2ab;
+        border-top:.4pt solid #e3e7eb; padding-top:2.5mm; }
+.rule { height:3px; width:64px; background:#8a5cf6; border-radius:2px; margin:0 0 5mm; }
+table { border-collapse:collapse; width:100%; font-size:9.5pt; margin:2mm 0 4mm; }
+th { text-align:left; font-size:8pt; letter-spacing:.06em; text-transform:uppercase;
+     color:#6b747d; font-weight:700; padding:0 3mm 2mm 0; border-bottom:1pt solid #d7dce1; }
+td { padding:2.4mm 3mm 2.4mm 0; border-bottom:.4pt solid #eef1f4; font-variant-numeric:tabular-nums; }
+td.num, th.num { text-align:right; }
+tr.hl td { background:#f6f2ff; font-weight:700; }
+tr.base td { color:#6b747d; }
+.note { margin-top:6mm; font-size:8.5pt; color:#7b848d; line-height:1.45; max-width:150mm; }
+.grid2 { display:flex; gap:8mm; }
+.card { flex:1; border:.7pt solid #e3e7eb; border-radius:3mm; padding:5mm; }
+.card h3 { font-size:11pt; margin:0 0 2mm; font-weight:750; }
+.card p { font-size:9pt; margin:0; color:#4a525b; }
+.big { font-size:44pt; font-weight:800; letter-spacing:-.03em; line-height:1; color:#8a5cf6; }
+.biglab { font-size:9pt; color:#6b747d; margin-top:1mm; }
+.stats { display:flex; gap:14mm; margin:6mm 0 2mm; }
+.spacer { flex:1; }
+</style></head><body>
+
+<!-- 1 -->
+<div class="page">
+  <div class="kicker">τ²-bench · dominio airline · gemini-3.5-flash-lite</div>
+  <h1>Si può migliorare un agente<br>cambiando solo il prompt?</h1>
+  <div class="rule"></div>
+  <p class="lead">Sei versioni di un agente di assistenza clienti, stesso modello e stessi 50 task,
+  misurate contro l'agente di default del benchmark. L'ultima lo batte di dodici punti — ma la
+  parte che vale non è il punteggio: è <em>perché</em> falliva, e come lo si dimostra.</p>
+
+  <div class="stats">
+    <div><div class="big">68%</div><div class="biglab">agente di default</div></div>
+    <div><div class="big">80,5%</div><div class="biglab">nostro agente, media di 4 giri</div></div>
+    <div><div class="big">90%</div><div class="biglab">tetto raggiungibile misurato</div></div>
+  </div>
+
+  <p class="note">50 task del dominio airline, un'esecuzione per versione. Il punteggio è binario:
+  un task riesce solo se lo stato finale del database coincide con quello atteso <em>e</em> le
+  informazioni richieste sono state comunicate al cliente.</p>
+  <div class="foot"><span>Progetto tassonomia — settembre 2026</span><span>1</span></div>
+</div>
+
+<!-- 2 -->
+<div class="page">
+  <div class="kicker">Il percorso</div>
+  <h2>Sei versioni, e cinque strade sbagliate</h2>
+  <p>Ogni versione nasce dalla lettura dei fallimenti della precedente. La v1 raccoglie le regole
+  emerse dalla prima tassonomia; v2 e v3 provano a isolarne l'effetto; v4 ristruttura l'intero
+  prompt; v5 e v6 correggono difetti trovati leggendo le tracce. Per cinque versioni il
+  guadagno resta dentro il rumore: solo l'ultima, ripetuta quattro volte, lo supera davvero.</p>
+
+  <svg viewBox="0 0 620 300" width="100%" style="margin-top:2mm">
+    <line x1="150" y1="10" x2="150" y2="268" stroke="#c9cfd6" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="150" y="284" font-size="10" fill="#8a949e" text-anchor="middle">68% — default</text>
+    <g font-size="12" fill="#3a424a">
+      <text x="0" y="34">default</text><text x="0" y="72">v1</text><text x="0" y="110">v2</text>
+      <text x="0" y="148">v3</text><text x="0" y="186">v4</text><text x="0" y="224">v5</text>
+      <text x="0" y="262">v6</text>
+    </g>
+    <g>
+      <rect x="60" y="20" width="196" height="20" rx="3" fill="#b9c1ca"/>
+      <rect x="60" y="58" width="225" height="20" rx="3" fill="#8a5cf6"/>
+      <rect x="60" y="96" width="219" height="20" rx="3" fill="#a98af0"/>
+      <rect x="60" y="134" width="202" height="20" rx="3" fill="#a98af0"/>
+      <rect x="60" y="172" width="213" height="20" rx="3" fill="#a98af0"/>
+      <rect x="60" y="210" width="219" height="20" rx="3" fill="#a98af0"/>
+      <rect x="60" y="248" width="228" height="20" rx="3" fill="#8a5cf6"/>
+    </g>
+    <g font-size="12" font-weight="700" fill="#2b323a">
+      <text x="266" y="35">68%</text><text x="295" y="73">78%</text><text x="289" y="111">76%</text>
+      <text x="272" y="149">70%</text><text x="283" y="187">74%</text><text x="289" y="225">76%</text>
+      <text x="298" y="263">80,5%</text>
+    </g>
+    <line x1="428" y1="10" x2="428" y2="268" stroke="#8a5cf6" stroke-width="1" stroke-dasharray="4 3" opacity=".55"/>
+    <text x="428" y="284" font-size="10" fill="#8a5cf6" text-anchor="middle">90% — tetto misurato</text>
+  </svg>
+
+  <p class="note">Il tetto non è teorico: è la quota di task risolti da almeno una delle sei
+  versioni. I cinque che non passa nessuno sono analizzati a pagina 5.</p>
+  <div class="foot"><span>Progetto tassonomia</span><span>2</span></div>
+</div>
+
+<!-- 3 -->
+<div class="page">
+  <div class="kicker">La diagnosi</div>
+  <h2>Tre modi diversi di sbagliare</h2>
+  <p>Il punteggio binario dice solo «fallito». Leggendo le conversazioni una per una, i fallimenti
+  si separano in tre famiglie con cause distinte — e due di esse erano invisibili finché non
+  abbiamo guardato <em>quali azioni</em> l'agente aveva davvero eseguito.</p>
+
+  <svg viewBox="0 0 620 210" width="100%" style="margin:2mm 0 3mm">
+    <g>
+      <rect x="0" y="0" width="196" height="180" rx="8" fill="#fdf3f3" stroke="#f0d4d4"/>
+      <text x="16" y="30" font-size="13" font-weight="700" fill="#b4453f">A · Non agisce</text>
+      <text x="16" y="54" font-size="11" fill="#5b636b">Il cliente dice «sì» e</text>
+      <text x="16" y="72" font-size="11" fill="#5b636b">chiude la chiamata prima</text>
+      <text x="16" y="90" font-size="11" fill="#5b636b">che l'azione parta.</text>
+      <text x="16" y="128" font-size="26" font-weight="800" fill="#b4453f">3</text>
+      <text x="52" y="128" font-size="11" fill="#8a929b">task</text>
+      <text x="16" y="158" font-size="10" fill="#8a929b">comunica bene, non esegue</text>
+    </g>
+    <g transform="translate(212,0)">
+      <rect x="0" y="0" width="196" height="180" rx="8" fill="#fdf7ef" stroke="#f0e2cd"/>
+      <text x="16" y="30" font-size="13" font-weight="700" fill="#a9741f">B · Agisce troppo</text>
+      <text x="16" y="54" font-size="11" fill="#5b636b">Si scrive da solo una</text>
+      <text x="16" y="72" font-size="11" fill="#5b636b">giustificazione falsa e la</text>
+      <text x="16" y="90" font-size="11" fill="#5b636b">usa come autorizzazione.</text>
+      <text x="16" y="128" font-size="26" font-weight="800" fill="#a9741f">2</text>
+      <text x="52" y="128" font-size="11" fill="#8a929b">task</text>
+      <text x="16" y="158" font-size="10" fill="#8a929b">esegue ciò che è vietato</text>
+    </g>
+    <g transform="translate(424,0)">
+      <rect x="0" y="0" width="196" height="180" rx="8" fill="#f2f4fd" stroke="#d8dcf2"/>
+      <text x="16" y="30" font-size="13" font-weight="700" fill="#4a55b8">C · Sceglie male</text>
+      <text x="16" y="54" font-size="11" fill="#5b636b">Cerca il «più economico»</text>
+      <text x="16" y="72" font-size="11" fill="#5b636b">e si ferma al primo</text>
+      <text x="16" y="90" font-size="11" fill="#5b636b">risultato valido.</text>
+      <text x="16" y="128" font-size="26" font-weight="800" fill="#4a55b8">4</text>
+      <text x="52" y="128" font-size="11" fill="#8a929b">task</text>
+      <text x="16" y="158" font-size="10" fill="#8a929b">mai affrontata fino alla v5</text>
+    </g>
+  </svg>
+
+  <p>La famiglia C è la scoperta più scomoda: è la più numerosa, e per cinque versioni non le
+  avevamo dedicato una sola riga di prompt.</p>
+  <p class="note">Esempio reale (famiglia B): l'agente scrive «nessun segmento è stato ancora
+  volato» due righe sotto le date dei voli, che sono nel passato — e procede a cancellare una
+  prenotazione che la policy protegge.</p>
+  <div class="foot"><span>Progetto tassonomia</span><span>3</span></div>
+</div>
+
+<!-- 4 -->
+<div class="page">
+  <div class="kicker">I numeri</div>
+  <h2>Il confronto completo</h2>
+  <p>Ogni versione contro l'agente di default, sugli stessi task. «Vinti» e «persi» contano i task
+  che cambiano esito. Il valore <em>p</em> viene dal test di McNemar: solo la v6, ripetuta quattro volte,
+  arriva a <strong>una differenza statisticamente significativa</strong>.</p>
+
+  <table>
+    <tr><th>Versione</th><th class="num">Riusciti</th><th class="num">Tasso</th>
+        <th class="num">Vinti</th><th class="num">Persi</th><th class="num">p</th>
+        <th class="num">Costo/successo</th></tr>
+    <tr class="base"><td>default</td><td class="num">34/50</td><td class="num">68%</td>
+        <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">$0,0449</td></tr>
+    <tr><td>v1 · le prime regole</td><td class="num">39/50</td><td class="num">78%</td>
+        <td class="num">+6</td><td class="num">−1</td><td class="num">0,125</td><td class="num">$0,0435</td></tr>
+    <tr><td>v2 · due clausole</td><td class="num">38/50</td><td class="num">76%</td>
+        <td class="num">+6</td><td class="num">−2</td><td class="num">0,289</td><td class="num">$0,0464</td></tr>
+    <tr><td>v3 · una clausola</td><td class="num">35/50</td><td class="num">70%</td>
+        <td class="num">+4</td><td class="num">−3</td><td class="num">1,000</td><td class="num">$0,0475</td></tr>
+    <tr><td>v4 · ristrutturazione</td><td class="num">37/50</td><td class="num">74%</td>
+        <td class="num">+5</td><td class="num">−2</td><td class="num">0,453</td><td class="num">$0,0568</td></tr>
+    <tr><td>v5 · conferma unica</td><td class="num">38/50</td><td class="num">76%</td>
+        <td class="num">+6</td><td class="num">−2</td><td class="num">0,289</td><td class="num">$0,0534</td></tr>
+    <tr class="hl"><td>v6 · quattro esecuzioni</td><td class="num">—</td><td class="num">80,5%</td>
+        <td class="num">+9</td><td class="num">−0</td><td class="num">0,004</td><td class="num">$0,0507</td></tr>
+  </table>
+  <p class="note" style="margin-top:0">La riga della v6 è la media di quattro esecuzioni
+  complete (200 simulazioni); vinti, persi e <em>p</em> sono quelli della migliore. Le altre
+  righe vengono da <strong>una sola</strong> esecuzione: non sono numeri della stessa
+  attendibilità.</p>
+
+  <div class="grid2" style="margin-top:3mm">
+    <div class="card"><h3>Il costo conta quanto il punteggio</h3>
+      <p>Criterio fissato prima di misurare: costo totale diviso i task riusciti. La v4 costa il
+      31% in più della v1 e ne risolve meno — la ristrutturazione non si ripaga.</p></div>
+    <div class="card"><h3>Il rumore è più grande dell'effetto</h3>
+      <p>Lo stesso agente, girato quattro volte sugli stessi task, oscilla fra 74% e 86%.
+      Le differenze fra le versioni a esecuzione singola stanno dentro quel margine.</p></div>
+  </div>
+  <div class="foot"><span>Progetto tassonomia</span><span>4</span></div>
+</div>
+
+<!-- 5 -->
+<div class="page">
+  <div class="kicker">Il soffitto</div>
+  <h2>Cinque task che non passa nessuno</h2>
+  <p>Sopra il 90% non arriva nessuna versione. Analizzandoli uno per uno, la maggior parte
+  non è colpa dell'agente: sono difetti del benchmark che abbiamo documentato, o problemi che
+  richiedono capacità che il modello non ha.</p>
+
+  <svg viewBox="0 0 620 58" width="100%" style="margin:3mm 0 1mm">
+    <g font-size="11.5">
+      <rect x="0" y="0" width="150" height="52" rx="6" fill="#fdf3f3" stroke="#f0d4d4"/>
+      <text x="14" y="24" font-weight="700" fill="#b4453f">2 · risultato atteso</text>
+      <text x="14" y="41" fill="#6b737b">incoerente col task</text>
+
+      <rect x="160" y="0" width="150" height="52" rx="6" fill="#fdf3f3" stroke="#f0d4d4"/>
+      <text x="174" y="24" font-weight="700" fill="#b4453f">2 · bug nel confronto</text>
+      <text x="174" y="41" fill="#6b737b">del database</text>
+
+      <rect x="320" y="0" width="150" height="52" rx="6" fill="#f2f4fd" stroke="#d8dcf2"/>
+      <text x="334" y="24" font-weight="700" fill="#4a55b8">2 · oltre il modello</text>
+      <text x="334" y="41" fill="#6b737b">ricerca e aritmetica</text>
+
+      <rect x="480" y="0" width="140" height="52" rx="6" fill="#eef8f1" stroke="#cbe6d5"/>
+      <text x="494" y="24" font-weight="700" fill="#2f7d4f">1 · bug dell'hash</text>
+      <text x="494" y="41" fill="#6b737b">passa 1 volta su 4</text>
+    </g>
+  </svg>
+
+  <p><strong>Quattro dei cinque sono difetti del benchmark, non nostri.</strong> Due task chiedono
+  uno stato finale che nessuna lettura difendibile della policy produce. Altri due colpiscono un
+  bug nel confronto fra database: l'esito viene giudicato sbagliato solo perché una lista è in
+  ordine diverso. La segnalazione è stata inviata agli autori.</p>
+
+  <h2 style="margin-top:6mm; font-size:14pt">E il limite del modello, misurato invece che supposto</h2>
+  <p>Ordinando le 70 submission pubbliche della classifica ufficiale per punteggio su questo
+  dominio, <strong>nessuna sopra l'80% è stata ottenuta senza ragionamento</strong>: chi ci arriva
+  usa un modello con thinking nativo o un secondo modello che rivede le azioni. Il confronto più
+  vicino al nostro — stessa famiglia di modello, ma con ragionamento attivo — fa 82,5%.</p>
+  <p class="note">Non è una scusa per ciò che resta fuori: è un limite documentato con una fonte
+  pubblica e verificabile.</p>
+  <div class="foot"><span>Progetto tassonomia</span><span>5</span></div>
+</div>
+
+<!-- 6 -->
+<div class="page">
+  <div class="kicker">Come lo sappiamo</div>
+  <h2>Ogni numero è ispezionabile</h2>
+  <p>Tutte le esecuzioni finiscono in un unico dataset su Langfuse: sei versioni, gli stessi 50
+  task, affiancate riga per riga. Per ogni task si legge la conversazione completa — cliente,
+  agente, chiamate agli strumenti — accanto al risultato atteso e ai punteggi.</p>
+
+  <div class="grid2" style="margin:4mm 0">
+    <div class="card"><h3>Confronto affiancato</h3>
+      <p>Ogni versione contro il default sullo stesso task, con la differenza di punteggio
+      evidenziata.</p></div>
+    <div class="card"><h3>Dialogo integrale</h3>
+      <p>La conversazione turno per turno, comprese le chiamate agli strumenti e i loro
+      risultati.</p></div>
+    <div class="card"><h3>Metriche per azione</h3>
+      <p>Non solo riuscito/fallito: azioni non richieste, argomenti sbagliati, quota di azioni
+      corrette.</p></div>
+  </div>
+
+  <h2 style="margin-top:5mm; font-size:14pt">Cosa resta</h2>
+  <p>I quattro giri richiesti dallo standard di Sierra sono completi. I risultati sono pubblicati
+  nello stesso dataset delle versioni precedenti: dieci esecuzioni sugli stessi cinquanta
+  task, confrontabili riga per riga.</p>
+  <p class="note">Codice dell'agente, modifiche al benchmark e diario completo del percorso —
+  incluse le ipotesi sbagliate — sono pubblici nel repository del progetto.</p>
+  <div class="foot"><span>Progetto tassonomia — settembre 2026</span><span>6</span></div>
+</div>
+
+</body></html>
