@@ -1,0 +1,362 @@
+<title>Revisione bozza tassonomia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#f4f4f1; --sheet:#fffffe; --ink:#1c1e21; --dim:#6a7078; --hair:#dedeD8;
+  --accent:#2f6f6b; --accent-soft:#e6efee; --mark:#a8402f; --mark-soft:#f7ebe8;
+  --shadow:0 1px 2px rgba(28,30,33,.05), 0 8px 24px -14px rgba(28,30,33,.18);
+}
+:root:not([data-theme="light"]){ @media (prefers-color-scheme: dark){
+  --ground:#16181a; --sheet:#1e2124; --ink:#e8e8e4; --dim:#9aa0a6; --hair:#2f3336;
+  --accent:#6fbdb6; --accent-soft:#1d2c2b; --mark:#e08a78; --mark-soft:#2c211f;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --ground:#16181a; --sheet:#1e2124; --ink:#e8e8e4; --dim:#9aa0a6; --hair:#2f3336;
+  --accent:#6fbdb6; --accent-soft:#1d2c2b; --mark:#e08a78; --mark-soft:#2c211f;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.6}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--ground) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--hair);
+  padding:12px clamp(16px,4vw,40px);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header h1{font-family:"Source Serif 4",Georgia,serif;font-size:19px;margin:0;font-weight:600;
+  letter-spacing:-.01em}
+.tot{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--dim);
+  font-variant-numeric:tabular-nums}
+.tot b{color:var(--ink);font-weight:500}
+.stato{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--dim)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex:0 0 auto}
+.dot.ok{background:var(--accent)} .dot.busy{background:#c99a2e} .dot.err{background:var(--mark)}
+main{max-width:1200px;margin:0 auto;padding:22px clamp(16px,4vw,40px) 90px;
+  display:flex;flex-direction:column;gap:18px}
+.intro{font-size:14px;color:var(--dim);max-width:64ch;margin:4px 0 2px}
+.step{background:var(--sheet);border:1px solid var(--hair);border-radius:4px;box-shadow:var(--shadow)}
+.top{display:flex;align-items:baseline;gap:12px;padding:14px 20px;border-bottom:1px solid var(--hair)}
+.n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);font-weight:500;
+  letter-spacing:.08em}
+.top h2{font-family:"Source Serif 4",Georgia,serif;font-size:19px;margin:0;font-weight:600;flex:1;
+  letter-spacing:-.01em;text-wrap:balance}
+.wc{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--dim);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.wc.over{color:var(--mark)}
+.cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media (max-width:940px){.cols{grid-template-columns:1fr}}
+.left{padding:18px 20px;border-right:1px solid var(--hair);display:flex;flex-direction:column;gap:12px}
+@media (max-width:940px){.left{border-right:0;border-bottom:1px solid var(--hair)}}
+.right{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);
+  font-weight:500;display:block;margin-bottom:6px}
+textarea{width:100%;border:1px solid var(--hair);border-radius:3px;background:transparent;
+  color:var(--ink);padding:12px 13px;resize:none;overflow:hidden;font:inherit}
+textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.testo{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;line-height:1.62}
+.nota{font-size:14px;background:var(--mark-soft);border-color:transparent}
+.nota::placeholder{color:var(--dim);opacity:.75}
+.nota:focus{outline-color:var(--mark)}
+.notawrap label{color:var(--mark)}
+.figbox{background:#fff;border:1px solid var(--hair);border-radius:3px;padding:14px}
+.figbox svg{width:100%;height:auto;display:block}
+.figname{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dim);margin-top:7px}
+.shot{border:1px dashed var(--hair);border-radius:3px;padding:18px 16px;background:var(--accent-soft)}
+.shot .t{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;
+  text-transform:uppercase;margin-bottom:7px}
+.shot .u{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dim);word-break:break-all;
+  line-height:1.5}
+.shot .d{font-size:13px;color:var(--dim);margin-top:9px}
+footer{max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,40px) 60px;
+  font-size:13px;color:var(--dim);max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header>
+  <h1>Revisione bozza</h1>
+  <span class="tot"><b id="tot">0</b> parole &middot; obiettivo &le;1.250</span>
+  <span class="stato"><span class="dot" id="dot"></span><span id="stato">in ascolto</span></span>
+</header>
+
+<main>
+  <p class="intro">Modifica il testo direttamente nei riquadri chiari. Il riquadro colorato accanto
+  a ogni passo &egrave; per le tue annotazioni &mdash; scrivici cosa cambiare, cosa manca, cosa
+  togliere. Tutto viene salvato mentre scrivi.</p>
+  <div id="steps"></div>
+</main>
+
+<footer id="foot"></footer>
+
+<script>
+const STEPS = [
+ {id:"sintesi", n:"IN APERTURA", tit:"Sintesi per la prima pagina", max:150,
+  testo:`Le aziende non mettono in produzione i modelli più potenti, ma i più economici: l'assistenza clienti si misura in milioni di conversazioni. Far rispettare un regolamento di quaranta pagine a un modello piccolo è quindi un problema commerciale, non accademico.
+
+Questo progetto misura quanto si guadagna agendo solo sul prompt — e soprattutto costruisce il modo di saperlo: ogni conversazione tracciata, metriche per singola azione, previsioni registrate prima dell'esperimento, ripetizioni per separare il risultato dal caso.
+
+È l'infrastruttura che resta quando il modello cambia. Ed è ciò che ha permesso di trovare un difetto nel benchmark stesso.`},
+ {id:"s1", n:"PASSO 1", tit:"Il banco di prova", fig:"fig1-banco-di-prova.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 260" font-family="system-ui,sans-serif">
+<rect x="20" y="80" width="150" height="70" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="95" y="110" text-anchor="middle" font-size="15" fill="#2b323a">Cliente</text>
+<text x="95" y="130" text-anchor="middle" font-size="15" fill="#2b323a">simulato</text>
+<rect x="265" y="80" width="170" height="70" rx="10" fill="#6d5cf0"/>
+<text x="350" y="112" text-anchor="middle" font-size="16" fill="#ffffff" font-weight="700">Agente</text>
+<text x="350" y="132" text-anchor="middle" font-size="12" fill="#e6e2ff">il nostro prompt</text>
+<rect x="530" y="30" width="150" height="60" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="605" y="58" text-anchor="middle" font-size="14" fill="#2b323a">Strumenti</text>
+<text x="605" y="76" text-anchor="middle" font-size="12" fill="#8a929b">prenota, annulla</text>
+<rect x="530" y="140" width="150" height="60" rx="10" fill="none" stroke="#8a929b" stroke-width="1.5"/>
+<text x="605" y="168" text-anchor="middle" font-size="14" fill="#2b323a">Regolamento</text>
+<text x="605" y="186" text-anchor="middle" font-size="12" fill="#8a929b">40 pagine</text>
+<line x1="172" y1="115" x2="262" y2="115" stroke="#8a929b" stroke-width="1.5"/>
+<line x1="437" y1="105" x2="527" y2="70" stroke="#8a929b" stroke-width="1.5"/>
+<line x1="437" y1="128" x2="527" y2="165" stroke="#8a929b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<rect x="230" y="205" width="240" height="42" rx="8" fill="#f4f2ff" stroke="#6d5cf0"/>
+<text x="350" y="231" text-anchor="middle" font-size="13" fill="#6d5cf0" font-weight="700">Verifica finale sul database</text>
+</svg>`,
+  testo:`τ²-bench è un banco di prova costruito da Sierra per misurare gli agenti conversazionali. Un agente fa l'assistente di una compagnia aerea: parla con un cliente simulato da un altro modello, consulta e modifica un database di prenotazioni vero, e deve rispettare un regolamento aziendale di quaranta pagine.
+
+Un task riesce solo se lo stato finale del database coincide esattamente con quello atteso e le informazioni richieste sono state comunicate al cliente. Non esistono mezzi voti.
+
+La domanda era una sola, e volutamente stretta: a modello fisso, quanto si guadagna cambiando solo il prompt? Niente addestramento, niente secondo modello, niente strumenti aggiuntivi.
+
+Il modello scelto è piccolo e senza ragionamento esplicito — la stessa classe che si usa quando un servizio deve reggere volumi veri. Il margine che si recupera lì non è un dettaglio da laboratorio: è la differenza fra un assistente che si può mettere in produzione e uno che no.`},
+ {id:"s2", n:"PASSO 2", tit:"La prima misura, e il muro", fig:"fig2-punteggio-binario.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 230" font-family="system-ui,sans-serif">
+<text x="0" y="20" font-size="12" fill="#8a929b">QUELLO CHE VEDI</text>
+<rect x="0" y="34" width="180" height="52" rx="8" fill="#f6f7f8" stroke="#e3e7eb"/>
+<text x="90" y="66" text-anchor="middle" font-size="20" fill="#2b323a" font-weight="700">FALLITO</text>
+<line x1="200" y1="60" x2="250" y2="60" stroke="#8a929b" stroke-width="1.5"/>
+<text x="270" y="20" font-size="12" fill="#8a929b">QUELLO CHE SERVE SAPERE</text>
+<rect x="270" y="34" width="200" height="52" rx="8" fill="#eef8f1" stroke="#cbe6d5"/>
+<text x="286" y="58" font-size="13" fill="#2f7d4f" font-weight="700">Ha comunicato bene?</text>
+<text x="286" y="76" font-size="13" fill="#8a929b">si</text>
+<rect x="270" y="98" width="200" height="52" rx="8" fill="#fdf3f3" stroke="#f0d4d4"/>
+<text x="286" y="122" font-size="13" fill="#b4453f" font-weight="700">Ha agito bene?</text>
+<text x="286" y="140" font-size="13" fill="#8a929b">no, azione mai eseguita</text>
+<rect x="490" y="34" width="210" height="116" rx="8" fill="#ffffff" stroke="#e3e7eb"/>
+<text x="506" y="58" font-size="13" fill="#2b323a" font-weight="700">Metriche per azione</text>
+<text x="506" y="82" font-size="12" fill="#8a929b">azioni non richieste</text>
+<text x="506" y="102" font-size="12" fill="#8a929b">argomenti sbagliati</text>
+<text x="506" y="122" font-size="12" fill="#8a929b">azioni corrette / attese</text>
+<text x="0" y="195" font-size="13" fill="#2b323a">Due agenti con lo stesso zero possono avere problemi opposti,</text>
+<text x="0" y="215" font-size="13" fill="#2b323a">e richiedere correzioni opposte.</text>
+</svg>`,
+  testo:`L'agente di default fornito dal benchmark risolve 34 task su 50. È il numero da battere.
+
+Ma il punteggio dice «fallito» e nient'altro. Sedici fallimenti, sedici scatole nere. Non si sa se l'agente abbia violato una regola, dimenticato un passaggio, o scelto l'opzione sbagliata fra due legittime.
+
+La prima cosa costruita non è stata quindi un agente migliore, ma un modo di guardare: ogni esecuzione tracciata, e il punteggio scomposto nelle sue due componenti — ha comunicato correttamente? e ha lasciato il database nello stato giusto? — insieme a metriche per singola azione: quante azioni non richieste, quante con argomenti sbagliati.
+
+Un agente che comunica benissimo e non esegue nulla, e un agente che esegue azioni vietate senza dire niente, prendono lo stesso zero. Sono problemi opposti e richiedono correzioni opposte: finché il punteggio resta un numero solo, non si sa nemmeno quale dei due si ha davanti.`},
+ {id:"s3", n:"PASSO 3", tit:"Leggere i fallimenti uno per uno", fig:"fig3-famiglie.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 175" font-family="system-ui,sans-serif">
+<rect x="0" y="0" width="222" height="160" rx="10" fill="#fdf3f3" stroke="#f0d4d4"/>
+<text x="18" y="34" font-size="16" font-weight="700" fill="#b4453f">Non agisce</text>
+<text x="18" y="64" font-size="13" fill="#5b636b">Il cliente crede sia fatto,</text>
+<text x="18" y="84" font-size="13" fill="#5b636b">dice si e riaggancia.</text>
+<text x="18" y="132" font-size="12" fill="#8a929b">comunica bene, non esegue</text>
+<g transform="translate(239,0)">
+<rect x="0" y="0" width="222" height="160" rx="10" fill="#fdf7ef" stroke="#f0e2cd"/>
+<text x="18" y="34" font-size="16" font-weight="700" fill="#a9741f">Agisce troppo</text>
+<text x="18" y="64" font-size="13" fill="#5b636b">Si scrive una giustificazione</text>
+<text x="18" y="84" font-size="13" fill="#5b636b">falsa e la usa come permesso.</text>
+<text x="18" y="132" font-size="12" fill="#8a929b">esegue cio che e vietato</text>
+</g>
+<g transform="translate(478,0)">
+<rect x="0" y="0" width="222" height="160" rx="10" fill="#f2f4fd" stroke="#d8dcf2"/>
+<text x="18" y="34" font-size="16" font-weight="700" fill="#4a55b8">Sceglie male</text>
+<text x="18" y="64" font-size="13" fill="#5b636b">Cerca il piu economico e</text>
+<text x="18" y="84" font-size="13" fill="#5b636b">si ferma al primo valido.</text>
+<text x="18" y="132" font-size="12" fill="#8a929b">valido, ma non il migliore</text>
+</g>
+</svg>`, shot:true,
+  testo:`Ogni fallimento è stato letto turno per turno, come si legge la registrazione di una telefonata. Da lì sono emerse tre famiglie con cause distinte.
+
+Non agisce. L'agente descrive l'operazione così bene che il cliente crede sia già fatta, dice «sì» e chiude la conversazione — prima che l'azione parta. Comunicazione perfetta, database intatto.
+
+Agisce troppo. L'agente si scrive da solo una giustificazione e la usa come autorizzazione. In un caso reale scrive «nessun volo è stato ancora effettuato» due righe sotto delle date che sono nel passato, e cancella una prenotazione che il regolamento proteggeva.
+
+Sceglie male. Al cliente che chiede «il volo più economico verso la costa ovest», l'agente cerca una sola combinazione e prenota la prima valida. Valida, ma non la più economica.
+
+E leggendo è emerso qualcos'altro: un task che passava o falliva senza che l'agente cambiasse comportamento. La causa non era l'agente, ma il modo in cui il benchmark confronta i risultati. È diventata una segnalazione agli autori, aperta e verificabile (issue #514) → approfondimento a pagina dedicata.`},
+ {id:"s4", n:"PASSO 4", tit:"L'errore che è costato di più", fig:"fig4-versioni.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 275" font-family="system-ui,sans-serif">
+<line x1="416" y1="10" x2="416" y2="256" stroke="#8a929b" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="416" y="270" text-anchor="middle" font-size="12" fill="#8a929b">68% - agente di default</text>
+<text x="0" y="33" font-size="13" fill="#2b323a">default</text><rect x="62" y="18" width="354" height="21" rx="3" fill="#b9c1ca"/><text x="426" y="34" font-size="13" font-weight="700" fill="#2b323a">68%</text><text x="0" y="67" font-size="13" fill="#2b323a">v1</text><rect x="62" y="52" width="406" height="21" rx="3" fill="#a98af0"/><text x="478" y="68" font-size="13" font-weight="700" fill="#2b323a">78%</text><text x="0" y="101" font-size="13" fill="#2b323a">v2</text><rect x="62" y="86" width="395" height="21" rx="3" fill="#a98af0"/><text x="467" y="102" font-size="13" font-weight="700" fill="#2b323a">76%</text><text x="0" y="135" font-size="13" fill="#2b323a">v3</text><rect x="62" y="120" width="364" height="21" rx="3" fill="#d9cdf7"/><text x="436" y="136" font-size="13" font-weight="700" fill="#2b323a">70%</text><text x="0" y="169" font-size="13" fill="#2b323a">v4</text><rect x="62" y="154" width="385" height="21" rx="3" fill="#a98af0"/><text x="457" y="170" font-size="13" font-weight="700" fill="#2b323a">74%</text><text x="0" y="203" font-size="13" fill="#2b323a">v5</text><rect x="62" y="188" width="395" height="21" rx="3" fill="#a98af0"/><text x="467" y="204" font-size="13" font-weight="700" fill="#2b323a">76%</text><text x="0" y="237" font-size="13" fill="#2b323a">v6</text><rect x="62" y="222" width="419" height="21" rx="3" fill="#6d5cf0"/><text x="491" y="238" font-size="13" font-weight="700" fill="#2b323a">80.5%</text>
+<text x="470" y="122" font-size="13" fill="#b4453f">v2 e v3: regole aggiunte,</text>
+<text x="470" y="142" font-size="13" fill="#b4453f">punteggio sceso</text>
+</svg>`,
+  testo:`L'istinto, dopo una diagnosi, è aggiungere una regola per ogni problema trovato. È esattamente quello che ho fatto, per tre versioni consecutive. E il punteggio è sceso.
+
+La spiegazione è arrivata dalla letteratura, non dall'intuito: superata una certa densità di istruzioni — attorno alla ventina — i modelli piccoli iniziano a violarle in silenzio, senza alcun errore visibile. Il regolamento del dominio ne conteneva già una quarantina. Ogni clausola aggiunta per chiudere un problema ne apriva un altro altrove.
+
+Conclusione scomoda ma utile: su un modello piccolo, aggiungere istruzioni ha rendimenti negativi. Serviva cambiare metodo, non aggiungere righe.
+
+Una precisazione sul grafico, perché altrimenti inganna: il 78% della v1 viene da una sola esecuzione, l'80,5% della v6 dalla media di quattro. Non sono numeri della stessa attendibilità, e il perché è il passo 6.`},
+ {id:"s5", n:"PASSO 5", tit:"Sottrarre invece che aggiungere", fig:"fig5-prima-dopo.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 250" font-family="system-ui,sans-serif">
+<text x="0" y="18" font-size="12" fill="#8a929b">PRIMA - un esempio dentro il prompt</text>
+<rect x="0" y="30" width="330" height="100" rx="8" fill="#fdf3f3" stroke="#f0d4d4"/>
+<text x="16" y="56" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">Azione: aggiungi bagagli</text>
+<text x="16" y="78" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">Permesso perche: i soci gold hanno</text>
+<text x="16" y="96" font-size="12" fill="#5b636b" font-family="ui-monospace,monospace">diritto a 3 bagagli gratuiti</text>
+<text x="16" y="120" font-size="12" fill="#b4453f">l'agente aggiunge bagagli non richiesti</text>
+<text x="370" y="18" font-size="12" fill="#8a929b">DOPO - l'esempio rimosso, un principio</text>
+<rect x="370" y="30" width="330" height="100" rx="8" fill="#eef8f1" stroke="#cbe6d5"/>
+<text x="386" y="66" font-size="16" fill="#2f7d4f" font-weight="700">Un diritto non e</text>
+<text x="386" y="90" font-size="16" fill="#2f7d4f" font-weight="700">un'istruzione.</text>
+<text x="386" y="120" font-size="12" fill="#2f7d4f">serve solo cio che e stato chiesto</text>
+<text x="0" y="178" font-size="14" fill="#2b323a">Dieci righe di casistica sostituite da una frase.</text>
+<text x="0" y="206" font-size="14" fill="#2b323a">Ogni modifica registrata come previsione prima di girare l'esperimento:</text>
+<text x="0" y="230" font-size="14" fill="#2b323a">quali task dovevano cambiare esito, e quali no.</text>
+</svg>`,
+  testo:`Il cambio di metodo: smettere di scrivere regole e cominciare a togliere le cause.
+
+Il prompt conteneva un esempio che mostrava all'agente come aggiungere bagagli gratuiti a un cliente che ne aveva diritto. In un task reale l'agente ha aggiunto due bagagli a un cliente che aveva appena detto di non averne — copiando l'esempio invece di ascoltare. Il difetto non era una regola mancante: era un esempio che insegnava la cosa sbagliata. Tolto l'esempio, dieci righe di casistica sono state sostituite da una frase: un diritto non è un'istruzione.
+
+Stessa logica per la famiglia «non agisce»: invece di regole su quando confermare, una riga apre ogni messaggio di conferma — «non ho ancora fatto nessuna di queste modifiche» — e toglie al cliente la ragione per riagganciare.
+
+Ogni modifica è stata registrata come previsione prima di girare l'esperimento: quali task dovevano cambiare esito e quali no. È ciò che distingue una correzione da un aggiustamento fortunato.`},
+ {id:"s6", n:"PASSO 6", tit:"Il risultato, e cosa non dice", fig:"fig6-risultato.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 300" font-family="system-ui,sans-serif">
+<text x="0" y="20" font-size="12" fill="#8a929b">LO STESSO AGENTE, QUATTRO ESECUZIONI IDENTICHE</text>
+<line x1="371" y1="30" x2="371" y2="196" stroke="#8a929b" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="371" y="212" text-anchor="middle" font-size="12" fill="#8a929b">68% - agente di default</text>
+<text x="0" y="56" font-size="14" fill="#2b323a">giro 1</text><rect x="86" y="41" width="344" height="21" rx="3" fill="#6d5cf0"/><text x="440" y="56" font-size="14" font-weight="700" fill="#2b323a">82%</text><text x="0" y="92" font-size="14" fill="#2b323a">giro 2</text><rect x="86" y="77" width="311" height="21" rx="3" fill="#6d5cf0"/><text x="407" y="92" font-size="14" font-weight="700" fill="#2b323a">74%</text><text x="0" y="128" font-size="14" fill="#2b323a">giro 3</text><rect x="86" y="113" width="336" height="21" rx="3" fill="#6d5cf0"/><text x="432" y="128" font-size="14" font-weight="700" fill="#2b323a">80%</text><text x="0" y="164" font-size="14" fill="#2b323a">giro 4</text><rect x="86" y="149" width="361" height="21" rx="3" fill="#6d5cf0"/><text x="457" y="164" font-size="14" font-weight="700" fill="#2b323a">86%</text>
+<line x1="0" y1="236" x2="700" y2="236" stroke="#e3e7eb"/>
+<text x="0" y="266" font-size="19" font-weight="700" fill="#6d5cf0">80,5% di media</text>
+<text x="182" y="266" font-size="14" fill="#2b323a">contro il 68% dell'agente di default</text>
+<text x="0" y="290" font-size="13" fill="#8a929b">Con una sola esecuzione il risultato pubblicato sarebbe stato 86%.</text>
+</svg>`,
+  testo:`Quattro esecuzioni complete, 200 simulazioni: 80,5% contro il 68% dell'agente di default.
+
+Ma i quattro giri servivano soprattutto a un'altra cosa. I singoli punteggi vanno da 74% a 86% — stesso agente, stessi task, campionamento deterministico. Con una sola esecuzione avrei pubblicato l'86% in buona fede, e sarebbe caduto alla prima verifica.
+
+Sull'affidabilità, infine, il nuovo agente è alla pari con quello di default: il guadagno è sul punteggio medio, non sulla costanza.`},
+ {id:"bug", n:"PAGINA A PARTE", tit:"Il bug nel benchmark", fig:"fig-bug.svg", svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 250" font-family="system-ui,sans-serif">
+<rect x="0" y="20" width="300" height="104" rx="8" fill="#f6f7f8" stroke="#e3e7eb"/>
+<text x="16" y="44" font-size="12" fill="#8a929b">ESECUZIONE A</text>
+<text x="16" y="70" font-size="12" fill="#2b323a" font-family="ui-monospace,monospace">carta 8020792 - $198</text>
+<text x="16" y="92" font-size="12" fill="#2b323a" font-family="ui-monospace,monospace">carta 6136092 - $129</text>
+<text x="16" y="114" font-size="12" fill="#2f7d4f" font-weight="700">superato</text>
+<rect x="330" y="20" width="300" height="104" rx="8" fill="#f6f7f8" stroke="#e3e7eb"/>
+<text x="346" y="44" font-size="12" fill="#8a929b">ESECUZIONE B</text>
+<text x="346" y="70" font-size="12" fill="#2b323a" font-family="ui-monospace,monospace">carta 6136092 - $129</text>
+<text x="346" y="92" font-size="12" fill="#2b323a" font-family="ui-monospace,monospace">carta 8020792 - $198</text>
+<text x="346" y="114" font-size="12" fill="#b4453f" font-weight="700">bocciato</text>
+<text x="0" y="162" font-size="14" fill="#2b323a">Stesse carte. Stessi importi. Stesso totale. Cambia solo l'ordine.</text>
+<rect x="0" y="182" width="660" height="58" rx="8" fill="#f4f2ff" stroke="#6d5cf0"/>
+<text x="16" y="206" font-size="13" fill="#6d5cf0" font-weight="700">L'impronta del database ordina le chiavi dei dizionari, non gli elementi delle liste.</text>
+<text x="16" y="228" font-size="13" fill="#2b323a">Un task risolto diventa una monetina, dentro un benchmark che misura la costanza.</text>
+</svg>`,
+  testo:`τ²-bench decide se un task è superato confrontando due impronte digitali del database: quella prodotta dall'agente e quella attesa.
+
+L'impronta si calcola mettendo il database in ordine e riducendolo a testo. Ma quell'ordinamento riguarda i campi, non gli elementi di una lista — e la cronologia dei pagamenti di una prenotazione è una lista.
+
+Due prenotazioni identiche — stesse carte, stessi importi, stesso totale — ma con i pagamenti elencati in ordine diverso, producono impronte diverse. Il benchmark le giudica differenti.
+
+Verificato su due esecuzioni reali dello stesso agente: unica differenza in tutta la chiamata, l'ordine di due carte regalo. Una superata, l'altra bocciata.
+
+Non è un errore del modello. Le due risposte sono entrambe corrette, e nessuna regola dice in che ordine elencare i pagamenti: è il metro di misura a distinguere ciò che non andrebbe distinto. E poiché l'ordine che un modello produce non è stabile, il difetto rende un task risolto una monetina — proprio dentro un banco di prova che esiste per misurare quanto un agente è costante.
+
+Segnalato agli autori: issue #514.`}
+];
+
+const SHOT_URL = "cloud.langfuse.com/project/cmtefvd6j05kqad0i158liz8k/traces/708da1f15bcd8f49c35167e1d3a1f83a";
+const conta = s => (s.trim().match(/[\p{L}\p{N}'’-]+/gu) || []).length;
+
+let db = null, timers = {};
+const el = id => document.getElementById(id);
+
+function stato(cls, txt){ el("dot").className = "dot " + cls; el("stato").textContent = txt; }
+
+function autoGrow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+
+function totale(){
+  // gira anche mentre la pagina si sta costruendo: i passi non ancora
+  // inseriti semplicemente non contano.
+  let n = 0;
+  STEPS.forEach(s => {
+    const t = document.getElementById("t-" + s.id);
+    if (t) n += conta(t.value);
+  });
+  el("tot").textContent = n.toLocaleString("it-IT");
+}
+
+function aggiornaConta(s){
+  const t = document.getElementById("t-" + s.id);
+  const w = conta(t.value);
+  const c = document.getElementById("w-" + s.id);
+  const max = s.id === "s3" ? 250 : (s.id === "bug" ? 200 : 200);
+  c.textContent = w + " / " + max + " parole";
+  c.className = "wc" + (w > max ? " over" : "");
+  totale();
+}
+
+function salva(s){
+  clearTimeout(timers[s.id]);
+  timers[s.id] = setTimeout(async () => {
+    if (!db) return;
+    stato("busy", "salvo…");
+    try{
+      await db.doc("edits/" + s.id).set({
+        testo: document.getElementById("t-" + s.id).value,
+        nota: document.getElementById("n-" + s.id).value,
+        titolo: s.tit,
+        aggiornato: new Date().toISOString()
+      });
+      stato("ok", "salvato");
+    }catch(e){ stato("err", "salvataggio non riuscito"); }
+  }, 700);
+}
+
+function render(){
+  const wrap = el("steps");
+  wrap.innerHTML = "";
+  STEPS.forEach(s => {
+    const sec = document.createElement("section");
+    sec.className = "step";
+    sec.innerHTML =
+      '<div class="top"><span class="n">' + s.n + '</span><h2>' + s.tit +
+      '</h2><span class="wc" id="w-' + s.id + '"></span></div>' +
+      '<div class="cols"><div class="left">' +
+        '<div><label for="t-' + s.id + '">Testo del report</label>' +
+        '<textarea class="testo" id="t-' + s.id + '"></textarea></div>' +
+      '</div><div class="right">' +
+        (s.shot ? '<div class="shot"><div class="t">Screenshot da catturare</div>' +
+          '<div class="u">' + SHOT_URL + '</div><div class="d">La traccia di una conversazione: ' +
+          'costo e token per chiamata, reward 1.00, temperature 0, e lo scambio fra cliente e agente.' +
+          '</div></div>' : '') +
+        '<div><div class="figbox">' + s.svg + '</div><div class="figname">' + s.fig + '</div></div>' +
+        '<div class="notawrap"><label for="n-' + s.id + '">Le tue annotazioni</label>' +
+        '<textarea class="nota" id="n-' + s.id + '" rows="3" ' +
+        'placeholder="Cosa cambiare, cosa manca, cosa togliere…"></textarea></div>' +
+      '</div></div>';
+    wrap.appendChild(sec);
+
+    const t = sec.querySelector("#t-" + s.id), n = sec.querySelector("#n-" + s.id);
+    t.value = s.testo;
+    [t, n].forEach(x => {
+      x.addEventListener("input", () => { autoGrow(x); if (x === t) aggiornaConta(s); salva(s); });
+    });
+    autoGrow(t); autoGrow(n); aggiornaConta(s);
+  });
+}
+
+render();
+el("foot").textContent = "Pagina di lavoro interna. Il testo di partenza è quello del file report.md; "
+  + "le modifiche e le note restano su questa pagina, e vengono rilette per aggiornare il file.";
+
+(async () => {
+  db = await claude.use("db");
+  if (!db){ stato("", "modifiche non salvate su questo dispositivo"); return; }
+  stato("ok", "salvataggio attivo");
+  for (const s of STEPS){
+    try{
+      const d = await db.doc("edits/" + s.id).get();
+      if (d && d.data){
+        const t = document.getElementById("t-" + s.id), n = document.getElementById("n-" + s.id);
+        if (typeof d.data.testo === "string" && d.data.testo.trim()){ t.value = d.data.testo; autoGrow(t); }
+        if (typeof d.data.nota === "string"){ n.value = d.data.nota; autoGrow(n); }
+        aggiornaConta(s);
+      }
+    }catch(e){}
+  }
+})();
+</script>

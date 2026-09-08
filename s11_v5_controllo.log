@@ -1,0 +1,2467 @@
+[32m2026-09-04 23:09:14.113[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-04 23:09:21.398[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m119[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-04 23:09:21.788[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-04 23:09:21.803[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-04 23:09:21.803[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+[GEMINI_API_KEY · custom_agent] 9 task da eseguire: ['9', '17', '21', '24', '29', '32', '33', '35', '42']
+[GEMINI_API_KEY · custom_agent] task 9: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 9                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t9  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 9, trial 1
+23:09:25 - LiteLLM:WARNING: opentelemetry.py:212 - Proxy Server is not installed. Skipping OpenTelemetry initialization.
+Status: 0/1 complete. Avg reward: N/A. 1 running: 9.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 9.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 9                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 65.33s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0466                                                         │
+│ User Cost: $0.0028                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent search_direct_flight [read] ✅ 1.0                               │
+│                                                                             │
+│ Partial Action Reward: 1/1 (100.0%)                                         │
+│   Read:  1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0466                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/1 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (1/9) task 9: reward 1.0
+[GEMINI_API_KEY · custom_agent] task 17: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 17                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t17  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 17, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 17.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 17.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 17                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 66.23s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0528                                                         │
+│ User Cost: $0.0040                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent update_reservation_flights [write] ✅ 1.0                        │
+│ - 1: agent update_reservation_passengers [write] ✅ 1.0                     │
+│ - 2: agent update_reservation_baggages [write] ✅ 1.0                       │
+│                                                                             │
+│ Partial Action Reward: 3/3 (100.0%)                                         │
+│   Write: 3/3 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0528                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          3/3 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (2/9) task 17: reward 1.0
+[GEMINI_API_KEY · custom_agent] task 21: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 21                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t21  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 21, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 21.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 21.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 21.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 21                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 112.26s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0661                                                         │
+│ User Cost: $0.0081                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent update_reservation_flights [write] ✅ 1.0                        │
+│ - 1: agent update_reservation_baggages [write] ✅ 1.0                       │
+│                                                                             │
+│ Partial Action Reward: 2/2 (100.0%)                                         │
+│   Write: 2/2 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0661                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          2/2 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (3/9) task 21: reward 1.0
+[GEMINI_API_KEY · custom_agent] task 24: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 24                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t24  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 24, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 24.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 24.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 24.0(90s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 24.0(120s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 24.0(150s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 24                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 166.06s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.1057                                                         │
+│ User Cost: $0.0069                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent book_reservation [write] ✅ 1.0                                  │
+│                                                                             │
+│ Partial Action Reward: 1/1 (100.0%)                                         │
+│   Write: 1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.1057                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          1/1 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (4/9) task 24: reward 1.0
+[GEMINI_API_KEY · custom_agent] task 29: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 29                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t29  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 29, trial 1
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 29                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 19.28s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0150                                                         │
+│ User Cost: $0.0037                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent cancel_reservation [write] ❌ 0.0                                │
+│ - 2: agent book_reservation [write] ❌ 0.0                                  │
+│                                                                             │
+│ Partial Action Reward: 1/3 (33.3%)                                          │
+│   Read:  1/1 (100.0%)                                                       │
+│   Write: 0/2 (0.0%)                                                         │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0150                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/1 (100.0%)                                    │
+│   ✏️  Write Actions          0/2 (0.0%)                                      │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (5/9) task 29: reward 0.0
+[GEMINI_API_KEY · custom_agent] task 32: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 32                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t32  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 32, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 32.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 32.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 32                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 67.23s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0397                                                         │
+│ User Cost: $0.0060                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 3: agent update_reservation_flights [write] ❌ 0.0                        │
+│ - 4: agent update_reservation_flights [write] ❌ 0.0                        │
+│                                                                             │
+│ Partial Action Reward: 3/5 (60.0%)                                          │
+│   Read:  3/3 (100.0%)                                                       │
+│   Write: 0/2 (0.0%)                                                         │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0397                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           3/3 (100.0%)                                    │
+│   ✏️  Write Actions          0/2 (0.0%)                                      │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (6/9) task 32: reward 0.0
+[GEMINI_API_KEY · custom_agent] task 33: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 33                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t33  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 33, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 33.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 33.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 33.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 33                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 102.22s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0595                                                         │
+│ User Cost: $0.0068                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 2: agent search_direct_flight [read] ❌ 0.0                               │
+│ - 3: agent update_reservation_flights [write] ✅ 1.0                        │
+│ - 4: agent update_reservation_baggages [write] ✅ 1.0                       │
+│                                                                             │
+│ Partial Action Reward: 4/5 (80.0%)                                          │
+│   Read:  2/3 (66.7%)                                                        │
+│   Write: 2/2 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0595                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/3 (66.7%)                                     │
+│   ✏️  Write Actions          2/2 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (7/9) task 33: reward 1.0
+[GEMINI_API_KEY · custom_agent] task 35: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 35                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t35  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 35, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(30s)
+  Retry 1/1 for task 35: UserMessage must have either content or tool_calls. 
+Got UserMessage
+is_final_chunk: True
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(5s R1)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(35s R1)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(65s R1)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(95s R1)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(125s R1)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 35                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 129.77s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0757                                                         │
+│ User Cost: $0.0055                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent book_reservation [write] ❌ 0.0                                  │
+│                                                                             │
+│ Partial Action Reward: 0/1 (0.0%)                                           │
+│   Write: 0/1 (0.0%)                                                         │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+  Task 35 succeeded on retry 1
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0757                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          0/1 (0.0%)                                      │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (8/9) task 35: reward 0.0
+[GEMINI_API_KEY · custom_agent] task 42: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 42                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t42  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 42, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 42.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 42.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 42.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 42                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 107.59s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0715                                                         │
+│ User Cost: $0.0020                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 3: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 4: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 5: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 6: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 7: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 8: agent cancel_reservation [write] ✅ 1.0                                │
+│ - 9: agent cancel_reservation [write] ✅ 1.0                                │
+│                                                                             │
+│ Partial Action Reward: 10/10 (100.0%)                                       │
+│   Read:  8/8 (100.0%)                                                       │
+│   Write: 2/2 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0715                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           8/8 (100.0%)                                    │
+│   ✏️  Write Actions          2/2 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (9/9) task 42: reward 0.0
+[GEMINI_API_KEY · custom_agent] FINE — completati 9, saltati 0, falliti 0 []
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         [GEMINI_API_KEY · custom_agent] task 29: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 29                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t29  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:10:28.968 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 29, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:10:29.855 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 29: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:10:31.981 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:10:32.121 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 29 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 29 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (5/9) task 29: FALLITO senza risultato
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 32                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t32  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:10:32.686 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 32, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:10:33.568 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 32: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:10:37.110 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:10:37.269 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 32 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 32 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] task 32: nessun risultato, attendo 90s
+[GEMINI_API_KEY · custom_agent] task 32: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 32                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t32  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:12:07.767 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 32, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:12:08.896 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 32: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:12:10.852 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:12:10.990 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 32 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 32 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (6/9) task 32: FALLITO senza risultato
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 33                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t33  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:12:11.618 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 33, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:12:12.773 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 33: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:12:14.833 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:12:14.981 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 33 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 33 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] task 33: nessun risultato, attendo 90s
+[GEMINI_API_KEY · custom_agent] task 33: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 33                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t33  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:13:45.537 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 33, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:13:46.524 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 33: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:13:48.446 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:13:48.593 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 33 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 33 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (7/9) task 33: FALLITO senza risultato
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 35                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t35  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:13:49.160 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 35, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:13:49.981 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 35: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:13:51.908 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:13:52.050 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 35 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 35 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] task 35: nessun risultato, attendo 90s
+[GEMINI_API_KEY · custom_agent] task 35: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 35                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t35  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:15:22.655 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 35, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:15:24.308 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 35: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:15:26.473 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:15:26.624 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 35 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 35 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (8/9) task 35: FALLITO senza risultato
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 42                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t42  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:15:27.160 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 42, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:15:27.989 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 42: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:15:29.989 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:15:30.138 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 42 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 42 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] task 42: nessun risultato, attendo 90s
+[GEMINI_API_KEY · custom_agent] task 42: scarto una simulazione incompleta
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 42                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s11_custom_agent_t42  Concurrency: 1  Verbose: False                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+2026-09-04 23:17:00.708 | ERROR    | tau2.utils.utils:get_commit_hash:102 - Failed to get git hash: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 3221225794.
+
+0/1 (trial 1/1). Running task 42, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:17:01.665 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Retry 1/1 for task 42: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-04 23:17:04.306 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+2026-09-04 23:17:04.548 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 42 failed after 2 attempts: litellm.AuthenticationError: GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+  Task 42 failed permanently after 2 attempts: litellm.AuthenticationError: 
+GeminiException - {
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "generativelanguage.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "API key not valid. Please pass a valid API key."
+      }
+    ]
+  }
+}
+
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY · custom_agent] (9/9) task 42: FALLITO senza risultato
+[GEMINI_API_KEY · custom_agent] FINE — completati 0, saltati 0, falliti 9 ['9', '17', '21', '24', '29', '32', '33', '35', '42']

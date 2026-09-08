@@ -1,0 +1,152 @@
+[32m2026-09-01 19:23:42.846[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-01 19:23:48.237[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m117[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-01 19:23:48.363[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-01 19:23:48.370[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-01 19:23:48.373[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+Rilancio solo 1 item: ['44']
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: Default  Tasks: 44                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: Not specified  Concurrency: 3  Verbose: False                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 44, trial 1
+19:23:52 - LiteLLM:WARNING: opentelemetry.py:212 - Proxy Server is not installed. Skipping OpenTelemetry initialization.
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(90s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(120s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(150s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 44                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 170.20s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.1046                                                         │
+│ User Cost: $0.0087                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 3: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 4: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 5: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 6: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 7: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 8: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 9: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 10: agent search_direct_flight [read] ✅ 1.0                              │
+│ - 11: agent search_direct_flight [read] ❌ 0.0                              │
+│ - 12: agent search_direct_flight [read] ❌ 0.0                              │
+│ - 13: agent search_direct_flight [read] ❌ 0.0                              │
+│ - 14: agent search_direct_flight [read] ✅ 1.0                              │
+│ - 15: agent search_direct_flight [read] ❌ 0.0                              │
+│ - 16: agent update_reservation_flights [write] ✅ 1.0                       │
+│ - 17: agent update_reservation_flights [write] ❌ 0.0                       │
+│ - 18: agent update_reservation_flights [write] ✅ 1.0                       │
+│                                                                             │
+│ Partial Action Reward: 14/19 (73.7%)                                        │
+│   Read:  12/16 (75.0%)                                                      │
+│   Write: 2/3 (66.7%)                                                        │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.1046                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           12/16 (75.0%)                                   │
+│   ✏️  Write Actions          2/3 (66.7%)                                     │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Individual Results: Hidden (1 items)
+💡 Set include_item_results=True to view them
+
+──────────────────────────────────────────────────
+🧪 Experiment: S5 round3 sonda 3 - clausola 3 (task 44)
+📋 Run name: S5 round3 sonda 3 - clausola 3 (task 44) - 2026-09-01T17:23:51.848436Z - custom_agent dopo il passo 1 di S5 (docs/s5-correzioni.md): clausola pagamenti riscritta per prenotazione, clausola di verifica policy prima di ogni scrittura, clausola parole di scopo rimossa. Stesso motore e stessi task del round1. Eseguito solo su ['44'], sullo stesso dataset (crea un Run in piu', non un dataset in piu').
+1 items
+Evaluations:
+  • unexpected_writes
+  • reward
+  • wrong_argument_writes
+  • db_check
+  • write_action_score
+
+Average Scores:
+  • unexpected_writes: 0.000
+  • reward: 0.000
+  • wrong_argument_writes: 2.000
+  • db_check: 0.000
+  • write_action_score: 0.667
+
+🔗 Dataset Run:
+   https://cloud.langfuse.com/project/cmtefvd6j05kqad0i158liz8k/datasets/cmthc7ovd06xrad0iwgx4j200/runs/66eb7116-6e17-40ae-bc5c-7b9a66bed3c9

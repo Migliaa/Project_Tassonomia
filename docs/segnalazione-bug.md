@@ -1,7 +1,8 @@
 # Segnalazione a sierra-research/tau2-bench
 
-Testo definitivo, pronto da incollare. Apri:
-<https://github.com/sierra-research/tau2-bench/issues/new>
+Inviata l’8 settembre 2026: **https://github.com/sierra-research/tau2-bench/issues/514**
+
+Qui sotto il testo come è stato pubblicato.
 
 ---
 

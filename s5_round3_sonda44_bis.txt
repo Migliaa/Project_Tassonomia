@@ -1,0 +1,1007 @@
+[32m2026-09-01 19:16:23.787[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-01 19:16:29.215[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m117[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-01 19:16:29.343[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-01 19:16:29.350[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-01 19:16:29.352[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+Rilancio solo 1 item: ['44']
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: Default  Tasks: 44                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: Not specified  Concurrency: 3  Verbose: False                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 44, trial 1
+19:16:34 - LiteLLM:WARNING: opentelemetry.py:212 - Proxy Server is not installed. Skipping OpenTelemetry initialization.
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(30s)
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 1430, in getresponse
+    response.begin()
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\ssl.py", line 1251, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\ssl.py", line 1103, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 490, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\util.py", line 39, in reraise
+    raise value
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 536, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 367, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Read timed out. (read timeout=5.0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\span_exporter.py", line 138, in export
+    return self._exporter.export(transformed_spans)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 690, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Read timed out. (read timeout=5.0)
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+Status: 0/1 complete. Avg reward: N/A. 1 running: 44.0(60s)
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-01 19:17:44.348 | ERROR    | tau2.utils.llm_utils:generate:443 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 136, in handle_request
+    raise exc
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 231, in _receive_event
+    raise RemoteProtocolError(msg)
+httpcore.RemoteProtocolError: Server disconnected without sending a response.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 3338, in completion
+    response = vertex_chat_completion.completion(  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\vertex_ai\gemini\vertex_and_google_ai_studio_gemini.py", line 2808, in completion
+    response = client.post(url=url, headers=headers, json=data, logging_obj=logging_obj)  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1044, in post
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1023, in post
+    response = self.client.send(req, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.RemoteProtocolError: Server disconnected without sending a response.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Server disconnected without sending a response.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\batch.py", line 426, in run_single_task
+    simulation = run_simulation(
+                 ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\simulation.py", line 59, in run_simulation
+    simulation = orchestrator.run()
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 280, in run
+    self.step()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 858, in step
+    agent_msg, self.agent_state = self.agent.generate_next_message(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\agent\custom_agent.py", line 242, in generate_next_message
+    assistant_message = self._generate_next_message(message, state)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\agent\custom_agent.py", line 285, in _generate_next_message
+    assistant_message = generate(
+                        ^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 444, in generate
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 435, in generate
+    response = completion(
+               ^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1693, in wrapper
+    return litellm.completion_with_retries(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4343, in completion_with_retries
+    return retryer(original_function, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1748, in wrapper
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\span_exporter.py", line 138, in export
+    return self._exporter.export(transformed_spans)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 165, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+  Retry 1/1 for task 44: litellm.APIConnectionError: GeminiException - [Errno 
+11001] getaddrinfo failed
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-01 19:17:45.801 | ERROR    | tau2.utils.llm_utils:generate:443 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+2026-09-01 19:17:45.837 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 44 failed after 2 attempts: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+  Task 44 failed permanently after 2 attempts: litellm.APIConnectionError: 
+GeminiException - [Errno 11001] getaddrinfo failed
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: Default  Tasks: 44                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: Not specified  Concurrency: 3  Verbose: False                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 44, trial 1
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-01 19:19:01.575 | ERROR    | tau2.utils.llm_utils:generate:443 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 3338, in completion
+    response = vertex_chat_completion.completion(  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\vertex_ai\gemini\vertex_and_google_ai_studio_gemini.py", line 2808, in completion
+    response = client.post(url=url, headers=headers, json=data, logging_obj=logging_obj)  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1044, in post
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1023, in post
+    response = self.client.send(req, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\batch.py", line 426, in run_single_task
+    simulation = run_simulation(
+                 ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\simulation.py", line 59, in run_simulation
+    simulation = orchestrator.run()
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 280, in run
+    self.step()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 837, in step
+    user_msg, self.user_state = self.user.generate_next_message(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\user\user_simulator.py", line 201, in generate_next_message
+    user_message = self._generate_next_message(message, state)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\user\user_simulator.py", line 235, in _generate_next_message
+    assistant_message = generate(
+                        ^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 444, in generate
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 435, in generate
+    response = completion(
+               ^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1693, in wrapper
+    return litellm.completion_with_retries(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4343, in completion_with_retries
+    return retryer(original_function, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1748, in wrapper
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\span_exporter.py", line 138, in export
+    return self._exporter.export(transformed_spans)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 165, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+  Retry 1/1 for task 44: litellm.APIConnectionError: GeminiException - [Errno 
+11001] getaddrinfo failed
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-01 19:19:02.883 | ERROR    | tau2.utils.llm_utils:generate:443 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+2026-09-01 19:19:02.916 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 44 failed after 2 attempts: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+  Task 44 failed permanently after 2 attempts: litellm.APIConnectionError: 
+GeminiException - [Errno 11001] getaddrinfo failed
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\utils.py", line 138, in run_async_safely
+    loop = asyncio.get_running_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\span_exporter.py", line 138, in export
+    return self._exporter.export(transformed_spans)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 165, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+Unexpected error occurred. Please check your request and contact support: https://langfuse.com/support.
+Individual Results: Hidden (1 items)
+💡 Set include_item_results=True to view them
+
+──────────────────────────────────────────────────
+🧪 Experiment: S5 round3 sonda 2 - clausola 3 (task 44)
+📋 Run name: S5 round3 sonda 2 - clausola 3 (task 44) - 2026-09-01T17:16:33.114708Z - custom_agent dopo il passo 1 di S5 (docs/s5-correzioni.md): clausola pagamenti riscritta per prenotazione, clausola di verifica policy prima di ogni scrittura, clausola parole di scopo rimossa. Stesso motore e stessi task del round1. Eseguito solo su ['44'], sullo stesso dataset (crea un Run in piu', non un dataset in piu').
+1 items
+Evaluations:
+  • unexpected_writes
+  • wrong_argument_writes
+  • reward
+  • write_action_score
+
+Average Scores:
+  • unexpected_writes: 0.000
+  • wrong_argument_writes: 0.000
+  • reward: 0.000
+  • write_action_score: 0.000
+

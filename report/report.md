@@ -1,6 +1,25 @@
 # Migliorare un agente AI cambiando solo il prompt
 
-*Sei passi, un benchmark pubblico, e un bug trovato per strada.*
+*Sei passi su un banco di prova pubblico, e un difetto trovato per strada.*
+
+---
+
+## Sintesi
+
+*Da mettere in apertura, prima dei passi.*
+
+Le aziende non mettono in produzione i modelli più potenti, ma i più economici: l'assistenza
+clienti si misura in milioni di conversazioni. Far rispettare un regolamento di quaranta pagine
+a un modello piccolo è quindi un problema commerciale, non accademico.
+
+Questo progetto misura quanto si guadagna agendo solo sul prompt — e soprattutto costruisce il
+modo di saperlo: ogni conversazione tracciata, metriche per singola azione, previsioni registrate
+prima dell'esperimento, ripetizioni per separare il risultato dal caso.
+
+È l'infrastruttura che resta quando il modello cambia. Ed è ciò che ha permesso di trovare un
+difetto nel benchmark stesso.
+
+*(98 parole)*
 
 ---
 
@@ -13,19 +32,17 @@ agente fa l'assistente di una compagnia aerea: parla con un cliente simulato da 
 consulta e modifica un database di prenotazioni vero, e deve rispettare un regolamento aziendale
 di quaranta pagine.
 
-Il punteggio è spietato: un task riesce **solo** se lo stato finale del database coincide
-esattamente con quello atteso **e** le informazioni richieste sono state comunicate al cliente.
-Non esistono mezzi voti.
+Un task riesce solo se lo stato finale del database coincide esattamente con quello atteso e le
+informazioni richieste sono state comunicate al cliente. Non esistono mezzi voti.
 
-La domanda del progetto era una sola, e volutamente stretta: **a modello fisso, quanto si può
-guadagnare cambiando solo il prompt?** Niente fine-tuning, niente secondo modello, niente
-strumenti aggiuntivi. Solo le istruzioni date all'agente.
+La domanda era una sola, e volutamente stretta: **a modello fisso, quanto si guadagna cambiando
+solo il prompt?** Niente addestramento, niente secondo modello, niente strumenti aggiuntivi.
 
-Il modello scelto è piccolo e senza capacità di ragionamento esplicito. È una scelta deliberata:
-su un modello già forte i margini di miglioramento sono minimi, e un eventuale guadagno sarebbe
-indistinguibile dal rumore.
+Il modello scelto è piccolo e senza ragionamento esplicito — la stessa classe che si usa quando
+un servizio deve reggere volumi veri. Il margine che si recupera lì non è un dettaglio da
+laboratorio: è la differenza fra un assistente che si può mettere in produzione e uno che no.
 
-*(146 parole)*
+*(151 parole)*
 
 ---
 
@@ -35,30 +52,30 @@ indistinguibile dal rumore.
 
 L'agente di default fornito dal benchmark risolve **34 task su 50**. È il numero da battere.
 
-Ma qui arriva il problema che ha definito tutto il progetto: il punteggio dice «fallito» e
-nient'altro. Sedici fallimenti, sedici scatole nere. Non si sa se l'agente abbia violato una
-regola, dimenticato un passaggio, o scelto l'opzione sbagliata fra due legittime.
+Ma il punteggio dice «fallito» e nient'altro. Sedici fallimenti, sedici scatole nere. Non si sa
+se l'agente abbia violato una regola, dimenticato un passaggio, o scelto l'opzione sbagliata fra
+due legittime.
 
 La prima cosa costruita non è stata quindi un agente migliore, ma **un modo di guardare**: ogni
-esecuzione viene tracciata su Langfuse, e il punteggio viene scomposto nelle sue due componenti
-— *ha comunicato correttamente?* e *ha lasciato il database nello stato giusto?* — insieme a
-metriche per singola azione: quante azioni non richieste, quante con argomenti sbagliati.
+esecuzione tracciata, e il punteggio scomposto nelle sue due componenti — *ha comunicato
+correttamente?* e *ha lasciato il database nello stato giusto?* — insieme a metriche per singola
+azione: quante azioni non richieste, quante con argomenti sbagliati.
 
-È una distinzione che sembra banale e non lo è. Un agente che comunica benissimo e non esegue
-nulla, e un agente che esegue azioni vietate senza dire niente, prendono lo stesso zero. Sono
-problemi opposti e richiedono correzioni opposte.
+Un agente che comunica benissimo e non esegue nulla, e un agente che esegue azioni vietate senza
+dire niente, prendono lo stesso zero. Sono problemi opposti e richiedono correzioni opposte:
+finché il punteggio resta un numero solo, non si sa nemmeno quale dei due si ha davanti.
 
-*(158 parole)*
+*(157 parole)*
 
 ---
 
 ## 3 · Leggere i fallimenti uno per uno
 
-**Figura A**: screenshot Langfuse — vedi `screenshot.md`, voce «traccia»
+**Figura A**: screenshot Langfuse — `screenshots/`, la traccia con `reward: 0.00`
 **Figura B**: `fig3-famiglie.svg`
 
-Nessuna scorciatoia: ogni fallimento è stato letto turno per turno, come si legge la
-registrazione di una telefonata. Da lì sono emerse tre famiglie con cause distinte.
+Ogni fallimento è stato letto turno per turno, come si legge la registrazione di una telefonata.
+Da lì sono emerse tre famiglie con cause distinte.
 
 **Non agisce.** L'agente descrive l'operazione così bene che il cliente crede sia già fatta, dice
 «sì» e chiude la conversazione — prima che l'azione parta. Comunicazione perfetta, database
@@ -71,12 +88,13 @@ sono nel passato, e cancella una prenotazione che il regolamento proteggeva.
 **Sceglie male.** Al cliente che chiede «il volo più economico verso la costa ovest», l'agente
 cerca una sola combinazione e prenota la prima valida. Valida, ma non la più economica.
 
-E leggendo è emerso qualcos'altro. Un task passava o falliva in modo apparentemente casuale, a
-parità di soluzione. La causa non era l'agente: era **un difetto nel modo in cui il benchmark
-confronta i risultati**. Due carte regalo elencate in ordine diverso producono un verdetto
-diverso. → *approfondimento a pagina dedicata*
+E leggendo è emerso qualcos'altro: un task che passava o falliva senza che l'agente cambiasse
+comportamento. La causa non era l'agente, ma **il modo in cui il benchmark confronta i
+risultati**. È diventata una segnalazione agli autori, aperta e verificabile
+([issue #514](https://github.com/sierra-research/tau2-bench/issues/514)) →
+*approfondimento a pagina dedicata*.
 
-*(211 parole)*
+*(197 parole)*
 
 ---
 
@@ -90,16 +108,16 @@ quello che ho fatto, per tre versioni consecutive. E il punteggio è **sceso**.
 La spiegazione è arrivata dalla letteratura, non dall'intuito: superata una certa densità di
 istruzioni — attorno alla ventina — i modelli piccoli iniziano a violarle **in silenzio**, senza
 alcun errore visibile. Il regolamento del dominio ne conteneva già una quarantina. Ogni clausola
-aggiunta per risolvere un problema ne slatentizzava un altro altrove.
-
-Un secondo esperimento ha chiuso la questione: riscrivendo **una sola** clausola, i fallimenti
-cambiavano su task che con quella clausola non c'entravano nulla. Il comportamento non era
-attribuibile alla regola, ma alla perturbazione del prompt nel suo insieme.
+aggiunta per chiudere un problema ne apriva un altro altrove.
 
 Conclusione scomoda ma utile: **su un modello piccolo, aggiungere istruzioni ha rendimenti
-negativi.** Bisognava cambiare metodo, non aggiungere righe.
+negativi.** Serviva cambiare metodo, non aggiungere righe.
 
-*(151 parole)*
+Una precisazione sul grafico, perché altrimenti inganna: il 78% della v1 viene da **una sola**
+esecuzione, l'80,5% della v6 dalla media di **quattro**. Non sono numeri della stessa
+attendibilità, e il perché è il passo 6.
+
+*(148 parole)*
 
 ---
 
@@ -107,80 +125,71 @@ negativi.** Bisognava cambiare metodo, non aggiungere righe.
 
 **Figura**: `fig5-prima-dopo.svg`
 
-Il cambio di metodo è stato questo: **smettere di scrivere regole e cominciare a rimuovere le
-cause.**
+Il cambio di metodo: **smettere di scrivere regole e cominciare a togliere le cause.**
 
-Un esempio concreto. Il modulo di conferma conteneva un esempio d'uso in cui l'agente aggiungeva
-bagagli gratuiti a cui il cliente aveva diritto. Quell'esempio insegnava un comportamento
-sbagliato: in un task reale l'agente ha aggiunto due bagagli a un cliente che aveva detto di non
-averne, giustificandoli con il diritto ad averli. **La correzione è stata togliere l'esempio**, e
-sostituire dieci righe di casistica con un principio solo: *un diritto non è un'istruzione*.
+Il prompt conteneva un esempio che mostrava all'agente come aggiungere bagagli gratuiti a un
+cliente che ne aveva diritto. In un task reale l'agente ha aggiunto due bagagli a un cliente che
+aveva appena detto di non averne — copiando l'esempio invece di ascoltare. **Il difetto non era
+una regola mancante: era un esempio che insegnava la cosa sbagliata.** Tolto l'esempio, dieci
+righe di casistica sono state sostituite da una frase: *un diritto non è un'istruzione*.
 
-Stessa logica per la famiglia «non agisce». Invece di aggiungere regole sul quando confermare,
-una riga sola apre ogni messaggio di conferma: *«non ho ancora fatto nessuna di queste
-modifiche»*. Toglie al cliente la ragione per riagganciare.
+Stessa logica per la famiglia «non agisce»: invece di regole su quando confermare, una riga apre
+ogni messaggio di conferma — *«non ho ancora fatto nessuna di queste modifiche»* — e toglie al
+cliente la ragione per riagganciare.
 
-Due righe al posto di due blocchi. E ogni modifica è stata **registrata come previsione prima di
-girare l'esperimento**: quali task specifici dovevano cambiare esito, e quali no. È ciò che
-distingue una correzione da un aggiustamento fortunato.
+Ogni modifica è stata registrata come previsione **prima** di girare l'esperimento: quali task
+dovevano cambiare esito e quali no. È ciò che distingue una correzione da un aggiustamento
+fortunato.
 
-*(174 parole)*
+*(163 parole)*
 
 ---
 
 ## 6 · Il risultato, e cosa non dice
 
 **Figura**: `fig6-risultato.svg`
+**Figura B**: screenshot Langfuse — `screenshots/`, le dieci esecuzioni a confronto
 
-Quattro esecuzioni complete, 200 simulazioni, come richiede lo standard dichiarato da Sierra per
-la propria classifica pubblica.
+Quattro esecuzioni complete, 200 simulazioni: **80,5% contro il 68%** dell'agente di default.
 
-**80,5% contro il 68% dell'agente di default.** Tre repliche su quattro battono il baseline in
-modo statisticamente significativo, e in due di esse il nuovo agente non perde **nemmeno un
-task**. Cinque task non li risolve nessuna versione: sono, in tutte e quattro le esecuzioni,
-esattamente quelli diagnosticati come difettosi nel benchmark o fuori dalla portata del modello.
+Ma i quattro giri servivano soprattutto a un'altra cosa. I singoli punteggi vanno da 74% a 86% —
+stesso agente, stessi task, campionamento deterministico. Con una sola esecuzione avrei
+pubblicato l'86% in buona fede, e sarebbe caduto alla prima verifica.
 
-Ma i quattro trial servivano soprattutto a misurare un'altra cosa. Presi singolarmente, i quattro
-punteggi vanno da 74% a 86%: **lo stesso agente, sugli stessi task, con temperatura a zero.** Con
-una sola esecuzione avrei pubblicato l'86% in buona fede, e sarebbe caduto alla prima verifica.
+Sull'affidabilità, infine, il nuovo agente è **alla pari** con quello di default: il guadagno è
+sul punteggio medio, non sulla costanza.
 
-E sull'affidabilità — riuscire più volte di fila sullo stesso task — il nuovo agente è **alla pari**
-con quello di default, non migliore. Il guadagno è sul punteggio medio, non sulla costanza.
-
-Dirlo è meno soddisfacente che fermarsi all'86%. È anche l'unica versione che regge a un
-controllo.
-
-*(184 parole)*
+*(76 parole)*
 
 ---
 
-# Pagina di approfondimento · Il bug
+# Pagina di approfondimento · Il difetto nel benchmark
 
 **Figura**: `fig-bug.svg`
 
-τ²-bench verifica il risultato confrontando due impronte digitali del database: quella prodotta
-dall'agente e quella attesa. Se coincidono, il task è superato.
+τ²-bench decide se un task è superato confrontando due impronte digitali del database: quella
+prodotta dall'agente e quella attesa.
 
-L'impronta si calcola serializzando il database in testo e ordinandone le chiavi
-(`json.dumps(..., sort_keys=True)`). Ma quell'ordinamento riguarda **le chiavi dei dizionari, non
-gli elementi delle liste**. E la cronologia dei pagamenti di una prenotazione è una lista.
+L'impronta si calcola mettendo il database in ordine e riducendolo a testo. Ma quell'ordinamento
+riguarda i campi, **non gli elementi di una lista** — e la cronologia dei pagamenti di una
+prenotazione è una lista.
 
-La conseguenza: due prenotazioni identiche — stesse carte, stessi importi, stesso totale — ma con
-i pagamenti elencati in ordine diverso, producono impronte diverse. Il benchmark le giudica
-differenti.
+Due prenotazioni identiche — stesse carte, stessi importi, stesso totale — ma con i pagamenti
+elencati in ordine diverso, producono impronte diverse. Il benchmark le giudica differenti.
 
-Verificato su due esecuzioni reali dello stesso agente. Unica differenza in tutta la chiamata:
-l'ordine di due carte regalo. Una esecuzione superata, l'altra bocciata.
+Verificato su due esecuzioni reali dello stesso agente: unica differenza in tutta la chiamata,
+l'ordine di due carte regalo. Una superata, l'altra bocciata.
 
-L'effetto va oltre il singolo falso negativo. Poiché l'ordine che un modello produce non è
-stabile, **il difetto inietta casualità nella metrica di affidabilità**: un task effettivamente
-risolto diventa una monetina. Un benchmark che misura proprio quanto un agente è costante viene
-reso, in quel punto, meno costante di quanto misuri.
+**Non è un errore del modello.** Le due risposte sono entrambe corrette, e nessuna regola dice in
+che ordine elencare i pagamenti: è il metro di misura a distinguere ciò che non andrebbe
+distinto. E poiché l'ordine che un modello produce non è stabile, il difetto rende un task
+risolto una monetina — proprio dentro un banco di prova che esiste per misurare quanto un agente
+è costante.
 
-Segnalazione preparata per gli autori.
+Segnalato agli autori: [issue #514](https://github.com/sierra-research/tau2-bench/issues/514).
 
-*(178 parole)*
+*(179 parole)*
 
 ---
 
-**Totale: ~1.202 parole**
+**Totale: ~1.170 parole**

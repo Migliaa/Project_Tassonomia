@@ -1,0 +1,765 @@
+[32m2026-09-02 23:16:00.250[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-02 23:16:06.294[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m119[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-02 23:16:06.574[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-02 23:16:06.587[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-02 23:16:06.589[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+[GEMINI_API_KEY_1 · custom_agent] 10 task da eseguire: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 0                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t0  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 0, trial 1
+23:16:09 - LiteLLM:WARNING: opentelemetry.py:212 - Proxy Server is not installed. Skipping OpenTelemetry initialization.
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 0                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 14.17s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0113                                                         │
+│ User Cost: $0.0037                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: {'note': 'No actions to evaluate'}                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0113                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (1/10) task 0: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 1                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t1  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 1, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 1.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 1.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 1                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 64.65s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0294                                                         │
+│ User Cost: $0.0036                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│                                                                             │
+│ Partial Action Reward: 2/2 (100.0%)                                         │
+│   Read:  2/2 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0294                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/2 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (2/10) task 1: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 2                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t2  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 2, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 2.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 2.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 2.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 2                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 111.00s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0434                                                         │
+│ User Cost: $0.0079                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent get_reservation_details [read] ✅ 1.0                            │
+│                                                                             │
+│ Partial Action Reward: 3/3 (100.0%)                                         │
+│   Read:  3/3 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0434                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           3/3 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (3/10) task 2: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 3                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t3  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 3, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 3.0(30s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 3                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 53.60s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0122                                                         │
+│ User Cost: $0.0021                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent get_user_details [read] ✅ 1.0                                   │
+│                                                                             │
+│ Partial Action Reward: 2/2 (100.0%)                                         │
+│   Read:  2/2 (100.0%)                                                       │
+│                                                                             │
+│ Communicate Checks:                                                         │
+│ - 0: 4 ✅                                                                   │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: None                                                           │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0122                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/2 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (4/10) task 3: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 4                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t4  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 4, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 4.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 4.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 4                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 67.20s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0334                                                         │
+│ User Cost: $0.0033                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 3: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 4: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 5: agent get_reservation_details [read] ✅ 1.0                            │
+│                                                                             │
+│ Partial Action Reward: 6/6 (100.0%)                                         │
+│   Read:  6/6 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0334                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           6/6 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (5/10) task 4: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 5                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t5  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 5, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 5.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 5.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 5.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 5                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 96.87s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0345                                                         │
+│ User Cost: $0.0050                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│                                                                             │
+│ Partial Action Reward: 1/1 (100.0%)                                         │
+│   Read:  1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0345                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/1 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (6/10) task 5: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 6                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t6  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 6, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 6.0(30s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 6                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 47.46s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0135                                                         │
+│ User Cost: $0.0036                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ❌ 0.0                            │
+│                                                                             │
+│ Partial Action Reward: 0/1 (0.0%)                                           │
+│   Read:  0/1 (0.0%)                                                         │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0135                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           0/1 (0.0%)                                      │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (7/10) task 6: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 7                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t7  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 7, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 7.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 7.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 7                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 79.23s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0597                                                         │
+│ User Cost: $0.0048                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 0.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent update_reservation_flights [write] ✅ 1.0                        │
+│ - 3: agent cancel_reservation [write] ✅ 1.0                                │
+│ - 4: agent cancel_reservation [write] ✅ 1.0                                │
+│                                                                             │
+│ Partial Action Reward: 5/5 (100.0%)                                         │
+│   Read:  2/2 (100.0%)                                                       │
+│   Write: 3/3 (100.0%)                                                       │
+│                                                                             │
+│ Communicate Checks:                                                         │
+│ - 0: 1628 ❌                                                                │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: None                                                           │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0597                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/2 (100.0%)                                    │
+│   ✏️  Write Actions          3/3 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (8/10) task 7: reward 0.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 8                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t8  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 8, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 8.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 8.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 8.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 8                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 94.88s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0369                                                         │
+│ User Cost: $0.0053                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 3: agent book_reservation [write] ✅ 1.0                                  │
+│                                                                             │
+│ Partial Action Reward: 4/4 (100.0%)                                         │
+│   Read:  3/3 (100.0%)                                                       │
+│   Write: 1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0369                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           3/3 (100.0%)                                    │
+│   ✏️  Write Actions          1/1 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (9/10) task 8: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 9                                │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s8_custom_agent_t9  Concurrency: 1  Verbose: False                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 9, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 9.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 9.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 9                                                                  │
+│ Trial: 0                                                                    │
+│ Duration: 63.24s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0241                                                         │
+│ User Cost: $0.0052                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent search_direct_flight [read] ✅ 1.0                               │
+│                                                                             │
+│ Partial Action Reward: 1/1 (100.0%)                                         │
+│   Read:  1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0241                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/1 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_1 · custom_agent] (10/10) task 9: reward 1.0
+[GEMINI_API_KEY_1 · custom_agent] FINE — completati 10, saltati 0, falliti 0 []

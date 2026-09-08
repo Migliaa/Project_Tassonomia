@@ -1,0 +1,1074 @@
+[32m2026-09-02 22:26:57.744[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-02 22:27:12.398[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m119[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-02 22:27:12.964[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-02 22:27:12.986[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-02 22:27:12.990[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+[GEMINI_API_KEY_4 · custom_agent] 10 task da eseguire: ['30', '31', '32', '33', '34', '35', '36', '37', '38', '39']
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 30                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t30  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 30, trial 1
+22:27:19 - LiteLLM:WARNING: opentelemetry.py:212 - Proxy Server is not installed. Skipping OpenTelemetry initialization.
+Status: 0/1 complete. Avg reward: N/A. 1 running: 30.0(30s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 30                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 29.96s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0216                                                         │
+│ User Cost: $0.0043                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 2: agent update_reservation_flights [write] ✅ 1.0                        │
+│                                                                             │
+│ Partial Action Reward: 3/3 (100.0%)                                         │
+│   Read:  2/2 (100.0%)                                                       │
+│   Write: 1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0216                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/2 (100.0%)                                    │
+│   ✏️  Write Actions          1/1 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (1/10) task 30: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 31                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t31  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 31, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 31.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 31.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 31.0(90s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 31.0(120s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 31                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 135.70s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0217                                                         │
+│ User Cost: $0.0039                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: {'note': 'No actions to evaluate'}                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0217                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (2/10) task 31: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 32                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t32  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 32, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 32.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 32.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 32                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 70.31s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0394                                                         │
+│ User Cost: $0.0074                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 3: agent update_reservation_flights [write] ❌ 0.0                        │
+│ - 4: agent update_reservation_flights [write] ❌ 0.0                        │
+│                                                                             │
+│ Partial Action Reward: 3/5 (60.0%)                                          │
+│   Read:  3/3 (100.0%)                                                       │
+│   Write: 0/2 (0.0%)                                                         │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0394                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           3/3 (100.0%)                                    │
+│   ✏️  Write Actions          0/2 (0.0%)                                      │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (3/10) task 32: reward 0.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 33                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t33  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 33, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 33.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 33.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 33                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 81.14s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0487                                                         │
+│ User Cost: $0.0081                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 2: agent search_direct_flight [read] ✅ 1.0                               │
+│ - 3: agent update_reservation_flights [write] ✅ 1.0                        │
+│ - 4: agent update_reservation_baggages [write] ❌ 0.0                       │
+│                                                                             │
+│ Partial Action Reward: 4/5 (80.0%)                                          │
+│   Read:  3/3 (100.0%)                                                       │
+│   Write: 1/2 (50.0%)                                                        │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0487                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           3/3 (100.0%)                                    │
+│   ✏️  Write Actions          1/2 (50.0%)                                     │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (4/10) task 33: reward 0.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 34                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t34  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 34, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 34.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 34.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 34                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 75.98s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0352                                                         │
+│ User Cost: $0.0063                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: {'note': 'No actions to evaluate'}                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0352                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (5/10) task 34: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 35                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t35  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 35, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(60s)
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-02 22:46:29.949 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+Status: 0/1 complete. Avg reward: N/A. 1 running: 35.0(739s)
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 136, in handle_request
+    raise exc
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpcore\_sync\http11.py", line 231, in _receive_event
+    raise RemoteProtocolError(msg)
+httpcore.RemoteProtocolError: Server disconnected without sending a response.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 3338, in completion
+    response = vertex_chat_completion.completion(  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\vertex_ai\gemini\vertex_and_google_ai_studio_gemini.py", line 2808, in completion
+    response = client.post(url=url, headers=headers, json=data, logging_obj=logging_obj)  # type: ignore
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1044, in post
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\llms\custom_httpx\http_handler.py", line 1023, in post
+    response = self.client.send(req, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.RemoteProtocolError: Server disconnected without sending a response.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - Server disconnected without sending a response.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\batch.py", line 426, in run_single_task
+    simulation = run_simulation(
+                 ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\runner\simulation.py", line 59, in run_simulation
+    simulation = orchestrator.run()
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 280, in run
+    self.step()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\orchestrator\orchestrator.py", line 837, in step
+    user_msg, self.user_state = self.user.generate_next_message(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\user\user_simulator.py", line 201, in generate_next_message
+    user_message = self._generate_next_message(message, state)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\user\user_simulator.py", line 235, in _generate_next_message
+    assistant_message = generate(
+                        ^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 492, in generate
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\src\tau2\utils\llm_utils.py", line 483, in generate
+    response = completion(
+               ^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1693, in wrapper
+    return litellm.completion_with_retries(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4343, in completion_with_retries
+    return retryer(original_function, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\tenacity\__init__.py", line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1748, in wrapper
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\utils.py", line 1569, in wrapper
+    result = original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\main.py", line 4305, in completion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2398, in exception_type
+    raise e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\litellm\litellm_core_utils\exception_mapping_utils.py", line 2367, in exception_type
+    raise APIConnectionError(
+litellm.exceptions.APIConnectionError: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\langfuse\_client\span_exporter.py", line 138, in export
+    return self._exporter.export(transformed_spans)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 165, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPSConnection(host='cloud.langfuse.com', port=443): Failed to resolve 'cloud.langfuse.com' ([Errno 11001] getaddrinfo failed)"))
+  Retry 1/1 for task 35: litellm.APIConnectionError: GeminiException - [Errno 
+11001] getaddrinfo failed
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+2026-09-02 22:46:31.880 | ERROR    | tau2.utils.llm_utils:generate:491 - litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+2026-09-02 22:46:31.980 | ERROR    | tau2.runner.progress:run_with_retry:101 - Task 35 failed after 2 attempts: litellm.APIConnectionError: GeminiException - [Errno 11001] getaddrinfo failed
+
+  Task 35 failed permanently after 2 attempts: litellm.APIConnectionError: 
+GeminiException - [Errno 11001] getaddrinfo failed
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   ⚠️  Infra Errors           1 (excluded from metrics below)                 │
+│   Evaluated                 0                                               │
+│   Total Tasks               0                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│   💰 Avg Cost/Conversation  $0.0000                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           -                                               │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               Not checked: 0                                  │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            0 (👤 0 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│                             No review data available                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] task 35: nessun risultato, attendo 90s
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 35                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t35  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+File 
+C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data\simulations\s7_custo
+m_agent_t35\results.json already exists. Do you want to resume the run? (y/n) [GEMINI_API_KEY_4 · custom_agent] task 35 tentativo 2: eccezione EOFError: EOF when reading a line
+[GEMINI_API_KEY_4 · custom_agent] (6/10) task 35: FALLITO senza risultato
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 36                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t36  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 36, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 36.0(30s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 36                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 48.12s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0138                                                         │
+│ User Cost: $0.0036                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│                                                                             │
+│ Partial Action Reward: 1/1 (100.0%)                                         │
+│   Read:  1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0138                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/1 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (7/10) task 36: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 37                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t37  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 37, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 37.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 37.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 37                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 65.92s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0322                                                         │
+│ User Cost: $0.0047                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 1: agent search_direct_flight [read] ❌ 0.0                               │
+│ - 2: agent search_direct_flight [read] ❌ 0.0                               │
+│ - 3: agent update_reservation_flights [write] ✅ 1.0                        │
+│                                                                             │
+│ Partial Action Reward: 2/4 (50.0%)                                          │
+│   Read:  1/3 (33.3%)                                                        │
+│   Write: 1/1 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0322                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           1/3 (33.3%)                                     │
+│   ✏️  Write Actions          1/1 (100.0%)                                    │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (8/10) task 37: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 38                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t38  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 38, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 38.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 38.0(60s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 38.0(90s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 38                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 115.01s                                                           │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0455                                                         │
+│ User Cost: $0.0052                                                          │
+│ Reward: ✅ 1.0000 (COMMUNICATE: 1.0, DB: 1.0)                               │
+│                                                                             │
+│ DB Check:✅ 1.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│                                                                             │
+│ Partial Action Reward: 2/2 (100.0%)                                         │
+│   Read:  2/2 (100.0%)                                                       │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         1.0000                                          │
+│      Pass^1                 1.000                                           │
+│   💰 Avg Cost/Conversation  $0.0455                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           2/2 (100.0%)                                    │
+│   ✏️  Write Actions          -                                               │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 1 / ✗ 0 (100.0%)                              │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (9/10) task 38: reward 1.0
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 39                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t39  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+0/1 (trial 1/1). Running task 39, trial 1
+Status: 0/1 complete. Avg reward: N/A. 1 running: 39.0(30s)
+Status: 0/1 complete. Avg reward: N/A. 1 running: 39.0(60s)
+┌──────────────────────────── Simulation Overview ────────────────────────────┐
+│ Task ID: 39                                                                 │
+│ Trial: 0                                                                    │
+│ Duration: 73.68s                                                            │
+│ Mode: half_duplex                                                           │
+│ Termination Reason: TerminationReason.USER_STOP                             │
+│ Agent Cost: $0.0434                                                         │
+│ User Cost: $0.0040                                                          │
+│ Reward: ❌ 0.0000 (COMMUNICATE: 1.0, DB: 0.0)                               │
+│                                                                             │
+│ DB Check:❌ 0.0                                                             │
+│                                                                             │
+│ Action Checks:                                                              │
+│ - 0: agent get_user_details [read] ✅ 1.0                                   │
+│ - 1: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 2: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 3: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 4: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 5: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 6: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 7: agent get_reservation_details [read] ✅ 1.0                            │
+│ - 8: agent cancel_reservation [write] ✅ 1.0                                │
+│ - 9: agent cancel_reservation [write] ✅ 1.0                                │
+│ - 10: agent cancel_reservation [write] ❌ 0.0                               │
+│                                                                             │
+│ Partial Action Reward: 10/11 (90.9%)                                        │
+│   Read:  8/8 (100.0%)                                                       │
+│   Write: 2/3 (66.7%)                                                        │
+│                                                                             │
+│ Additional Info:                                                            │
+│ env: None                                                                   │
+│ nl: None                                                                    │
+│ communicate: {'note': 'No communicate_info to evaluate'}                    │
+│ action: None                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Successfully completed all simulations!
+To review the simulations, run: tau2 view
+┌───────────────────────── Agent Performance Metrics ─────────────────────────┐
+│   ═══ Overview ═══                                                          │
+│   Total Simulations         1                                               │
+│   Total Tasks               1                                               │
+│                                                                             │
+│   ═══ Reward Metrics ═══                                                    │
+│   🏆 Average Reward         0.0000                                          │
+│      Pass^1                 0.000                                           │
+│   💰 Avg Cost/Conversation  $0.0434                                         │
+│                                                                             │
+│   ═══ Action Metrics ═══                                                    │
+│   📖 Read Actions           8/8 (100.0%)                                    │
+│   ✏️  Write Actions          2/3 (66.7%)                                     │
+│                                                                             │
+│   ═══ DB Match ═══                                                          │
+│   🗄️  DB Match               ✓ 0 / ✗ 1 (0.0%)                                │
+│                                                                             │
+│   ═══ Authentication ═══                                                    │
+│      Not Checked            1                                               │
+│                                                                             │
+│   ═══ Termination ═══                                                       │
+│   🛑 Normal Stop            1 (👤 1 / 🤖 0)                                 │
+│                                                                             │
+│   ═══ LLM Judge Review ═══                                                  │
+│   🤖 Agent Errors           0 errors                                        │
+│      Sims by severity       -                                               │
+│   👤 User Errors            0 errors                                        │
+│      Sims by severity       -                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+[GEMINI_API_KEY_4 · custom_agent] (10/10) task 39: reward 0.0
+[GEMINI_API_KEY_4 · custom_agent] FINE — completati 9, saltati 0, falliti 1 ['35']

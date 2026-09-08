@@ -34,7 +34,7 @@ therefore hash differently and are judged different.
 Verified on two runs of the same agent differing only in the order of two gift cards: one
 passes, one fails. Because the ordering an LLM emits is unstable, this does not merely produce
 false negatives — it injects variance into `pass^k`, the very metric the benchmark exists to
-measure. Full write-up: [`docs/segnalazione-bug.md`](docs/segnalazione-bug.md).
+measure. Reported upstream as [sierra-research/tau2-bench#514](https://github.com/sierra-research/tau2-bench/issues/514); full write-up in [`docs/segnalazione-bug.md`](docs/segnalazione-bug.md).
 
 ## Method
 

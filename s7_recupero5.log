@@ -1,0 +1,63 @@
+[32m2026-09-02 22:54:31.765[0m | [1mINFO    [0m | [36mtau2.utils.utils[0m:[36m<module>[0m:[36m28[0m - [1mUsing data directory from source: C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data[0m
+[32m2026-09-02 22:54:45.127[0m | [1mINFO    [0m | [36mtau2.utils.llm_utils[0m:[36m<module>[0m:[36m119[0m - [1mLiteLLM: Cache is disabled[0m
+[32m2026-09-02 22:54:45.711[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m282[0m - [34m[1mRegistering default components...[0m
+[32m2026-09-02 22:54:45.737[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m293[0m - [34m[1mVoice dependencies not installed, skipping voice user registration[0m
+[32m2026-09-02 22:54:45.739[0m | [34m[1mDEBUG   [0m | [36mtau2.registry[0m:[36m<module>[0m:[36m352[0m - [34m[1mDefault components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "custom_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}[0m
+[GEMINI_API_KEY_5 · custom_agent] 1 task da eseguire: ['44']
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 44                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t44  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+File 
+C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data\simulations\s7_custo
+m_agent_t44\results.json already exists. Do you want to resume the run? (y/n) [GEMINI_API_KEY_5 · custom_agent] task 44 tentativo 1: eccezione EOFError: EOF when reading a line
+[GEMINI_API_KEY_5 · custom_agent] task 44: nessun risultato, attendo 90s
+┌───────────────────────── Simulation Configuration ──────────────────────────┐
+│ Domain: airline  Task Set: airline  Tasks: 44                               │
+│ Trials: 1  Max Steps: 200  Max Errors: 10                                   │
+│                                                                             │
+│ Agent: custom_agent → gemini/gemini-3.5-flash-lite                          │
+│ User:  user_simulator → gemini/gemini-3.5-flash-lite                        │
+│                                                                             │
+│ Save: s7_custom_agent_t44  Concurrency: 1  Verbose: False                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+File 
+C:\Users\andre\Desktop\Progetti\tassonomia\tau2-bench\data\simulations\s7_custo
+m_agent_t44\results.json already exists. Do you want to resume the run? (y/n) [GEMINI_API_KEY_5 · custom_agent] task 44 tentativo 2: eccezione EOFError: EOF when reading a line
+[GEMINI_API_KEY_5 · custom_agent] (1/1) task 44: FALLITO senza risultato
+[GEMINI_API_KEY_5 · custom_agent] FINE — completati 0, saltati 0, falliti 1 ['44']
