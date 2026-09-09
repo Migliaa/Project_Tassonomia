@@ -2,6 +2,8 @@
 
 *Sei passi su un banco di prova pubblico, e un difetto trovato per strada.*
 
+Testo approvato da Andrea l'8 settembre 2026. Istruzioni per l'implementazione: `CONSEGNA.md`.
+
 ---
 
 ## Sintesi
@@ -16,10 +18,9 @@ Questo progetto misura quanto si guadagna agendo solo sul prompt — e soprattut
 modo di saperlo: ogni conversazione tracciata, metriche per singola azione, previsioni registrate
 prima dell'esperimento, ripetizioni per separare il risultato dal caso.
 
-È l'infrastruttura che resta quando il modello cambia. Ed è ciò che ha permesso di trovare un
-difetto nel benchmark stesso.
+È l'infrastruttura che resta quando il modello cambia.
 
-*(98 parole)*
+*(85 parole)*
 
 ---
 
@@ -39,10 +40,9 @@ La domanda era una sola, e volutamente stretta: **a modello fisso, quanto si gua
 solo il prompt?** Niente addestramento, niente secondo modello, niente strumenti aggiuntivi.
 
 Il modello scelto è piccolo e senza ragionamento esplicito — la stessa classe che si usa quando
-un servizio deve reggere volumi veri. Il margine che si recupera lì non è un dettaglio da
-laboratorio: è la differenza fra un assistente che si può mettere in produzione e uno che no.
+un servizio deve reggere volumi veri.
 
-*(151 parole)*
+*(125 parole)*
 
 ---
 
@@ -56,7 +56,7 @@ Ma il punteggio dice «fallito» e nient'altro. Sedici fallimenti, sedici scatol
 se l'agente abbia violato una regola, dimenticato un passaggio, o scelto l'opzione sbagliata fra
 due legittime.
 
-La prima cosa costruita non è stata quindi un agente migliore, ma **un modo di guardare**: ogni
+La prima cosa costruita non è stata quindi un agente migliore, ma **un modo per guardare**: ogni
 esecuzione tracciata, e il punteggio scomposto nelle sue due componenti — *ha comunicato
 correttamente?* e *ha lasciato il database nello stato giusto?* — insieme a metriche per singola
 azione: quante azioni non richieste, quante con argomenti sbagliati.
@@ -71,7 +71,7 @@ finché il punteggio resta un numero solo, non si sa nemmeno quale dei due si ha
 
 ## 3 · Leggere i fallimenti uno per uno
 
-**Figura A**: screenshot Langfuse — `screenshots/`, la traccia con `reward: 0.00`
+**Figura A**: `screenshots/` — la traccia Langfuse con `reward: 0.00`
 **Figura B**: `fig3-famiglie.svg`
 
 Ogni fallimento è stato letto turno per turno, come si legge la registrazione di una telefonata.
@@ -82,8 +82,6 @@ Da lì sono emerse tre famiglie con cause distinte.
 intatto.
 
 **Agisce troppo.** L'agente si scrive da solo una giustificazione e la usa come autorizzazione.
-In un caso reale scrive *«nessun volo è stato ancora effettuato»* due righe sotto delle date che
-sono nel passato, e cancella una prenotazione che il regolamento proteggeva.
 
 **Sceglie male.** Al cliente che chiede «il volo più economico verso la costa ovest», l'agente
 cerca una sola combinazione e prenota la prima valida. Valida, ma non la più economica.
@@ -94,7 +92,7 @@ risultati**. È diventata una segnalazione agli autori, aperta e verificabile
 ([issue #514](https://github.com/sierra-research/tau2-bench/issues/514)) →
 *approfondimento a pagina dedicata*.
 
-*(197 parole)*
+*(165 parole)*
 
 ---
 
@@ -137,29 +135,28 @@ Stessa logica per la famiglia «non agisce»: invece di regole su quando conferm
 ogni messaggio di conferma — *«non ho ancora fatto nessuna di queste modifiche»* — e toglie al
 cliente la ragione per riagganciare.
 
-Ogni modifica è stata registrata come previsione **prima** di girare l'esperimento: quali task
-dovevano cambiare esito e quali no. È ciò che distingue una correzione da un aggiustamento
-fortunato.
+Ogni modifica è stata registrata come previsione prima di girare l'esperimento — quali task
+dovevano cambiare esito e quali no — in modo tale che l'esperimento potesse smentirmi, invece di
+darmi ragione comunque.
 
-*(163 parole)*
+*(165 parole)*
 
 ---
 
 ## 6 · Il risultato, e cosa non dice
 
-**Figura**: `fig6-risultato.svg`
-**Figura B**: screenshot Langfuse — `screenshots/`, le dieci esecuzioni a confronto
+**Figura A**: `fig6-risultato.svg`
+**Figura B**: `screenshots/` — le dieci esecuzioni a confronto nel dataset
 
 Quattro esecuzioni complete, 200 simulazioni: **80,5% contro il 68%** dell'agente di default.
 
 Ma i quattro giri servivano soprattutto a un'altra cosa. I singoli punteggi vanno da 74% a 86% —
-stesso agente, stessi task, campionamento deterministico. Con una sola esecuzione avrei
-pubblicato l'86% in buona fede, e sarebbe caduto alla prima verifica.
+stesso agente, stessi task, campionamento deterministico.
 
 Sull'affidabilità, infine, il nuovo agente è **alla pari** con quello di default: il guadagno è
 sul punteggio medio, non sulla costanza.
 
-*(76 parole)*
+*(63 parole)*
 
 ---
 
@@ -186,10 +183,12 @@ distinto. E poiché l'ordine che un modello produce non è stabile, il difetto r
 risolto una monetina — proprio dentro un banco di prova che esiste per misurare quanto un agente
 è costante.
 
-Segnalato agli autori: [issue #514](https://github.com/sierra-research/tau2-bench/issues/514).
+Segnalato agli autori: [issue #514](https://github.com/sierra-research/tau2-bench/issues/514),
+collegata a [#325](https://github.com/sierra-research/tau2-bench/issues/325), che aveva osservato
+lo stesso sintomo su un altro dominio senza individuarne la causa.
 
-*(179 parole)*
+*(196 parole)*
 
 ---
 
-**Totale: ~1.170 parole**
+**Totale: ~1.104 parole**
