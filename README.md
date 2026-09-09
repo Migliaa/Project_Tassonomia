@@ -14,8 +14,10 @@ all 50 airline tasks.
 | default `llm_agent` (benchmark's own) | 68.0% | 34/50, single run |
 | our agent, v6 | **80.5%** | average of 4 full trials (200 simulations) |
 
-Per trial: 82% / 74% / 80% / 86%. Three of the four beat the baseline with McNemar
-*p* = 0.039 / 0.508 / 0.031 / 0.004; in two of them the agent loses **no** task to the baseline.
+Per trial: 82% / 74% / 80% / 86%, McNemar *p* = 0.039 / 0.508 / 0.031 / 0.004 — trials 1, 3 and
+4 reach significance (*p* < 0.05), trial 2 doesn't; in two of the three the agent loses **no**
+task to the baseline. No correction for multiple comparisons is applied across the four
+replications.
 
 Two things this result does **not** say, both documented rather than hidden:
 

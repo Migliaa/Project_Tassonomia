@@ -95,3 +95,10 @@ attiva e' confrontabile solo con altri numeri prodotti con la patch attiva. Il b
 rigirato nelle stesse condizioni, e la cosa va dichiarata nel report (precedente: la
 submission Anthropic `claude-sonnet-4-5_anthropic_2025-10-02` sulla leaderboard ufficiale fa
 la stessa cosa e la dichiara).
+
+**Non attiva nei numeri pubblicati**: dopo la sonda `s12` (v5 senza backport sui task 17, 21,
+33, per isolare le due correzioni) questa patch e' stata rimossa dal clone di lavoro e non era
+applicata in nessuno dei run che contano per il risultato finale — ne' i quattro trial v6
+(`s15`-`s18`) sottomessi alla classifica, ne' i baseline con cui sono confrontati. Resta qui
+solo come contributo documentato (vedi README principale e issue tracker), non come parte
+della submission.
