@@ -3040,6 +3040,58 @@ Resta vero che non abbiamo comprato affidabilità; non è vero che l'abbiamo peg
 **Limite dichiarato**: il baseline ha due esecuzioni, non quattro. Un pass^4 del baseline non lo
 possiamo calcolare, e il confronto a k=4 resta aperto.
 
+## 2026-09-09 — Due correzioni prima della submission, trovate da una revisione avversariale
+
+Prima di aprire la pull request a Sierra ho fatto revisionare submission, issue e report da un
+agente istruito a cercare **motivi per non pubblicare**, non a confermare il lavoro fatto. Due
+cose sono risultate vere e sono state corrette prima che qualcun altro le trovasse.
+
+### La provenienza dei commit nei 200 run
+
+I quattro trial v6 (`s15`-`s18`) sono stati eseguiti come run per-task singoli, per via dei
+retry dopo le interruzioni di quota giornaliera (vedi le voci del 2026-09-05 sopra). Fra un
+retry e l'altro il clone locale di `tau2-bench` veniva aggiornato, quindi i 200 run coprono in
+realtà **sei commit diversi** del repository a monte, non uno solo:
+
+| trial | commit | n |
+|---|---|---|
+| s15 | `ccfd89f65593c430f8a4906829601c4a792ea3e4` | 49 |
+| s15 | `6b1bba5b1894612430083f7274ffe3e26391d0bf` | 1 |
+| s16 | `ccfd89f65593c430f8a4906829601c4a792ea3e4` | 34 |
+| s16 | `ebadf721929fef8878b9cb1e31bffed18ae5bad2` | 16 |
+| s17 | `fd358b320f7d511b4b007d1f1f0ed4b2784b21d6` | 40 |
+| s17 | `e7f5babe61325efd53a3bf2ec63803b647545a47` | 10 |
+| s18 | `d7560a4b9f9d8acbe66e1fe8ca374f76b7be0437` | 50 |
+
+Lo script che unisce i 50 file per-task in un unico `results.json` per trial (necessario per
+`tau2 submit prepare`, che rifiuta un file per trial e ne vuole uno solo per dominio) prendeva il
+commit dal primo file processato — che per puro ordine di cartella era proprio l'unico run fuori
+norma di `s15` (1 caso su 200). La submission dichiarava quindi un commit che valeva per una sola
+simulazione, non per le altre 199.
+
+Verificato prima di correggere: definizione dei task e configurazione di agente/simulatore
+(`agent_info`, `user_info`, `environment_info`, modello, temperatura) sono **identiche byte per
+byte** su tutti i 200 run, a prescindere dal commit — quindi non è una contaminazione dei
+risultati, solo un campo di metadato sbagliato. Corretto scegliendo il commit più frequente
+(`ccfd89f6...`, 83/200 — pluralità, non maggioranza assoluta) e dichiarando la varianza nelle
+note della submission, con rimando a questa tabella.
+
+### La issue #514 sovrastimava se stessa
+
+L'ultima riga della issue diceva: *"Two tasks (14 and 23) failed for this reason alone"* — cioè
+che i due task erano falliti **solo** per il difetto di ordinamento delle liste nell'hash. Non è
+vero per nessuno dei due, controllando `reward_breakdown` sui 4 trial:
+
+| task | s15 | s16 | s17 | s18 |
+|---|---|---|---|---|
+| 14 | DB 1 / COM 1 (pass) | **DB 0 / COM 1** (pattern del bug) | DB 0 / COM 0 (fallimento vero) | DB 0 / COM 0 (fallimento vero) |
+| 23 | DB 0 / COM 0 (fallimento vero) | **DB 0 / COM 1** (pattern del bug) | **DB 0 / COM 1** (pattern del bug) | **DB 0 / COM 1** (pattern del bug) |
+
+Su 7 fallimenti totali fra i due task, solo 4 hanno la firma del bug (`DB 0, COMMUNICATE 1`); gli
+altri 3 sono fallimenti indipendenti dell'agente (`COMMUNICATE 0`), che il bug non spiega. La
+segnalazione conserva il meccanismo e la riproduzione minima, che restano corretti — solo la
+frase di chiusura andava ridimensionata. Corretta con un commento sulla issue #514.
+
 ## Registro spesa API (tetto €20)
 
 | Data | Run | Task | Modello | Costo | Totale progressivo |
